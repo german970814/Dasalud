@@ -1,0 +1,4 @@
+Django==1.11.1
+django-environ==0.4.3
+django-tenant-schemas==1.8.0
+psycopg2==2.7.1
