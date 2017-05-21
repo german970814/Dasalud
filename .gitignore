@@ -3,3 +3,4 @@
 .vscode
 *.pyc
 dasalud/settings/.env
+static/bower_components

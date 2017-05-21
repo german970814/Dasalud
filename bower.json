@@ -1,0 +1,10 @@
+{
+  "name": "dasalud",
+  "authors": [
+    "Ingeniarte Soft"
+  ],
+  "private": true,
+  "dependencies": {
+    "app-layout": "PolymerElements/app-layout#^2.0.0"
+  }
+}
