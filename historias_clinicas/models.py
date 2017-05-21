@@ -16,6 +16,7 @@ class Paciente(models.Model):
     apellidos = models.CharField(_lazy('apellidos'), max_length=150)
     genero = models.CharField(_lazy('genero'), max_length=1, choices=GENEROS)
     fecha_nacimiento = models.DateField(_lazy('fecha de nacimiento'))
-    tipo_sangre = models.CharField(_lazy('tipo de sangre'))
+    tipo_sangre = models.CharField(_lazy('tipo de sangre'), max_length=1)
     fecha_ingreso = models.DateField(_lazy('fecha de ingreso'))
+
 
