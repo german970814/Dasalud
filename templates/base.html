@@ -39,7 +39,18 @@
                 app-header paper-icon-button {
                     --paper-icon-button-ink-color: white;
                 }
+
+                .card {
+                    margin: 24px;
+                    padding: 16px;
+                    color: #757575;
+                    border-radius: 5px;
+                    background-color: #fff;
+                    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+                }
             </style>
+
+            {% block css %}{% endblock css %}
         </custom-style>
     </head>
     <body> 
@@ -54,10 +65,24 @@
 
             <app-drawer-layout>
                 <app-drawer slot="drawer" id="drawer">
-                    <app-toolbar>Menu</app-toolbar>
+                    <!--<app-toolbar>Menu</app-toolbar>-->
+                    <app-menu>
+                        <app-submenu>
+                            <div class="app-menu-item" slot="submenu-trigger">
+                            <app-menu-icon-item icon="my-icons:people">Pacientes</app-menu-icon-item>
+                            <iron-icon icon="my-icons:expand-more" class="expand-icon"></iron-icon>
+                            </div>
+                            <app-menu slot="submenu-content">
+                                <a class="app-menu-item">Listar</a>
+                                <a class="app-menu-item">Crear</a>
+                            </app-menu>
+                        </app-submenu>
+                    </app-menu>
                 </app-drawer>
 
-                <sample-content size="20"></sample-content>
+                <main>
+                    {% block content %}{% endblock content %}
+                </main>
             </app-drawer-layout>
         </app-header-layout>
 
@@ -81,7 +106,7 @@
                     </app-toolbar>
                 </app-header>
 
-                <sample-content size="100"></sample-content>
+                {# {% block content %}{% endblock content %} #}
 
             </app-header-layout>
         </app-drawer-layout>-->
@@ -91,5 +116,7 @@
                 document.querySelector('#drawer').toggle();
             })
         </script>
+
+        {% block js %}{% endblock js %}
     </body>
 </html>
