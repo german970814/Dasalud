@@ -11,32 +11,14 @@
     <div class="card">
         <h1>{% trans "Pacientes" %}</h1>
 
-        <vaadin-grid items='[
-        {"name": "John", "surname": "Lennon", "role": "singer"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"},
-        {"name": "Ringo", "surname": "Starr", "role": "drums"}
-        ]'>            
+        <vaadin-grid items='{{ pacientes }}'>
             <vaadin-grid-column>
                 <template class="header">
                     <vaadin-grid-sorter path="name.first">{% trans "Nombres" %}</vaadin-grid-sorter>
                     <!--<div class="cell">{% trans "Nombres" %}</div>-->
                 </template>
                 <template>
-                <div class="cell">[[item.name]]</div>
+                <div class="cell">[[item.nombres]]</div>
                 </template>
             </vaadin-grid-column>
 
@@ -45,7 +27,7 @@
                 <div class="cell">{% trans "Apellidos" %}</div>
                 </template>
                 <template>
-                <div class="cell">[[item.role]]</div>
+                <div class="cell">[[item.apellidos]]</div>
                 </template>
             </vaadin-grid-column>
 
@@ -54,7 +36,7 @@
                 <div class="cell numeric last">{% trans "Cédula" %}</div>
                 </template>
                 <template>
-                <div class="cell numeric last">[[item.surname]]</div>
+                <div class="cell numeric last">[[item.numero_documento]]</div>
                 </template>
             </vaadin-grid-column>
 
@@ -63,7 +45,7 @@
                 <div class="cell numeric last">{% trans "Género" %}</div>
                 </template>
                 <template>
-                <div class="cell numeric last">[[item.surname]]</div>
+                <div class="cell numeric last">[[item.genero]]</div>
                 </template>
             </vaadin-grid-column>
 
@@ -72,7 +54,7 @@
                 <div class="cell numeric last">{% trans "Empresa" %}</div>
                 </template>
                 <template>
-                <div class="cell numeric last">[[item.surname]]</div>
+                <div class="cell numeric last">[[item.empresa]]</div>
                 </template>
             </vaadin-grid-column>
 

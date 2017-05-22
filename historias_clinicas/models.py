@@ -9,7 +9,7 @@ class Paciente(models.Model):
     MASCULINO = 'M'
     GENEROS = (
         (FEMENINO, _lazy('Femenino')),
-        (MASCULINO, _lazy('Masculino')),
+        (MASCULINO, _lazy('Masculino'))
     )
 
     MENOR_NN = 'MN'
@@ -28,7 +28,7 @@ class Paciente(models.Model):
         (TARJETA_IDENTIDAD, _lazy('Tarjeta de identidad')),
         (ADULTO_NN, _lazy('Adulto sin identificar')),
         (MENOR_NN, _lazy('Menor sin identificar')),
-        (NUMERO_UNICO_ID, 'Número único de identificación'),
+        (NUMERO_UNICO_ID, 'Número único de identificación')
     )
 
     VIUDO = 'V'
@@ -41,14 +41,14 @@ class Paciente(models.Model):
         (CASADO, _lazy('Casado')),
         (SOLTERO, _lazy('Soltero')),
         (DIVORCIADO, _lazy('Divociado')),
-        (UNION_LIBRE, _lazy('Unión libre')),
+        (UNION_LIBRE, _lazy('Unión libre'))
     )
 
     RURAL = 'R'
     URBANO = 'U'
     ZONAS = (
         (URBANO, _lazy('Urbano')),
-        (RURAL, _lazy('Rural')),
+        (RURAL, _lazy('Rural'))
     )
 
     AB = 'AB'
@@ -57,7 +57,7 @@ class Paciente(models.Model):
     GRUPOS_SANGUINEOS = (
         (O_NEGATIVO, 'O+'),
         (O_POSITIVO, 'O-'),
-        (AB, 'AB'),
+        (AB, 'AB')
     )
 
     OTRO = 'O'
@@ -68,7 +68,7 @@ class Paciente(models.Model):
         (DESPLAZADO, _lazy('Desplazado')),
         (INDIGENA, _lazy('Indigena')),
         (NEGRO, _lazy('Negro')),
-        (OTRO, _lazy('Otro')),
+        (OTRO, _lazy('Otro'))
     )
 
     nombres = models.CharField(_lazy('nombres'), max_length=150)
@@ -90,6 +90,7 @@ class Paciente(models.Model):
 
     # profesion = models.ForeignKey('profesion', related_name='pacientes', verbose_name=_lazy('profesión'),  null=True, blank=True)
     # lugar_nacimiento = models.ForeignKey('lugar de nacinon', related_name='pacientes', verbose_name=_lazy('nacio en'))
+    # empresa = models.ForeignKey('empresa')
 
     class Meta:
         verbose_name = _lazy('paciente')

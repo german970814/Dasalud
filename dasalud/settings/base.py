@@ -28,7 +28,7 @@ SECRET_KEY = '&2s$0j)d0@%!i)$$hfk8fjx9)*6ap^r788lt-95&9ado8cs2xb'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.localhost']
 
 
 # Application definition
@@ -42,6 +42,7 @@ SHARED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
 
     'clientes'
 ]

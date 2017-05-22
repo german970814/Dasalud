@@ -1,3 +1,20 @@
-from django.shortcuts import render
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-# Create your views here.
+from .models import Paciente
+from .serializers import PacienteSerializer
+
+
+class ListarPacientesView(APIView):
+    """Lista los pacientes."""
+
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'historias_clinicas/lista_pacientes.html'
+
+    def get(self, request):
+        serializer = PacienteSerializer(Paciente.objects.all(), many=True)
+        pacientes = JSONRenderer().render(serializer.data)
+        return Response({'pacientes': pacientes})
+
+
