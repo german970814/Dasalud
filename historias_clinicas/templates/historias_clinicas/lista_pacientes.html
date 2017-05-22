@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block imports %}
+    <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
+    <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid-sorter.html">
+    <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+{% endblock imports %}
+
+{% block content %}
+    <div class="card">
+        <h1>{% trans "Pacientes" %}</h1>
+
+        <vaadin-grid items='[
+        {"name": "John", "surname": "Lennon", "role": "singer"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"},
+        {"name": "Ringo", "surname": "Starr", "role": "drums"}
+        ]'>            
+            <vaadin-grid-column>
+                <template class="header">
+                    <vaadin-grid-sorter path="name.first">{% trans "Nombres" %}</vaadin-grid-sorter>
+                    <!--<div class="cell">{% trans "Nombres" %}</div>-->
+                </template>
+                <template>
+                <div class="cell">[[item.name]]</div>
+                </template>
+            </vaadin-grid-column>
+
+            <vaadin-grid-column>
+                <template class="header">
+                <div class="cell">{% trans "Apellidos" %}</div>
+                </template>
+                <template>
+                <div class="cell">[[item.role]]</div>
+                </template>
+            </vaadin-grid-column>
+
+            <vaadin-grid-column>
+                <template class="header">
+                <div class="cell numeric last">{% trans "Cédula" %}</div>
+                </template>
+                <template>
+                <div class="cell numeric last">[[item.surname]]</div>
+                </template>
+            </vaadin-grid-column>
+
+            <vaadin-grid-column>
+                <template class="header">
+                <div class="cell numeric last">{% trans "Género" %}</div>
+                </template>
+                <template>
+                <div class="cell numeric last">[[item.surname]]</div>
+                </template>
+            </vaadin-grid-column>
+
+            <vaadin-grid-column>
+                <template class="header">
+                <div class="cell numeric last">{% trans "Empresa" %}</div>
+                </template>
+                <template>
+                <div class="cell numeric last">[[item.surname]]</div>
+                </template>
+            </vaadin-grid-column>
+
+            <vaadin-grid-column>
+                <template class="header">
+                    <div class="cell last"></div>
+                </template>
+                <template>
+                    <div class="cell last">
+                        <paper-icon-button icon="my-icons:mode-edit" title="{% trans 'Editar' %}"></paper-icon-button>
+                        <paper-icon-button icon="my-icons:menu" title="{% trans 'Orden' %}"></paper-icon-button>
+                        <paper-icon-button icon="my-icons:menu" title="{% trans 'Historia clinica' %}"></paper-icon-button>
+                    </div>
+                </template>
+            </vaadin-grid-column>
+        </vaadin-grid>
+        <p>123 {% trans "Pacientes" %}</p>
+    </div>
+{% endblock content %}
