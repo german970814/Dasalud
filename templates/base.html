@@ -1,14 +1,16 @@
+{% load i18n %}
+
 <!DOCTYPE html>
 <html lang="es">
     <head>
         <title>Dasalud</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <base href="/static">
 
         <!-- Load webcomponents-loader.js to check and load any polyfills your browser needs -->
         <script src="/static/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
         <link rel="import" href="/static/elements.html">
+        {% block imports %}{% endblock imports %}
 
         <custom-style>
             <style>
@@ -69,12 +71,12 @@
                     <app-menu>
                         <app-submenu>
                             <div class="app-menu-item" slot="submenu-trigger">
-                            <app-menu-icon-item icon="my-icons:people">Pacientes</app-menu-icon-item>
+                            <app-menu-icon-item icon="my-icons:people">{% trans "Pacientes" %}</app-menu-icon-item>
                             <iron-icon icon="my-icons:expand-more" class="expand-icon"></iron-icon>
                             </div>
                             <app-menu slot="submenu-content">
-                                <a class="app-menu-item">Listar</a>
-                                <a class="app-menu-item">Crear</a>
+                                <a class="app-menu-item">{% trans "Listar" %}</a>
+                                <a class="app-menu-item" href="{% url 'historias_clinicas:crear_paciente' %}">{% trans "Crear" %}</a>
                             </app-menu>
                         </app-submenu>
                     </app-menu>
