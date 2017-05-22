@@ -15,6 +15,6 @@ class ListarPacientesView(APIView):
     def get(self, request):
         serializer = PacienteSerializer(Paciente.objects.all(), many=True)
         pacientes = JSONRenderer().render(serializer.data)
-        return Response({'pacientes': pacientes})
+        return Response({'pacientes': pacientes, 'total_pacientes': len(serializer.data)})
 
 
