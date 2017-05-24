@@ -21,4 +21,6 @@ class PacienteSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['activo'].initial = True
-        # self.fields['fecha_ingreso'].initial = timezone.now()
+        self.fields['zona'].initial = Paciente.URBANO
+        self.fields['grupo_etnico'].initial = Paciente.OTRO
+        # self.fields['fecha_ingreso'].initial = datetime.date.today()

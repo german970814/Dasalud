@@ -160,17 +160,10 @@
             <app-drawer-layout>
                 <app-drawer slot="drawer" id="drawer">
                     <!--<app-toolbar>Menu</app-toolbar>-->
-                    <app-menu>
-                        <app-submenu>
-                            <div class="app-menu-item" slot="submenu-trigger">
+                    <app-menu selected="0">
+                        <a class="app-menu-item" href="{% url 'historias_clinicas:listar_pacientes' %}">
                             <app-menu-icon-item icon="my-icons:people">{% trans "Pacientes" %}</app-menu-icon-item>
-                            <iron-icon icon="my-icons:expand-more" class="expand-icon"></iron-icon>
-                            </div>
-                            <app-menu slot="submenu-content">
-                                <a class="app-menu-item" href="{% url 'historias_clinicas:listar_pacientes' %}">{% trans "Listar" %}</a>
-                                <a class="app-menu-item" href="{% url 'historias_clinicas:crear_paciente' %}">{% trans "Crear" %}</a>
-                            </app-menu>
-                        </app-submenu>
+                        </a>
                     </app-menu>
                 </app-drawer>
 

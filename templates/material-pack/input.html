@@ -2,14 +2,17 @@
 <link rel="import" href="/static/bower_components/vaadin-date-picker/vaadin-date-picker.html">
 
 {% if style.input_type == 'date' %}
-  <vaadin-date-picker data-name="{{ field.name }}" label="{{ field.label }}"
+  <vaadin-date-picker data-name="{{ field.name }}" label="{{ field.label }}" auto-validate
                       {% if field.value %} value="{{ field.value }}" {% endif %}
-                      {% if field.errors %} error-message="{{ field.errors|join:',' }}" invalid {% endif %}>
+                      {% if field.errors %} error-message="{{ field.errors|join:',' }}" invalid {% endif %}
+                      {% if field.required %} required {% endif %}>
   </vaadin-date-picker>
 {% else %}
-  <paper-input data-name="{{ field.name }}" label="{{ field.label }}"
-             {% if field.value %} value="{{ field.value }}" {% endif %}
-             {% if field.errors %} error-message="{{ field.errors|join:',' }}" invalid {% endif %}>
+  <paper-input data-name="{{ field.name }}" label="{{ field.label }}" auto-validate
+             {% if field.value %} value="{{ field.value }}" {% endif %} type="{{ style.input_type }}"
+             {% if field.errors %} error-message="{{ field.errors|join:',' }}" invalid {% endif %}
+             {% if style.input_type == 'text' %} char-counter maxlength="{{ field.max_length }}" {% endif %}
+             {% if field.required %} required {% endif %}>
   </paper-input>    
 {% endif %}
 
