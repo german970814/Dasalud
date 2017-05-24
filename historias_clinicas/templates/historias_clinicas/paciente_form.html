@@ -8,7 +8,7 @@
 {% block content %}
 
     <div class="card">
-        <h1>Crear Paciente</h1>
+        <h1>{{ VERBO }} Paciente</h1>
 
         <form method="POST">
             {% csrf_token %}
@@ -19,7 +19,7 @@
                 {% render_form serializer template_pack='material-pack' %}
 
                 <br>
-                <paper-button raised>{% trans "Crear" %}</paper-button>
+                <paper-button raised>{{ VERBO }}</paper-button>
             </fieldset>
         </form>
     </div>

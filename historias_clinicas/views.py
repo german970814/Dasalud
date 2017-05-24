@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, get_object_or_404
+from django.utils.translation import ugettext_lazy as _lazy
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -35,17 +36,18 @@ class CrearPacienteView(APIView):
 
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'historias_clinicas/paciente_form.html'
+    VERBO = _lazy('Crear')
 
     def get(self, request):
         serializer = PacienteSerializer(context={'request': None})
-        return Response({'serializer': serializer})
+        return Response({'serializer': serializer, 'VERBO': self.VERBO})
     
     def post(self, request):
         serializer = PacienteSerializer(data=request.data, context={'request': None})
         if serializer.is_valid():
             serializer.save()
             return redirect('historias_clinicas:listar_pacientes')
-        return Response({'serializer': serializer})
+        return Response({'serializer': serializer, 'VERBO': self.VERBO})
 
 
 class EditarPacienteView(APIView):
@@ -53,11 +55,12 @@ class EditarPacienteView(APIView):
 
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'historias_clinicas/paciente_form.html'
+    VERBO = _lazy('Editar')
 
     def get(self, request, pk):
         paciente = get_object_or_404(Paciente, pk=pk)
         serializer = PacienteSerializer(paciente, context={'request': None})
-        return Response({'serializer': serializer})
+        return Response({'serializer': serializer, 'VERBO': self.VERBO})
     
     def post(self, request, pk):
         paciente = get_object_or_404(Paciente, pk=pk)
@@ -65,7 +68,7 @@ class EditarPacienteView(APIView):
         if serializer.is_valid():
             serializer.save()
             return redirect('historias_clinicas:listar_pacientes')
-        return Response({'serializer': serializer})
+        return Response({'serializer': serializer, 'VERBO': self.VERBO})
 
 
 
