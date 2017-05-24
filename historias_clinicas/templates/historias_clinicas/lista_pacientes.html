@@ -64,7 +64,9 @@
                 </template>
                 <template>
                     <div class="cell last">
-                        <paper-icon-button icon="my-icons:mode-edit" title="{% trans 'Editar' %}"></paper-icon-button>
+                        <a href="[[item.edit_link]]" tabindex="-1">
+                            <paper-icon-button icon="my-icons:mode-edit" title="{% trans 'Editar' %}"></paper-icon-button>
+                        </a>                        
                         <paper-icon-button icon="my-icons:menu" title="{% trans 'Orden' %}"></paper-icon-button>
                         <paper-icon-button icon="my-icons:menu" title="{% trans 'Historia clinica' %}"></paper-icon-button>
                     </div>
