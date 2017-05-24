@@ -1,0 +1,48 @@
+{% load rest_framework %}
+{% for field in form %}
+  {% if not field.read_only %}
+    {% render_field field style=style %}
+  {% endif %}
+{% endfor %}
+
+{% block js %}
+    <script>
+        let form = document.querySelector('form');
+        form.addEventListener('input', function(e) {
+            if (e.target.name == undefined) { // Es un paper-input
+                this.querySelector('input[name=' + e.target.dataset.name + ']').value = e.target.value;
+            }
+            
+            e.stopPropagation();
+        }, false);
+
+        document.querySelectorAll('paper-dropdown-menu').forEach(function(element, index, array){
+            element.addEventListener('value-changed', function(e) {
+                let select = document.querySelector('select[name=' + e.target.dataset.name + ']');
+                select.value = e.target.selectedItem.dataset.value;
+                e.stopPropagation();
+            })
+        });
+
+        document.querySelectorAll('paper-toggle-button').forEach(function(element, index, array){
+            element.addEventListener('checked-changed', function(e) {
+                let check = document.querySelector('input[name=' + e.target.dataset.name + ']');
+                if(e.target.checked) { 
+                    check.checked = true;
+                }
+                else {
+                    check.checked = false;
+                }                
+                e.stopPropagation();
+            })
+        });
+
+        document.querySelectorAll('vaadin-date-picker').forEach(function(element, index, array){
+            element.addEventListener('value-changed', function(e) {
+                let dateInput = document.querySelector('input[name=' + e.target.dataset.name + ']');
+                dateInput.value = e.target.value;       
+                e.stopPropagation();
+            })
+        });
+    </script>
+{% endblock js %}

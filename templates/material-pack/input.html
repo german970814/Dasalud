@@ -1,0 +1,19 @@
+<link rel="import" href="/static/bower_components/paper-input/paper-input.html">
+<link rel="import" href="/static/bower_components/vaadin-date-picker/vaadin-date-picker.html">
+
+
+{% if style.input_type == 'date' %}
+  <vaadin-date-picker data-name="{{ field.name }}" label="{{ field.label }}"
+                      {% if field.value %} value="{{ field.value }}" {% endif %}
+                      {% if field.errors %} error-message="{{ field.errors|join:',' }}" invalid {% endif %}>
+  </vaadin-date-picker>
+{% else %}
+  <paper-input data-name="{{ field.name }}" label="{{ field.label }}"
+             {% if field.value %} value="{{ field.value }}" {% endif %}
+             {% if field.errors %} error-message="{{ field.errors|join:',' }}" invalid {% endif %}>
+  </paper-input>    
+{% endif %}
+
+<div class="form-group" style="display:none;">
+  <input name="{{ field.name }}" type="text" {% if field.value %}value="{{ field.value }}"{% endif %}>
+</div>

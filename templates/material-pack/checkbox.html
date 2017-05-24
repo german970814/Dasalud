@@ -1,0 +1,13 @@
+<link rel="import" href="/static/bower_components/paper-toggle-button/paper-toggle-button.html">
+
+<paper-toggle-button data-name="{{ field.name }}" {% if field.value %}checked{% endif %} value="true">
+  {{ field.label }}
+</paper-toggle-button>
+
+<div class="form-group" style="display:none;">
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" name="{{ field.name }}" value="true" {% if field.value %}checked{% endif %}>
+    </label>
+  </div>
+</div>
