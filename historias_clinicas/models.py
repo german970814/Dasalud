@@ -90,6 +90,7 @@ class Paciente(models.Model):
 
     # profesion = models.ForeignKey('profesion', related_name='pacientes', verbose_name=_lazy('profesión'),  null=True, blank=True)
     # lugar_nacimiento = models.ForeignKey('lugar de nacinon', related_name='pacientes', verbose_name=_lazy('nacio en'))
+    # lugar_residencia = models.ForeignKey('lugar de nacinon', related_name='pacientes', verbose_name=_lazy('nacio en'))
     # empresa = models.ForeignKey('empresa')
 
     class Meta:

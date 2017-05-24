@@ -18,3 +18,20 @@ class ListarPacientesView(APIView):
         return Response({'pacientes': pacientes, 'total_pacientes': len(serializer.data)})
 
 
+class CrearPacienteView(APIView):
+    """Permite crear un paciente."""
+
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'historias_clinicas/paciente_form.html'
+
+    def get(self, request):
+        serializer = PacienteSerializer()
+        return Response({'serializer': serializer})
+    
+    def post(self, request):
+        serializer = PacienteSerializer(data=request.data)
+        serializer.is_valid()
+        return Response({'serializer': serializer})
+
+
+

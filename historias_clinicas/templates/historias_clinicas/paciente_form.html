@@ -1,39 +1,21 @@
 {% extends "base.html" %}
-
-{% block imports %}
-    <link rel="import" href="/static/bower_components/paper-input/paper-input.html">
-{% endblock imports %}
+{% load rest_framework i18n %}
 
 {% block content %}
+
     <div class="card">
         <h1>Crear Paciente</h1>
-
 
         <form method="POST">
             {% csrf_token %}
 
             <fieldset>
-                <legend>Datos Personales</legend>
-                <paper-input label="Nombres"></paper-input>
-                <paper-input label="Apellidos"></paper-input>
-                <paper-input label="Tipo de Documento"></paper-input>
-                <paper-input label="Número de Documento"></paper-input>
-                <paper-input label="Género"></paper-input>
-                <paper-input label="Nacio En"></paper-input>
-                <paper-input label="Estado Civil"></paper-input>
-                <paper-input label="Fecha de Nacimiento"></paper-input>
-                <paper-input label="Tipo"></paper-input>
-                <paper-input label="Afiliado"></paper-input>
-                <paper-input label="Zona"></paper-input>
-                <paper-input label="Ciudad"></paper-input>
-                <paper-input label="Profesión"></paper-input>
-                <paper-input label="Dirección"></paper-input>
-                <paper-input label="Telefono"></paper-input>
-                <paper-input label="Celular"></paper-input>
-                <paper-input label="Email"></paper-input>
-                <paper-input label="Email"></paper-input>
+                <legend>{% trans "Datos Personales" %}</legend>
+
+                {% render_form serializer template_pack='material-pack' %}
+
+                <button type="">asdasd</button>
             </fieldset>
-            <button type="">Aceptae</button>
         </form>
     </div>
 {% endblock content %}
