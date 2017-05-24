@@ -30,7 +30,9 @@ class CrearPacienteView(APIView):
     
     def post(self, request):
         serializer = PacienteSerializer(data=request.data)
-        serializer.is_valid()
+        if serializer.is_valid():
+            serializer.save()
+            return redirect('historias_clinicas:listar_pacientes')
         return Response({'serializer': serializer})
 
 
