@@ -15,7 +15,7 @@ class PacienteSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'nombres', 'apellidos', 'tipo_documento', 'numero_documento', 'genero', 'estado_civil', 
             'fecha_nacimiento', 'zona', 'direccion', 'telefono', 'celular', 'email', 'grupo_sanguineo', 
-            'grupo_etnico', 'activo', 'fecha_ingreso', 'edit_link'
+            'grupo_etnico', 'profesion', 'activo', 'fecha_ingreso', 'edit_link'
         )
     
     def __init__(self, *args, **kwargs):

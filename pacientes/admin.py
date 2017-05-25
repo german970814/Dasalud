@@ -3,3 +3,4 @@ from .models import Paciente
 
 
 admin.site.register(Paciente)
+

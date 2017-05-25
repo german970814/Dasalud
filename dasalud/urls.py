@@ -21,7 +21,7 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='base.html')),
-    url(r'^historias-clinicas/', include('historias_clinicas.urls', namespace='historias_clinicas')),
+    url(r'^pacientes/', include('pacientes.urls', namespace='pacientes')),
     url(r'^admin/', admin.site.urls),
 ]
 

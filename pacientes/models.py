@@ -1,4 +1,5 @@
 from django.db import models
+
 from django.utils.translation import ugettext_lazy as _lazy
 
 
@@ -77,7 +78,7 @@ class Paciente(models.Model):
     fecha_nacimiento = models.DateField(_lazy('fecha de nacimiento'))
     fecha_ingreso = models.DateField(_lazy('fecha de ingreso'))
     tipo_documento = models.CharField(_lazy('tipo de documento'), max_length=2, choices=TIPO_DOCUMENTOS)
-    numero_documento = models.IntegerField(_lazy('número de documento'))
+    numero_documento = models.CharField(_lazy('número de documento'), max_length=20, unique=True)
     estado_civil = models.CharField(_lazy('estado civil'), max_length=2, choices=ESTADOS_CIVILES)
     zona = models.CharField(_lazy('zona'), max_length=1, choices=ZONAS)
     direccion = models.CharField(_lazy('dirección'), max_length=200)
@@ -87,8 +88,15 @@ class Paciente(models.Model):
     grupo_sanguineo = models.CharField(_lazy('grupo sanguineo'), max_length=2, choices=GRUPOS_SANGUINEOS, blank=True)
     grupo_etnico = models.CharField(_lazy('grupo etnico'), max_length=1, choices=GRUPOS_ETNICOS, blank=True)
     activo = models.BooleanField(_lazy('activo'), default=True)
+    profesion = models.ForeignKey('utilidades.Profesion', related_name='pacientes', verbose_name=_lazy('profesión'),  null=True, blank=True)
 
-    # profesion = models.ForeignKey('profesion', related_name='pacientes', verbose_name=_lazy('profesión'),  null=True, blank=True)
+    # Menores de edad
+    identificacion_padre = models.CharField(_lazy('identificación del padre'), max_length=15, blank=True)
+    nombres_padre = models.CharField(_lazy('nombres del padre'), max_length=150, blank=True)
+    apellidos_padre = models.CharField(_lazy('apellidos del padre'), max_length=150, blank=True)
+    identificacion_madre = models.CharField(_lazy('identificación de la madre'), max_length=15, blank=True)
+    nombres_madre = models.CharField(_lazy('nombres de la madre'), max_length=150, blank=True)
+    apellidos_madre = models.CharField(_lazy('apellidos de la madre'), max_length=150, blank=True)
     # lugar_nacimiento = models.ForeignKey('lugar de nacinon', related_name='pacientes', verbose_name=_lazy('nacio en'))
     # lugar_residencia = models.ForeignKey('lugar de nacinon', related_name='pacientes', verbose_name=_lazy('nacio en'))
     # empresa = models.ForeignKey('empresa')
