@@ -25,8 +25,20 @@ class ParentescoMixin(object):
         (PRIMO, _lazy('Primo')),
         (CONYUGUE, _lazy('Conyugue')),
         (AMIGO, _lazy('Amigo')),
-        (OTRO, _lazy('Otro')),
+        (OTRO, _lazy('Otro'))
     )
+
+    parentesco = models.CharField(_lazy('parentesco'), max_length=3, choices=PARENTESCOS)
+
+    class Meta:
+        abstract = True
+
+def paciente_foto_path(instance, filename):
+    return 'paciente_{0}/foto_{1}'.format(instance.pk, filename)
+
+
+def paciente_firma_path(instance, filename):
+    return 'paciente_{0}/firma_{1}'.format(instance.pk, filename)
 
 
 class Paciente(ParentescoMixin, models.Model):
@@ -127,9 +139,10 @@ class Paciente(ParentescoMixin, models.Model):
     profesion = models.ForeignKey('globales.Profesion', related_name='pacientes', verbose_name=_lazy('profesión'),  null=True, blank=True)
     lugar_nacimiento = models.ForeignKey('globales.Poblado', related_name='pacientes_nacidos_en', verbose_name=_lazy('nacio en'))
     lugar_residencia = models.ForeignKey('globales.Poblado', related_name='pacientes_viven_en', verbose_name=_lazy('donde vive'))
+    foto = models.ImageField(upload_to=paciente_foto_path, verbose_name=_lazy('foto'), blank=True)
+    firma = models.ImageField(upload_to=paciente_firma_path, verbose_name=_lazy('firma'), blank=True)
 
     # Datos responsable
-    parentesco_reponsable = models.CharField(_lazy('parentesco del responsable'), max_length=3, choices=PARENTESCOS)
     nombre_responsable = models.CharField(_lazy('nombre completo del responsable'), max_length=300)
     direccion_responsable = models.CharField(_lazy('dirección del responsable'), max_length=200)
     telefono_responsable = models.IntegerField(_lazy('telefono del responsable'), null=True, blank=True)
@@ -146,3 +159,34 @@ class Paciente(ParentescoMixin, models.Model):
 
     def __str__(self):
         return '{} {}'.format(self.nombres, self.apellidos)
+
+
+class Orden(models.Model):
+    """Modelo que maneja la información de una orden de un paciente."""
+
+    paciente = models.ForeignKey(Paciente, related_name='ordenes', verbose_name=_lazy('paciente'))
+
+    class Meta:
+        verbose_name = 'orden'
+        verbose_name_plural = 'ordenes'
+    
+    def __str__(self):
+        return '{0} - {1}'.format(str(self.paciente), self.pk)
+
+
+class Acompanante(ParentescoMixin, models.Model):
+    """Modelo que guarda la información del acompañante de un paciente según el ordenamiento."""
+
+    orden = models.OneToOneField(Orden, verbose_name=_lazy('orden'))
+    asistio = models.BooleanField(_lazy('acompañante'))
+    nombre = models.CharField(_lazy('nombre completo'), max_length=200)
+    direccion = models.CharField(_lazy('dirección'), max_length=200)
+    telefono = models.IntegerField(_lazy('teléfono'))
+
+    class Meta:
+        verbose_name = _lazy('acompañate')
+        verbose_name_plural = _lazy('acompañates')
+    
+    def __str__(self):
+        return self.nombre
+

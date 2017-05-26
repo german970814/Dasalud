@@ -3,3 +3,4 @@ django-environ==0.4.3
 django-tenant-schemas==1.8.0
 psycopg2==2.7.1
 djangorestframework==3.6.3
+Pillow==4.1.1

@@ -23,7 +23,7 @@ class ListarPacientesView(APIView):
     """Lista los pacientes."""
 
     renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'historias_clinicas/lista_pacientes.html'
+    template_name = 'pacientes/lista_pacientes.html'
 
     def get(self, request):
         serializer = PacienteSerializer(Paciente.objects.all(), many=True, context={'request': None})
@@ -35,7 +35,7 @@ class CrearPacienteView(APIView):
     """Permite crear un paciente."""
 
     renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'historias_clinicas/paciente_form.html'
+    template_name = 'pacientes/paciente_form.html'
     VERBO = _lazy('Crear')
 
     def get(self, request):
@@ -54,7 +54,7 @@ class EditarPacienteView(APIView):
     """Permite editar un paciente."""
 
     renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'historias_clinicas/paciente_form.html'
+    template_name = 'pacientes/paciente_form.html'
     VERBO = _lazy('Editar')
 
     def get(self, request, pk):
