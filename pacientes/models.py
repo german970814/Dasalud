@@ -1,9 +1,35 @@
 from django.db import models
-
 from django.utils.translation import ugettext_lazy as _lazy
 
 
-class Paciente(models.Model):
+class ParentescoMixin(object):
+    """Mixin para los parentescos de un paciente."""
+
+    TIO = 'T'
+    OTRO = 'O'
+    HIJO = 'I'
+    PADRE = 'P'
+    MADRE = 'M'
+    AMIGO = 'AM'
+    ABUELO = 'A'
+    PRIMO = 'PR'
+    HERMANO = 'H'
+    CONYUGUE = 'C'
+    PARENTESCOS = (
+        (PADRE, _lazy('Padre')),
+        (MADRE, _lazy('Madre')),
+        (HERMANO, _lazy('Hermano')),
+        (HIJO, _lazy('Hijo')),
+        (ABUELO, _lazy('Abuelo')),
+        (TIO, _lazy('Tio')),
+        (PRIMO, _lazy('Primo')),
+        (CONYUGUE, _lazy('Conyugue')),
+        (AMIGO, _lazy('Amigo')),
+        (OTRO, _lazy('Otro')),
+    )
+
+
+class Paciente(ParentescoMixin, models.Model):
     """Modelo para guardar la información de un paciente."""
 
     FEMENINO = 'F'
@@ -52,13 +78,23 @@ class Paciente(models.Model):
         (RURAL, _lazy('Rural'))
     )
 
-    AB = 'AB'
     O_POSITIVO = 'O+'
     O_NEGATIVO = 'O-'
+    A_POSITIVO = 'A+'
+    A_NEGATIVO = 'A-'
+    B_POSITIVO = 'B+'
+    B_NEGATIVO = 'B-'
+    AB_POSITIVO = 'AB+'
+    AB_NEGATIVO = 'AB-'
     GRUPOS_SANGUINEOS = (
-        (O_NEGATIVO, 'O+'),
-        (O_POSITIVO, 'O-'),
-        (AB, 'AB')
+        (O_NEGATIVO, O_NEGATIVO),
+        (O_POSITIVO, O_POSITIVO),
+        (A_NEGATIVO, A_NEGATIVO),
+        (A_POSITIVO, A_POSITIVO),
+        (B_NEGATIVO, B_NEGATIVO),
+        (B_POSITIVO, B_POSITIVO),
+        (AB_NEGATIVO, AB_NEGATIVO),
+        (AB_POSITIVO, AB_POSITIVO),
     )
 
     OTRO = 'O'
@@ -85,21 +121,24 @@ class Paciente(models.Model):
     telefono = models.IntegerField(_lazy('telefono'), null=True, blank=True)
     celular = models.IntegerField(_lazy('celular'), null=True, blank=True)
     email = models.EmailField(_lazy('email'))
-    grupo_sanguineo = models.CharField(_lazy('grupo sanguineo'), max_length=2, choices=GRUPOS_SANGUINEOS, blank=True)
+    grupo_sanguineo = models.CharField(_lazy('grupo sanguineo'), max_length=3, choices=GRUPOS_SANGUINEOS, blank=True)
     grupo_etnico = models.CharField(_lazy('grupo etnico'), max_length=1, choices=GRUPOS_ETNICOS, blank=True)
     activo = models.BooleanField(_lazy('activo'), default=True)
-    profesion = models.ForeignKey('utilidades.Profesion', related_name='pacientes', verbose_name=_lazy('profesión'),  null=True, blank=True)
+    profesion = models.ForeignKey('globales.Profesion', related_name='pacientes', verbose_name=_lazy('profesión'),  null=True, blank=True)
+    lugar_nacimiento = models.ForeignKey('globales.Poblado', related_name='pacientes_nacidos_en', verbose_name=_lazy('nacio en'))
+    lugar_residencia = models.ForeignKey('globales.Poblado', related_name='pacientes_viven_en', verbose_name=_lazy('donde vive'))
+
+    # Datos responsable
+    parentesco_reponsable = models.CharField(_lazy('parentesco del responsable'), max_length=3, choices=PARENTESCOS)
+    nombre_responsable = models.CharField(_lazy('nombre completo del responsable'), max_length=300)
+    direccion_responsable = models.CharField(_lazy('dirección del responsable'), max_length=200)
+    telefono_responsable = models.IntegerField(_lazy('telefono del responsable'), null=True, blank=True)
 
     # Menores de edad
     identificacion_padre = models.CharField(_lazy('identificación del padre'), max_length=15, blank=True)
-    nombres_padre = models.CharField(_lazy('nombres del padre'), max_length=150, blank=True)
-    apellidos_padre = models.CharField(_lazy('apellidos del padre'), max_length=150, blank=True)
+    nombre_padre = models.CharField(_lazy('nombre completo del padre'), max_length=300, blank=True)
     identificacion_madre = models.CharField(_lazy('identificación de la madre'), max_length=15, blank=True)
-    nombres_madre = models.CharField(_lazy('nombres de la madre'), max_length=150, blank=True)
-    apellidos_madre = models.CharField(_lazy('apellidos de la madre'), max_length=150, blank=True)
-    # lugar_nacimiento = models.ForeignKey('lugar de nacinon', related_name='pacientes', verbose_name=_lazy('nacio en'))
-    # lugar_residencia = models.ForeignKey('lugar de nacinon', related_name='pacientes', verbose_name=_lazy('nacio en'))
-    # empresa = models.ForeignKey('empresa')
+    nombre_madre = models.CharField(_lazy('nombre completo de la madre'), max_length=300, blank=True)
 
     class Meta:
         verbose_name = _lazy('paciente')
