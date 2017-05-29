@@ -5,30 +5,95 @@
     <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
 {% endblock html_imports %}
 
+{% block css %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="/static/bower_components/mdl-stepper/stepper.min.css">
+{% endblock css %}
+
 {% block content %}
 
     <div class="card">
         <h1>{{ VERBO }} Paciente</h1>
 
-        <form method="POST">
-            {% csrf_token %}
+        <ul class="mdl-stepper mdl-stepper--horizontal mdl-stepper--linear" id="demo-stepper-state-error">
+        <li class="mdl-step mdl-step--editable">
+            <span class="mdl-step__label">
+                <span class="mdl-step__title">
+                    <span class="mdl-step__title-text">{% trans "Paciente" %}</span>
+                    <span class="mdl-step__title-message">{% trans "Información general" %}</span>
+                </span>
+            </span>
+            <div class="mdl-step__content">
+                <form method="POST">
+                    {% render_form serializer template_pack='material-pack' %}
+                </form>          
+            </div>
+            <div class="mdl-step__actions">
+                <paper-button raised data-stepper-next>{% trans "Continuar" %}</paper-button>
+            </div>
+        </li>
+        <li class="mdl-step mdl-step--editable">
+            <span class="mdl-step__label">
+                <span class="mdl-step__title">
+                    <span class="mdl-step__title-text">{% trans "Orden" %}</span>
+                </span>
+            </span>
+            <div class="mdl-step__content"></div>
+            <div class="mdl-step__actions">
+                <paper-button raised data-stepper-next>{% trans "Continuar" %}</paper-button>
+                <paper-button raised data-stepper-back>{% trans "Atras" %}</paper-button>
+            </div>
+        </li>
+        <li class="mdl-step mdl-step--editable">
+            <span class="mdl-step__label">
+                <span class="mdl-step__title">
+                    <span class="mdl-step__title-text">{% trans "Acompañante" %}</span>
+                </span>
+            </span>
+            <div class="mdl-step__content"></div>
+            <div class="mdl-step__actions">
+                <paper-button raised data-stepper-next>{% trans "Terminar" %}</paper-button>
+                <paper-button raised data-stepper-back>{% trans "Atras" %}</paper-button>
+            </div>
+        </li>
+        </ul>
 
-            <fieldset>
-                <legend>{% trans "Datos Personales" %}</legend>
-
-                {% render_form serializer template_pack='material-pack' %}
-
-                <br>
-                <paper-button raised>{{ VERBO }}</paper-button>
-            </fieldset>
-        </form>
     </div>
 {% endblock content %}
 
 {% block js %}
+    <script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+    <script src="/static/bower_components/mdl-stepper/stepper.min.js"></script>
     <script>
-        document.querySelector('paper-button').addEventListener('click', function(){
-            document.querySelector('form').submit();
-        });
+        // document.querySelector('paper-button').addEventListener('click', function(){
+        //     document.querySelector('form').submit();
+        // });
+
+        var stepper;
+
+        // Check if MDL Component Handler is loaded.
+        if (typeof componentHandler !== 'undefined') {
+            // Get the MaterialStepper instance of element to control it.
+            var stepperElement = document.querySelector('ul.mdl-stepper');
+            let steps = stepperElement.querySelectorAll('.mdl-step');
+            document.addEventListener('onstepnext', function(event) {
+                if (!stepper) {
+                    stepper = document.querySelector('.mdl-stepper').MaterialStepper;
+                    console.log(stepper);
+                }
+
+                stepper.next();
+            })
+
+
+            stepper = stepperElement.MaterialStepper;
+            // Moves the stepper to the next step for test.
+            // Stepper.next();
+        } else {
+            console.log("no encontrado");
+            // Material Design Lite javascript is not loaded or for another  
+            // reason MDL Component Handler is not available globally and
+            // you can't use (register and upgrade) Stepper component at this point.
+        }
     </script>
 {% endblock js %}

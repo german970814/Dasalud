@@ -164,7 +164,49 @@ class Paciente(ParentescoMixin, models.Model):
 class Orden(models.Model):
     """Modelo que maneja la información de una orden de un paciente."""
 
+    COTIZANTE = 'C'
+    BENEFICIARIO = 'B'
+    SUBSIDIADO = 'A'
+    PARTICULAR = 'P'
+    VINCULADO = 'V'
+    OTRO = 'O'
+    AFILIACIONES = (
+        (COTIZANTE, _lazy('Cotizante')),
+        (BENEFICIARIO, _lazy('Beneficiario')),
+        (SUBSIDIADO, _lazy('Subsidiado')),
+        (PARTICULAR, _lazy('Particular')),
+        (VINCULADO, _lazy('Vinculado')),
+        (OTRO, _lazy('Otro'))
+    )
+
+    CONTRIBUTIVO = 'C'
+    TIPOS_USUARIO = (
+        (CONTRIBUTIVO, _lazy('Contributivo')),
+        (SUBSIDIADO, _lazy('Subsidiado')),
+        (VINCULADO, _lazy('Vinculado')),
+        (PARTICULAR, _lazy('Particular')),
+        (OTRO, _lazy('Otro'))
+    )
+
+    EFECTIVO = 'E'
+    TARJETA = 'T'
+    FORMAS_PAGO = (
+        (EFECTIVO, _lazy('Efectivo')),
+        (TARJETA, _lazy('Tarjeta'))
+    )
+
     paciente = models.ForeignKey(Paciente, related_name='ordenes', verbose_name=_lazy('paciente'))
+    fecha_orden = models.DateField(_lazy('Fecha de la orden'))
+    autorizacion = models.CharField(_lazy('autorización'), max_length=50, blank=True)
+    pendiente_autorizacion = models.BooleanField(_lazy('Pendiente por autorización'), default=False)
+    afiliacion = models.CharField(_lazy('afiliación'), max_length=1, choices=AFILIACIONES)
+    tipo_usuario = models.CharField(_lazy('tipo de usuario'), max_length=1, choices=TIPOS_USUARIO)
+    anulada = models.BooleanField(_lazy('anulada'), default=False)
+    razon_anulacion = models.CharField(_lazy('razón de anulación'), max_length=200, blank=True)
+    forma_pago = models.CharField(_lazy('forma de pago'), max_length=2, choices=FORMAS_PAGO)
+
+    # empresa = models.ForeignKey('Empresa', related_name='ordenes', verbose_name=_lazy('empresa'))
+    # institucion = models.ForeignKey('Institucion', related_name='ordenes', verbose_name=_lazy('Institución'))
 
     class Meta:
         verbose_name = 'orden'
