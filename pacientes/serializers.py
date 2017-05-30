@@ -9,7 +9,7 @@ from .models import Paciente, Orden, Acompanante
 class PacienteSerializer(PrefixFieldSerializerNameMixin, serializers.ModelSerializer):
     """Serializer para el modelo paciente."""
 
-    edit_link = serializers.HyperlinkedIdentityField(view_name='historias_clinicas:editar_paciente')
+    edit_link = serializers.HyperlinkedIdentityField(view_name='pacientes:editar')
 
     class Meta:
         model = Paciente

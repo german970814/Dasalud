@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% load rest_framework i18n %}
 
-{% block html_imports %}
+{% block imports %}
     <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
-{% endblock html_imports %}
+{% endblock imports %}
 
 {% block css %}
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -15,54 +15,50 @@
     <div class="card">
         <h1>{{ VERBO }} Paciente</h1>
 
-        <form method="POST">
-            {% csrf_token %}
-            <ul class="mdl-stepper mdl-stepper--horizontal " id="demo-stepper-state-error">
-            <li class="mdl-step mdl-step--editable">
-                <span class="mdl-step__label">
-                    <span class="mdl-step__title">
-                        <span class="mdl-step__title-text">{% trans "Paciente" %}</span>
-                        <span class="mdl-step__title-message">{% trans "Información general" %}</span>
-                    </span>
+        <ul class="mdl-stepper mdl-stepper--horizontal " id="demo-stepper-state-error">
+        <li class="mdl-step mdl-step--editable">
+            <span class="mdl-step__label">
+                <span class="mdl-step__title">
+                    <span class="mdl-step__title-text">{% trans "Paciente" %}</span>
+                    <span class="mdl-step__title-message">{% trans "Información general" %}</span>
                 </span>
-                <div class="mdl-step__content">
-                    {% render_form paciente_s template_pack='material-pack' %}
-                </div>
-                <div class="mdl-step__actions">
-                    <paper-button raised data-stepper-next>{% trans "Continuar" %}</paper-button>
-                </div>
-            </li>
-            <li class="mdl-step mdl-step--editable">
-                <span class="mdl-step__label">
-                    <span class="mdl-step__title">
-                        <span class="mdl-step__title-text">{% trans "Orden" %}</span>
-                    </span>
+            </span>
+            <div class="mdl-step__content">
+                {% render_form paciente_s template_pack='material-pack' %}
+            </div>
+            <div class="mdl-step__actions">
+                <paper-button raised data-stepper-next>{% trans "Continuar" %}</paper-button>
+            </div>
+        </li>
+        <li class="mdl-step mdl-step--editable">
+            <span class="mdl-step__label">
+                <span class="mdl-step__title">
+                    <span class="mdl-step__title-text">{% trans "Orden" %}</span>
                 </span>
-                <div class="mdl-step__content">
-                    {% render_form orden_s template_pack='material-pack' %}
-                </div>
-                <div class="mdl-step__actions">
-                    <paper-button raised data-stepper-next>{% trans "Continuar" %}</paper-button>
-                    <paper-button raised data-stepper-back>{% trans "Atras" %}</paper-button>
-                </div>
-            </li>
-            <li class="mdl-step mdl-step--editable">
-                <span class="mdl-step__label">
-                    <span class="mdl-step__title">
-                        <span class="mdl-step__title-text">{% trans "Acompañante" %}</span>
-                    </span>
+            </span>
+            <div class="mdl-step__content">
+                {% render_form orden_s template_pack='material-pack' %}
+            </div>
+            <div class="mdl-step__actions">
+                <paper-button raised data-stepper-next>{% trans "Continuar" %}</paper-button>
+                <paper-button raised data-stepper-back>{% trans "Atras" %}</paper-button>
+            </div>
+        </li>
+        <li class="mdl-step mdl-step--editable">
+            <span class="mdl-step__label">
+                <span class="mdl-step__title">
+                    <span class="mdl-step__title-text">{% trans "Acompañante" %}</span>
                 </span>
-                <div class="mdl-step__content">
-                    {% render_form acompanante_s template_pack='material-pack' %}
-                </div>
-                <div class="mdl-step__actions">
-                    <paper-button raised data-stepper-next>{% trans "Terminar" %}</paper-button>
-                    <paper-button raised data-stepper-back>{% trans "Atras" %}</paper-button>
-                </div>
-            </li>
-            </ul>
-        </form>
-
+            </span>
+            <div class="mdl-step__content">
+                {% render_form acompanante_s template_pack='material-pack' %}
+            </div>
+            <div class="mdl-step__actions">
+                <paper-button raised data-stepper-next>{% trans "Terminar" %}</paper-button>
+                <paper-button raised data-stepper-back>{% trans "Atras" %}</paper-button>
+            </div>
+        </li>
+        </ul>
     </div>
 {% endblock content %}
 
