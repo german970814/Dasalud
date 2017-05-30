@@ -15,48 +15,53 @@
     <div class="card">
         <h1>{{ VERBO }} Paciente</h1>
 
-        <ul class="mdl-stepper mdl-stepper--horizontal mdl-stepper--linear" id="demo-stepper-state-error">
-        <li class="mdl-step mdl-step--editable">
-            <span class="mdl-step__label">
-                <span class="mdl-step__title">
-                    <span class="mdl-step__title-text">{% trans "Paciente" %}</span>
-                    <span class="mdl-step__title-message">{% trans "Información general" %}</span>
+        <form method="POST">
+            {% csrf_token %}
+            <ul class="mdl-stepper mdl-stepper--horizontal " id="demo-stepper-state-error">
+            <li class="mdl-step mdl-step--editable">
+                <span class="mdl-step__label">
+                    <span class="mdl-step__title">
+                        <span class="mdl-step__title-text">{% trans "Paciente" %}</span>
+                        <span class="mdl-step__title-message">{% trans "Información general" %}</span>
+                    </span>
                 </span>
-            </span>
-            <div class="mdl-step__content">
-                <form method="POST">
-                    {% render_form serializer template_pack='material-pack' %}
-                </form>          
-            </div>
-            <div class="mdl-step__actions">
-                <paper-button raised data-stepper-next>{% trans "Continuar" %}</paper-button>
-            </div>
-        </li>
-        <li class="mdl-step mdl-step--editable">
-            <span class="mdl-step__label">
-                <span class="mdl-step__title">
-                    <span class="mdl-step__title-text">{% trans "Orden" %}</span>
+                <div class="mdl-step__content">
+                    {% render_form paciente_s template_pack='material-pack' %}
+                </div>
+                <div class="mdl-step__actions">
+                    <paper-button raised data-stepper-next>{% trans "Continuar" %}</paper-button>
+                </div>
+            </li>
+            <li class="mdl-step mdl-step--editable">
+                <span class="mdl-step__label">
+                    <span class="mdl-step__title">
+                        <span class="mdl-step__title-text">{% trans "Orden" %}</span>
+                    </span>
                 </span>
-            </span>
-            <div class="mdl-step__content"></div>
-            <div class="mdl-step__actions">
-                <paper-button raised data-stepper-next>{% trans "Continuar" %}</paper-button>
-                <paper-button raised data-stepper-back>{% trans "Atras" %}</paper-button>
-            </div>
-        </li>
-        <li class="mdl-step mdl-step--editable">
-            <span class="mdl-step__label">
-                <span class="mdl-step__title">
-                    <span class="mdl-step__title-text">{% trans "Acompañante" %}</span>
+                <div class="mdl-step__content">
+                    {% render_form orden_s template_pack='material-pack' %}
+                </div>
+                <div class="mdl-step__actions">
+                    <paper-button raised data-stepper-next>{% trans "Continuar" %}</paper-button>
+                    <paper-button raised data-stepper-back>{% trans "Atras" %}</paper-button>
+                </div>
+            </li>
+            <li class="mdl-step mdl-step--editable">
+                <span class="mdl-step__label">
+                    <span class="mdl-step__title">
+                        <span class="mdl-step__title-text">{% trans "Acompañante" %}</span>
+                    </span>
                 </span>
-            </span>
-            <div class="mdl-step__content"></div>
-            <div class="mdl-step__actions">
-                <paper-button raised data-stepper-next>{% trans "Terminar" %}</paper-button>
-                <paper-button raised data-stepper-back>{% trans "Atras" %}</paper-button>
-            </div>
-        </li>
-        </ul>
+                <div class="mdl-step__content">
+                    {% render_form acompanante_s template_pack='material-pack' %}
+                </div>
+                <div class="mdl-step__actions">
+                    <paper-button raised data-stepper-next>{% trans "Terminar" %}</paper-button>
+                    <paper-button raised data-stepper-back>{% trans "Atras" %}</paper-button>
+                </div>
+            </li>
+            </ul>
+        </form>
 
     </div>
 {% endblock content %}
@@ -65,30 +70,53 @@
     <script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
     <script src="/static/bower_components/mdl-stepper/stepper.min.js"></script>
     <script>
-        // document.querySelector('paper-button').addEventListener('click', function(){
-        //     document.querySelector('form').submit();
-        // });
-
+        var stepperNode= document.querySelector('.mdl-stepper');
         var stepper;
+
+        function getStepper() {
+            if (!stepper) {
+                stepper = stepperNode.MaterialStepper;
+                console.log(stepper);
+            }
+        }
 
         // Check if MDL Component Handler is loaded.
         if (typeof componentHandler !== 'undefined') {
             // Get the MaterialStepper instance of element to control it.
-            var stepperElement = document.querySelector('ul.mdl-stepper');
-            let steps = stepperElement.querySelectorAll('.mdl-step');
-            document.addEventListener('onstepnext', function(event) {
-                if (!stepper) {
-                    stepper = document.querySelector('.mdl-stepper').MaterialStepper;
-                    console.log(stepper);
-                }
+            stepperNode.addEventListener('onstepnext', function(e) {
+                getStepper();
+                let activeStep = stepper.getActive();
 
-                stepper.next();
+                let valid = true;
+                let content = activeStep.querySelector('.mdl-step__content');
+                console.log(content.children);
+                let children = content.children;
+                for (let i=0; i < children.length; i++) {
+                    let element = children[i];
+                    try {
+                        if (!element.validate()) valid = false;
+                    } catch (error) {
+                        // 
+                    }
+                }
+                
+                if (valid) { 
+                    stepper.next();
+                }
+                else {
+                    stepper.error("Hay errores en el formulario.");
+                }
             })
 
+            stepperNode.addEventListener('onstepback', function(e) {
+                getStepper();
+                stepper.back();
+            });
 
-            stepper = stepperElement.MaterialStepper;
-            // Moves the stepper to the next step for test.
-            // Stepper.next();
+            stepperNode.addEventListener('onsteppercomplete', function() {
+                document.querySelector('form').submit();
+            });
+
         } else {
             console.log("no encontrado");
             // Material Design Lite javascript is not loaded or for another  

@@ -2,10 +2,11 @@ import datetime
 from django.utils import timezone
 from django.shortcuts import redirect
 from rest_framework import serializers
-from .models import Paciente
+from common.serializers import PrefixFieldSerializerNameMixin
+from .models import Paciente, Orden, Acompanante
 
 
-class PacienteSerializer(serializers.ModelSerializer):
+class PacienteSerializer(PrefixFieldSerializerNameMixin, serializers.ModelSerializer):
     """Serializer para el modelo paciente."""
 
     edit_link = serializers.HyperlinkedIdentityField(view_name='historias_clinicas:editar_paciente')
@@ -23,4 +24,17 @@ class PacienteSerializer(serializers.ModelSerializer):
         self.fields['activo'].initial = True
         self.fields['zona'].initial = Paciente.URBANO
         self.fields['grupo_etnico'].initial = Paciente.OTRO
-        # self.fields['fecha_ingreso'].initial = datetime.date.today()
+
+class OrdenSerializer(PrefixFieldSerializerNameMixin, serializers.ModelSerializer):
+    """Serializer para el modelo orden."""
+
+    class Meta:
+        model = Orden
+        fields = ('autorizacion', 'pendiente_autorizacion', 'empresa', 'afiliacion', 'tipo_usuario', 'forma_pago')
+
+class AcompananteSerializer(PrefixFieldSerializerNameMixin, serializers.ModelSerializer):
+    """Serializer para el modelo acompanante."""
+
+    class Meta:
+        model = Acompanante
+        fields = ('asistio', 'nombre', 'direccion', 'telefono')
