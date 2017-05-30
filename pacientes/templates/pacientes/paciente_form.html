@@ -3,6 +3,7 @@
 
 {% block imports %}
     <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+    <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
 {% endblock imports %}
 
 {% block css %}
@@ -24,7 +25,12 @@
                 </span>
             </span>
             <div class="mdl-step__content">
-                {% render_form paciente_s template_pack='material-pack' %}
+                <iron-form>
+                    <form method="POST" enctype="application/x-www-form-urlencoded">
+                        {% csrf_token %}
+                        {% render_form paciente_s template_pack='material-pack' %}              
+                    </form>
+                </iron-form>
             </div>
             <div class="mdl-step__actions">
                 <paper-button raised data-stepper-next>{% trans "Continuar" %}</paper-button>
@@ -37,7 +43,12 @@
                 </span>
             </span>
             <div class="mdl-step__content">
-                {% render_form orden_s template_pack='material-pack' %}
+                <iron-form>
+                    <form method="POST" enctype="application/x-www-form-urlencoded">
+                        {% csrf_token %}
+                        {% render_form orden_s template_pack='material-pack' %}
+                    </form>
+                </iron-form>
             </div>
             <div class="mdl-step__actions">
                 <paper-button raised data-stepper-next>{% trans "Continuar" %}</paper-button>
@@ -51,7 +62,12 @@
                 </span>
             </span>
             <div class="mdl-step__content">
-                {% render_form acompanante_s template_pack='material-pack' %}
+                <iron-form>
+                    <form method="POST" enctype="application/x-www-form-urlencoded">
+                        {% csrf_token %}
+                        {% render_form acompanante_s template_pack='material-pack' %}
+                    </form>
+                </iron-form>
             </div>
             <div class="mdl-step__actions">
                 <paper-button raised data-stepper-next>{% trans "Terminar" %}</paper-button>
@@ -84,19 +100,11 @@
                 let activeStep = stepper.getActive();
 
                 let valid = true;
-                let content = activeStep.querySelector('.mdl-step__content');
-                console.log(content.children);
-                let children = content.children;
-                for (let i=0; i < children.length; i++) {
-                    let element = children[i];
-                    try {
-                        if (!element.validate()) valid = false;
-                    } catch (error) {
-                        // 
-                    }
-                }
-                
-                if (valid) { 
+                let form = activeStep.querySelector('.mdl-step__content iron-form');
+                console.log(form.serializeForm());
+
+                if (form.validate()) {
+                    form.submit();
                     stepper.next();
                 }
                 else {

@@ -6,8 +6,8 @@
 {% endfor %}
 
 {% block js %}
-    <script>
-        document.querySelector('form').addEventListener('input', function(e) {
+    <!--<script>
+        document.querySelector('iron-form').addEventListener('input', function(e) {
             if (e.target.name == undefined) { // Es un paper-input
                 this.querySelector('input[data-name=' + e.target.dataset.name + ']').value = e.target.value;
             }
@@ -43,5 +43,5 @@
                 e.stopPropagation();
             })
         });
-    </script>
+    </script>-->
 {% endblock js %}

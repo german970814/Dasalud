@@ -34,7 +34,7 @@ class ListarPacientesView(APIView):
 class CrearPacienteView(APIView):
     """Permite crear un paciente."""
 
-    renderer_classes = [TemplateHTMLRenderer]
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'pacientes/paciente_form.html'
     VERBO = _lazy('Crear')
 
@@ -45,18 +45,19 @@ class CrearPacienteView(APIView):
         return Response({'paciente_s': paciente_s, 'orden_s': orden_s, 'acompanante_s': acompanante_s, 'VERBO': self.VERBO})
     
     def post(self, request):
-        orden_s = OrdenSerializer(data=request.data)
-        acompanante_s = AcompananteSerializer(data=request.data)
+        print(",,,,,,,,,,,,,", request.data)
         paciente_s = PacienteSerializer(data=request.data, context={'request': None})
-        acompanante_v = acompanante_s.is_valid()
+        orden_s = OrdenSerializer()
+        acompanante_s = AcompananteSerializer()
+        acompanante_v = False
         paciente_v = paciente_s.is_valid()
-        orden_v = orden_s.is_valid()
+        orden_v = False
 
         if paciente_v and orden_v and acompanante_v:
             # paciente.save()
             return redirect('pacientes:listar_pacientes')
-        print(".........................", paciente_s.errors, orden_s.errors, acompanante_s.errors)
-        print(".........................", paciente_s.data, orden_s.data, acompanante_s.data)
+        print(".........................", paciente_s.errors)
+        print(".........................", paciente_s.data)
         return Response({'paciente_s': paciente_s, 'orden_s': orden_s, 'acompanante_s': acompanante_s, 'VERBO': self.VERBO})
 
 

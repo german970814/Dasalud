@@ -25,6 +25,7 @@
     "vaadin-date-picker": "vaadin/vaadin-date-picker#^2.0.0",
     "paper-button": "PolymerElements/paper-button#^2.0.0",
     "paper-fab": "PolymerElements/paper-fab#^2.0.0",
-    "mdl-stepper": "ahlechandre/mdl-stepper#^1.1.6"
+    "mdl-stepper": "ahlechandre/mdl-stepper#^1.1.6",
+    "iron-form": "PolymerElements/iron-form#2.0-preview"
   }
 }

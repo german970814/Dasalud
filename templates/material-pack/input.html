@@ -5,18 +5,18 @@
   <vaadin-date-picker data-name="{{ style.serializer }}-{{ field.name }}" label="{{ field.label }}" auto-validate
                       {% if field.value %} value="{{ field.value }}" {% endif %}
                       {% if field.errors %} error-message="{{ field.errors|join:',' }}" invalid {% endif %}
-                      {% if field.required %} required {% endif %}>
+                      {% if field.required %} required {% endif %} name="{{ field.name }}">
   </vaadin-date-picker>
 {% else %}
   <paper-input data-name="{{ style.serializer }}-{{ field.name }}" label="{{ field.label }}" auto-validate
              {% if field.value %} value="{{ field.value }}" {% endif %} type="{{ style.input_type }}"
              {% if field.errors %} error-message="{{ field.errors|join:',' }}" invalid {% endif %}
              {% if style.input_type == 'text' %} char-counter maxlength="{{ field.max_length }}" {% endif %}
-             {% if field.required %} required {% endif %}>
+             {% if field.required %} required {% endif %} name="{{ field.name }}">
   </paper-input>    
 {% endif %}
 
-<div class="form-group" style="display: none;">
+<!--<div class="form-group" style="display: none;">
   <input name="{{ field.name }}" data-name="{{ style.serializer }}-{{ field.name }}" type="text"
          {% if field.value %}value="{{ field.value }}"{% endif %}>
-</div>
+</div>-->

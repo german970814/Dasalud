@@ -6,7 +6,7 @@
 <link rel="import" href="/static/bower_components/neon-animation/web-animations.html">
 
 <paper-dropdown-menu label="{{ field.label }}" data-name="{{ style.serializer }}-{{ field.name }}" 
-                     {% if field.required %} required {% endif %}
+                     {% if field.required %} required {% endif %} name="{{ field.name }}"
                      {% if field.errors %} error-message="{{ field.errors|join:',' }}" invalid {% endif %}>
   <paper-listbox slot="dropdown-content" attr-for-selected="data-value" 
                  {% if field.value %} selected="{{ field.value }}" {% endif %}>
@@ -16,7 +16,7 @@
   </paper-listbox>
 </paper-dropdown-menu>
 
-<div class="form-group" style="display:none;">
+<!--<div class="form-group" style="display:none;">
   <select class="form-control" name="{{ field.name }}" data-name="{{ style.serializer }}-{{ field.name }}" >
     <option value="">--------</option>
     {% for select in field.iter_options %}
@@ -29,4 +29,4 @@
         {% endif %}
     {% endfor %}
   </select>
-</div>
+</div>-->
