@@ -24,3 +24,17 @@ class Empresa(models.Model):
     
     def __str__(self):
         return self.nombre
+
+class Plan(models.Model):
+    """Modelo para guardar información de los planes que manejan las empresas"""
+
+    nombre = models.CharField(_lazy('plan'), max_length=200)
+    empresa = models.ForeignKey(Empresa, related_name='planes', verbose_name=_lazy('empresa'))
+    servicios = models.ManyToManyField(Servicio, related_name='planes', verbose_name=_lazy('servicios'))
+
+    class Meta:
+        verbose_name = 'plan'
+        verbose_name_plural = 'planes'
+    
+    def __str__(self):
+        return self.nombre
