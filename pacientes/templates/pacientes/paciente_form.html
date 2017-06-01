@@ -9,6 +9,12 @@
 {% block css %}
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="/static/bower_components/mdl-stepper/stepper.min.css">
+    <style>
+        .mdl-stepper {
+            max-width: none;
+            width: 100%;
+        }
+    </style>
 {% endblock css %}
 
 {% block content %}
@@ -17,7 +23,7 @@
         <h1>{{ VERBO }} Paciente</h1>
 
         <ul class="mdl-stepper mdl-stepper--horizontal " id="demo-stepper-state-error">
-        <li class="mdl-step mdl-step--editable">
+        <li class="mdl-step mdl-step--editable" data-number="1">
             <span class="mdl-step__label">
                 <span class="mdl-step__title">
                     <span class="mdl-step__title-text">{% trans "Paciente" %}</span>
@@ -26,9 +32,9 @@
             </span>
             <div class="mdl-step__content">
                 <iron-form>
-                    <form method="POST" enctype="application/x-www-form-urlencoded">
+                    <form action="{% url 'pacientes:listar' %}" method="POST" enctype="application/x-www-form-urlencoded">
                         {% csrf_token %}
-                        {% render_form paciente_s template_pack='material-pack' %}              
+                        {% render_form paciente_s template_pack='material-pack' %}
                     </form>
                 </iron-form>
             </div>
@@ -36,7 +42,7 @@
                 <paper-button raised data-stepper-next>{% trans "Continuar" %}</paper-button>
             </div>
         </li>
-        <li class="mdl-step mdl-step--editable">
+        <li class="mdl-step mdl-step--editable" data-number="2">
             <span class="mdl-step__label">
                 <span class="mdl-step__title">
                     <span class="mdl-step__title-text">{% trans "Orden" %}</span>
@@ -55,7 +61,7 @@
                 <paper-button raised data-stepper-back>{% trans "Atras" %}</paper-button>
             </div>
         </li>
-        <li class="mdl-step mdl-step--editable">
+        <li class="mdl-step mdl-step--editable" data-number="3">
             <span class="mdl-step__label">
                 <span class="mdl-step__title">
                     <span class="mdl-step__title-text">{% trans "Acompañante" %}</span>
@@ -82,7 +88,7 @@
     <script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
     <script src="/static/bower_components/mdl-stepper/stepper.min.js"></script>
     <script>
-        var stepperNode= document.querySelector('.mdl-stepper');
+        var stepperNode = document.querySelector('.mdl-stepper');
         var stepper;
 
         function getStepper() {
@@ -95,6 +101,7 @@
         // Check if MDL Component Handler is loaded.
         if (typeof componentHandler !== 'undefined') {
             // Get the MaterialStepper instance of element to control it.
+            var forms = new Array(3);
             stepperNode.addEventListener('onstepnext', function(e) {
                 getStepper();
                 let activeStep = stepper.getActive();
@@ -103,9 +110,37 @@
                 let form = activeStep.querySelector('.mdl-step__content iron-form');
                 console.log(form.serializeForm());
 
+
                 if (form.validate()) {
-                    form.submit();
-                    stepper.next();
+                    if (parseInt(activeStep.dataset.number) == 1) {
+                        activeStep.setAttribute('data-step-transient-message', 'Creando el paciente!!');
+                        activeStep.classList.add('mdl-step--transient');
+                        form.submit();
+                        let response;
+                        form.addEventListener('iron-form-error', function(e) {
+                            stepper.error("Hay errores en el formulario.");
+                            activeStep.classList.remove('mdl-step--transient');
+                            response = e.detail.request.response;
+                            for (let key in response) {
+                                let input = form.querySelector('*[name=' + key + ']');
+                                input.errorMessage = response[key];
+                                input.invalid = true;
+                                input.autofocus = true;
+                            }
+                        });
+
+                        form.addEventListener('iron-form-response', function(e) {
+                            console.log('paciente creado');
+                            activeStep.classList.remove('mdl-step--transient');
+                            response = e.detail.response;
+                            form.querySelector('form').setAttribute('action', response['edit_link']);
+                            stepper.next();
+                        });
+                    }
+                    else {
+                        forms[parseInt(activeStep.dataset.number)] = form;
+                        stepper.next();
+                    }                    
                 }
                 else {
                     stepper.error("Hay errores en el formulario.");
@@ -118,7 +153,13 @@
             });
 
             stepperNode.addEventListener('onsteppercomplete', function() {
-                document.querySelector('form').submit();
+                console.log(forms);
+                form.addEventListener('iron-form-response', function(e) {
+                    console.log('kjkk');
+                });
+                form.addEventListener('iron-form-error', function(e) {
+                    console.log('error');
+                });
             });
 
         } else {

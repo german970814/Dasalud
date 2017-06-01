@@ -35,6 +35,7 @@ class Municipio(models.Model):
 
     codigo = models.IntegerField(_lazy('código'))
     nombre = models.CharField(_lazy('nombre'), max_length=250)
+    departamento = models.ForeignKey(Departamento, related_name='municipios', verbose_name=_lazy('departamento'))
 
     class Meta:
         verbose_name = 'municipio'
@@ -48,6 +49,7 @@ class Poblado(models.Model):
 
     codigo = models.IntegerField(_lazy('código'))
     nombre = models.CharField(_lazy('nombre'), max_length=250)
+    municipio = models.ForeignKey(Municipio, related_name='poblados', verbose_name=_lazy('municipio'))
 
     class Meta:
         verbose_name = 'poblado'

@@ -45,7 +45,8 @@ SHARED_APPS = [
     'rest_framework',
 
     'clientes',
-    'globales'
+    'globales',
+    'common'
 ]
 
 TENANT_APPS = [

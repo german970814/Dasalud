@@ -16,7 +16,9 @@ class PacienteSerializer(PrefixFieldSerializerNameMixin, serializers.ModelSerial
         fields = (
             'id', 'nombres', 'apellidos', 'tipo_documento', 'numero_documento', 'genero', 'estado_civil', 
             'fecha_nacimiento', 'zona', 'direccion', 'telefono', 'celular', 'email', 'grupo_sanguineo', 
-            'grupo_etnico', 'profesion', 'activo', 'fecha_ingreso', 'edit_link'
+            'grupo_etnico', 'profesion', 'lugar_nacimiento', 'lugar_residencia', 'activo', 'fecha_ingreso',
+            'nombre_responsable', 'direccion_responsable', 'telefono_responsable' , 'edit_link',
+            'identificacion_padre', 'nombre_padre', 'identificacion_madre', 'nombre_madre' 
         )
     
     def __init__(self, *args, **kwargs):
@@ -31,6 +33,11 @@ class OrdenSerializer(PrefixFieldSerializerNameMixin, serializers.ModelSerialize
     class Meta:
         model = Orden
         fields = ('autorizacion', 'pendiente_autorizacion', 'empresa', 'afiliacion', 'tipo_usuario', 'forma_pago')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['afiliacion'].initial = Orden.PARTICULAR
+        self.fields['tipo_usuario'].initial = Orden.PARTICULAR
 
 class AcompananteSerializer(PrefixFieldSerializerNameMixin, serializers.ModelSerializer):
     """Serializer para el modelo acompanante."""

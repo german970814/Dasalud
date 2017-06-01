@@ -158,8 +158,8 @@
                 </app-toolbar>
             </app-header>
 
-            <app-drawer-layout>
-                <app-drawer slot="drawer" id="drawer">
+            <app-drawer-layout id="drawer">
+                <app-drawer slot="drawer">
                     <!--<app-toolbar>Menu</app-toolbar>-->
                     <app-menu selected="0">
                         <a class="app-menu-item" href="{% url 'pacientes:listar' %}">
@@ -201,7 +201,7 @@
 
         <script>
             document.querySelector('#menu').addEventListener('click', function() {
-                document.querySelector('#drawer').toggle();
+                document.querySelector('#drawer').drawer.toggle();
             })
         </script>
 

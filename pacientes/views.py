@@ -19,11 +19,12 @@ class PacientesList(generics.ListAPIView):
         return context
 
 
-class ListarPacientesView(APIView):
+class ListarPacientesView(generics.ListCreateAPIView):
     """Lista los pacientes."""
 
-    renderer_classes = [TemplateHTMLRenderer]
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'pacientes/lista_pacientes.html'
+    serializer_class = PacienteSerializer
 
     def get(self, request):
         serializer = PacienteSerializer(Paciente.objects.all(), many=True, context={'request': None})
@@ -34,7 +35,7 @@ class ListarPacientesView(APIView):
 class CrearPacienteView(APIView):
     """Permite crear un paciente."""
 
-    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    renderer_classes = [TemplateHTMLRenderer]
     template_name = 'pacientes/paciente_form.html'
     VERBO = _lazy('Crear')
 
@@ -42,22 +43,6 @@ class CrearPacienteView(APIView):
         paciente_s = PacienteSerializer(context={'request': None})
         orden_s = OrdenSerializer()
         acompanante_s = AcompananteSerializer()
-        return Response({'paciente_s': paciente_s, 'orden_s': orden_s, 'acompanante_s': acompanante_s, 'VERBO': self.VERBO})
-    
-    def post(self, request):
-        print(",,,,,,,,,,,,,", request.data)
-        paciente_s = PacienteSerializer(data=request.data, context={'request': None})
-        orden_s = OrdenSerializer()
-        acompanante_s = AcompananteSerializer()
-        acompanante_v = False
-        paciente_v = paciente_s.is_valid()
-        orden_v = False
-
-        if paciente_v and orden_v and acompanante_v:
-            # paciente.save()
-            return redirect('pacientes:listar_pacientes')
-        print(".........................", paciente_s.errors)
-        print(".........................", paciente_s.data)
         return Response({'paciente_s': paciente_s, 'orden_s': orden_s, 'acompanante_s': acompanante_s, 'VERBO': self.VERBO})
 
 
@@ -80,6 +65,16 @@ class EditarPacienteView(APIView):
             serializer.save()
             return redirect('pacientes:listar_pacientes')
         return Response({'serializer': serializer, 'VERBO': self.VERBO})
+
+
+class CrearOrdenView(APIView):
+    """Permite crear una orden a un paciente."""
+
+    renderer_class = [JSONRenderer]
+
+    def post(self, request, pk):
+        paciente = get_object_or_404(Paciente, pk=pk)
+        return Response()
 
 
 
