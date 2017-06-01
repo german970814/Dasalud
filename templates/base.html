@@ -158,7 +158,7 @@
                 </app-toolbar>
             </app-header>
 
-            <app-drawer-layout id="drawer">
+            <app-drawer-layout id="drawerLayout">
                 <app-drawer slot="drawer">
                     <!--<app-toolbar>Menu</app-toolbar>-->
                     <app-menu selected="0">
@@ -174,34 +174,14 @@
             </app-drawer-layout>
         </app-header-layout>
 
-        <!--<app-drawer-layout fullbleed>
-            <app-drawer id="drawer" slot="drawer">
-                <app-header-layout has-scrolling-region>
-                    <app-header slot="header" fixed>
-                        <app-toolbar>DASALUD</app-toolbar>
-                    </app-header>
-                    
-
-                </app-header-layout>
-            </app-drawer>
-
-            <app-header-layout has-scrolling-region>
-
-                <app-header slot="header" condenses fixed effects="waterfall">
-                    <app-toolbar>
-                        <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-                        <div main-title></div>
-                    </app-toolbar>
-                </app-header>
-
-                {# {% block content %}{% endblock content %} #}
-
-            </app-header-layout>
-        </app-drawer-layout>-->
-
         <script>
-            document.querySelector('#menu').addEventListener('click', function() {
-                document.querySelector('#drawer').drawer.toggle();
+            var drawerLayout = document.getElementById('drawerLayout');
+            document.getElementById('menu').addEventListener('click', function() {
+                if (drawerLayout.forceNarrow || !drawerLayout.narrow) {
+                    drawerLayout.forceNarrow = !drawerLayout.forceNarrow;
+                } else {
+                    drawerLayout.drawer.toggle();
+                }
             })
         </script>
 
