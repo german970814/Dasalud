@@ -58,7 +58,8 @@ TENANT_APPS = [
     'django.contrib.staticfiles',
 
     'pacientes',
-    'servicios'
+    'servicios',
+    'organizacional'
 ]
 
 INSTALLED_APPS = SHARED_APPS + list(set(TENANT_APPS) - set(SHARED_APPS))
