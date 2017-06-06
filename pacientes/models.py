@@ -130,7 +130,7 @@ class Paciente(ParentescoMixin, models.Model):
     estado_civil = models.CharField(_lazy('estado civil'), max_length=2, choices=ESTADOS_CIVILES)
     zona = models.CharField(_lazy('zona'), max_length=1, choices=ZONAS)
     direccion = models.CharField(_lazy('dirección'), max_length=200)
-    telefono = models.IntegerField(_lazy('telefono'), null=True, blank=True)
+    telefono = models.PositiveIntegerField(_lazy('telefono'), null=True, blank=True)
     celular = models.IntegerField(_lazy('celular'), null=True, blank=True)
     email = models.EmailField(_lazy('email'))
     grupo_sanguineo = models.CharField(_lazy('grupo sanguineo'), max_length=3, choices=GRUPOS_SANGUINEOS, blank=True)
@@ -145,7 +145,7 @@ class Paciente(ParentescoMixin, models.Model):
     # Datos responsable
     nombre_responsable = models.CharField(_lazy('nombre completo del responsable'), max_length=300)
     direccion_responsable = models.CharField(_lazy('dirección del responsable'), max_length=200)
-    telefono_responsable = models.IntegerField(_lazy('telefono del responsable'), null=True, blank=True)
+    telefono_responsable = models.PositiveIntegerField(_lazy('telefono del responsable'), null=True, blank=True)
 
     # Menores de edad
     identificacion_padre = models.CharField(_lazy('identificación del padre'), max_length=15, blank=True)
@@ -204,9 +204,12 @@ class Orden(models.Model):
     anulada = models.BooleanField(_lazy('anulada'), default=False)
     razon_anulacion = models.CharField(_lazy('razón de anulación'), max_length=200, blank=True)
     forma_pago = models.CharField(_lazy('forma de pago'), max_length=2, choices=FORMAS_PAGO)
-    empresa = models.ForeignKey('servicios.Empresa', related_name='ordenes', verbose_name=_lazy('empresa'))
-
-    # institucion = models.ForeignKey('Institucion', related_name='ordenes', verbose_name=_lazy('Institución'))
+    empresa = models.ForeignKey('servicios.Plan', related_name='ordenes', verbose_name=_lazy('empresa'))
+    institucion = models.ForeignKey('organizacional.Institucion', related_name='ordenes', verbose_name=_lazy('Institución'))
+    servicios = models.ManyToManyField(
+        'servicios.Servicio', through='ServicioOrden', related_name='ordenes', verbose_name=_lazy('servicios')
+    )
+    sucursal = models.ForeignKey('organizacional.Sucursal', related_name='ordenes', verbose_name=_lazy('sucursal'))
 
     class Meta:
         verbose_name = 'orden'
@@ -216,6 +219,31 @@ class Orden(models.Model):
         return '{0} - {1}'.format(str(self.paciente), self.pk)
 
 
+class ServicioOrden(models.Model):
+    """Modelo para guardar los servicios que maneja una orden."""
+
+    COOPAGO = 'CO'
+    CUOTA_MODERADORA = 'CM'
+    TIPOS_PAGO = (
+        (COOPAGO, _lazy('Coopago')),
+        (CUOTA_MODERADORA, _lazy('Cuota moderadora'))
+    )
+
+    orden = models.ForeignKey(Orden, related_name='servicios_orden', verbose_name=_lazy('orden'))
+    servicio = models.ForeignKey('servicios.Servicio', related_name='servicios_orden', verbose_name=_lazy('servicio'))
+    tipo_pago = models.CharField(_lazy('tipo de pago'), max_length=2, choices=TIPOS_PAGO)
+    valor = models.PositiveIntegerField(_lazy('valor'))
+    descuento = models.PositiveIntegerField(_lazy('descuento'))
+    medico = models.ForeignKey('organizacional.Empleado', related_name='servicios', verbose_name=_lazy('medico'))
+
+    class Meta:
+        verbose_name = 'servicio orden'
+        verbose_name_plural = 'servicios orden'
+    
+    def __str__(self):
+        return '{} - {}'.format(self.orden.pk, self.servicio.nombre)
+
+
 class Acompanante(ParentescoMixin, models.Model):
     """Modelo que guarda la información del acompañante de un paciente según el ordenamiento."""
 
@@ -223,7 +251,7 @@ class Acompanante(ParentescoMixin, models.Model):
     asistio = models.BooleanField(_lazy('acompañante'))
     nombre = models.CharField(_lazy('nombre completo'), max_length=200)
     direccion = models.CharField(_lazy('dirección'), max_length=200)
-    telefono = models.IntegerField(_lazy('teléfono'))
+    telefono = models.PositiveIntegerField(_lazy('teléfono'))
 
     class Meta:
         verbose_name = _lazy('acompañate')
