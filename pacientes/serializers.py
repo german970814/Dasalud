@@ -2,17 +2,16 @@ import datetime
 from django.utils import timezone
 from django.shortcuts import redirect
 from rest_framework import serializers
-from common.serializers import PrefixFieldSerializerNameMixin
-from .models import Paciente, Orden, Acompanante
+from . import models
 
 
-class PacienteSerializer(PrefixFieldSerializerNameMixin, serializers.ModelSerializer):
+class PacienteSerializer(serializers.ModelSerializer):
     """Serializer para el modelo paciente."""
 
     edit_link = serializers.HyperlinkedIdentityField(view_name='pacientes:editar')
 
     class Meta:
-        model = Paciente
+        model = models.Paciente
         fields = (
             'id', 'nombres', 'apellidos', 'tipo_documento', 'numero_documento', 'genero', 'estado_civil', 
             'fecha_nacimiento', 'zona', 'direccion', 'telefono', 'celular', 'email', 'grupo_sanguineo', 
@@ -24,24 +23,31 @@ class PacienteSerializer(PrefixFieldSerializerNameMixin, serializers.ModelSerial
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['activo'].initial = True
-        self.fields['zona'].initial = Paciente.URBANO
-        self.fields['grupo_etnico'].initial = Paciente.OTRO
+        self.fields['zona'].initial = models.Paciente.URBANO
+        self.fields['grupo_etnico'].initial = models.Paciente.OTRO
 
-class OrdenSerializer(PrefixFieldSerializerNameMixin, serializers.ModelSerializer):
+class OrdenSerializer(serializers.ModelSerializer):
     """Serializer para el modelo orden."""
 
     class Meta:
-        model = Orden
-        fields = ('autorizacion', 'pendiente_autorizacion', 'empresa', 'afiliacion', 'tipo_usuario', 'forma_pago')
+        model = models.Orden
+        fields = ('sucursal', 'autorizacion', 'pendiente_autorizacion', 'institucion', 'empresa', 'afiliacion', 'tipo_usuario', 'forma_pago')
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['afiliacion'].initial = Orden.PARTICULAR
-        self.fields['tipo_usuario'].initial = Orden.PARTICULAR
+        self.fields['afiliacion'].initial = models.Orden.PARTICULAR
+        self.fields['tipo_usuario'].initial = models.Orden.PARTICULAR
 
-class AcompananteSerializer(PrefixFieldSerializerNameMixin, serializers.ModelSerializer):
+class ServicioOrdenSerializer(serializers.ModelSerializer):
+    """Serializer para el modelo servicio orden."""
+
+    class Meta:
+        model = models.ServicioOrden
+        fields = ('medico', 'servicio', 'tipo_pago', 'valor', 'descuento')
+
+class AcompananteSerializer(serializers.ModelSerializer):
     """Serializer para el modelo acompanante."""
 
     class Meta:
-        model = Acompanante
+        model = models.Acompanante
         fields = ('asistio', 'nombre', 'direccion', 'telefono')

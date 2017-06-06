@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Paciente
-from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSerializer
+from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSerializer, ServicioOrdenSerializer
 
 
 from rest_framework import generics
@@ -43,7 +43,11 @@ class CrearPacienteView(APIView):
         paciente_s = PacienteSerializer(context={'request': None})
         orden_s = OrdenSerializer()
         acompanante_s = AcompananteSerializer()
-        return Response({'paciente_s': paciente_s, 'orden_s': orden_s, 'acompanante_s': acompanante_s, 'VERBO': self.VERBO})
+        servicios_s = ServicioOrdenSerializer()
+        return Response({
+            'paciente_s': paciente_s, 'orden_s': orden_s, 'servicios_s': servicios_s,
+            'acompanante_s': acompanante_s, 'VERBO': self.VERBO
+        })
 
 
 class EditarPacienteView(APIView):

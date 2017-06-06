@@ -205,7 +205,9 @@ class Orden(models.Model):
     razon_anulacion = models.CharField(_lazy('razón de anulación'), max_length=200, blank=True)
     forma_pago = models.CharField(_lazy('forma de pago'), max_length=2, choices=FORMAS_PAGO)
     empresa = models.ForeignKey('servicios.Plan', related_name='ordenes', verbose_name=_lazy('empresa'))
-    institucion = models.ForeignKey('organizacional.Institucion', related_name='ordenes', verbose_name=_lazy('Institución'))
+    institucion = models.ForeignKey(
+        'organizacional.Institucion', related_name='ordenes', verbose_name=_lazy('entidad que prestará el servicio')
+    )
     servicios = models.ManyToManyField(
         'servicios.Servicio', through='ServicioOrden', related_name='ordenes', verbose_name=_lazy('servicios')
     )
