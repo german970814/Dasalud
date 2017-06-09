@@ -4,14 +4,24 @@ from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Paciente
+from .models import Paciente, Orden
 from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSerializer, ServicioOrdenSerializer
+from .serializers import CrearOrdenSerializer
 
 
 from rest_framework import generics
 class PacientesList(generics.ListAPIView):
     queryset = Paciente.objects.all()
     serializer_class = PacienteSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = None
+        return context
+
+class OrdenesList(generics.ListAPIView):
+    queryset = Orden.objects.all()
+    serializer_class = OrdenSerializer
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -71,14 +81,15 @@ class EditarPacienteView(APIView):
         return Response({'serializer': serializer, 'VERBO': self.VERBO})
 
 
-class CrearOrdenView(APIView):
+class CrearOrdenView(generics.CreateAPIView):
     """Permite crear una orden a un paciente."""
 
     renderer_class = [JSONRenderer]
+    serializer_class = CrearOrdenSerializer
 
-    def post(self, request, pk):
-        paciente = get_object_or_404(Paciente, pk=pk)
-        return Response()
+    def post(self, request, *args, **kwargs):
+        print(request.POST);
+        super().post(request, *args, **kwargs)
 
 
 

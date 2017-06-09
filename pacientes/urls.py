@@ -13,4 +13,5 @@ urlpatterns = [
 
 
     url(r'^list/$', views.PacientesList.as_view()),
+    url(r'^ordenes/$', views.OrdenesList.as_view()),
 ]

@@ -32,7 +32,7 @@ class Institucion(models.Model):
     nombre = models.CharField(_lazy('nombre'), max_length=100)
     razon_social = models.CharField(_lazy('razón social'), max_length=100)
     tipo_documento = models.CharField(_lazy('tipo de documento'), max_length=2, choices=TIPO_DOCUMENTOS)
-    identificacion = models.CharField(_lazy('identificación'), max_length=50)
+    identificacion = models.CharField(_lazy('identificación'), max_length=50, unique=True)
     codigo = models.CharField(_lazy('código'), max_length=50, blank=True)
     direccion = models.CharField(_lazy('dirección'), max_length=100)
     telefono = models.PositiveIntegerField(_lazy('telefono'), blank=True, null=True)
@@ -51,11 +51,11 @@ def empleado_firma_path(instance, filename):
 class Empleado(models.Model):
     """Modelo para guardar los empleados de un cliente."""
 
-    MEDICOS = 'M'
-    ADMINISTRATIVOS = 'A'
+    MEDICO = 'M'
+    ADMINISTRATIVO = 'A'
     TIPOS = (
-        (MEDICOS, _lazy('medicos')),
-        (ADMINISTRATIVOS, 'administrativos')
+        (MEDICO, _lazy('medico')),
+        (ADMINISTRATIVO, 'administrativo')
     )
 
     nombres = models.CharField(_lazy('nombres'), max_length=100)

@@ -190,9 +190,11 @@ class Orden(models.Model):
 
     EFECTIVO = 'E'
     TARJETA = 'T'
+    CONSIGNACION = 'C'
     FORMAS_PAGO = (
         (EFECTIVO, _lazy('Efectivo')),
-        (TARJETA, _lazy('Tarjeta'))
+        (TARJETA, _lazy('Tarjeta')),
+        (CONSIGNACION, _lazy('Consignación'))
     )
 
     paciente = models.ForeignKey(Paciente, related_name='ordenes', verbose_name=_lazy('paciente'))
@@ -204,7 +206,7 @@ class Orden(models.Model):
     anulada = models.BooleanField(_lazy('anulada'), default=False)
     razon_anulacion = models.CharField(_lazy('razón de anulación'), max_length=200, blank=True)
     forma_pago = models.CharField(_lazy('forma de pago'), max_length=2, choices=FORMAS_PAGO)
-    empresa = models.ForeignKey('servicios.Plan', related_name='ordenes', verbose_name=_lazy('empresa'))
+    plan = models.ForeignKey('servicios.Plan', related_name='ordenes', verbose_name=_lazy('empresa'))
     institucion = models.ForeignKey(
         'organizacional.Institucion', related_name='ordenes', verbose_name=_lazy('entidad que prestará el servicio')
     )
@@ -233,7 +235,7 @@ class ServicioOrden(models.Model):
 
     orden = models.ForeignKey(Orden, related_name='servicios_orden', verbose_name=_lazy('orden'))
     servicio = models.ForeignKey('servicios.Servicio', related_name='servicios_orden', verbose_name=_lazy('servicio'))
-    tipo_pago = models.CharField(_lazy('tipo de pago'), max_length=2, choices=TIPOS_PAGO)
+    tipo_pago = models.CharField(_lazy('tipo de pago'), max_length=2, choices=TIPOS_PAGO, blank=True)
     valor = models.PositiveIntegerField(_lazy('valor'))
     descuento = models.PositiveIntegerField(_lazy('descuento'))
     medico = models.ForeignKey('organizacional.Empleado', related_name='servicios', verbose_name=_lazy('medico'))

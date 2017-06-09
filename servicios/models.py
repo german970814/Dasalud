@@ -93,4 +93,4 @@ class Plan(models.Model):
         verbose_name_plural = 'planes'
     
     def __str__(self):
-        return self.nombre
+        return '{} - {}'.format(self.empresa.nombre, self.nombre)
