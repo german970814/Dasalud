@@ -1,6 +1,17 @@
 from django.contrib import admin
-from .models import Paciente
+from . import models
+
+class AcompananteInline(admin.StackedInline):
+    model = models.Acompanante
+
+class ServiciosOrdenInline(admin.TabularInline):
+    model = models.ServicioOrden
 
 
-admin.site.register(Paciente)
+class OrdenAdmin(admin.ModelAdmin):
+    inlines = [AcompananteInline, ServiciosOrdenInline]
+
+
+admin.site.register(models.Paciente)
+admin.site.register(models.Orden, OrdenAdmin)
 
