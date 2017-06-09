@@ -198,7 +198,7 @@ class Orden(models.Model):
     )
 
     paciente = models.ForeignKey(Paciente, related_name='ordenes', verbose_name=_lazy('paciente'))
-    fecha_orden = models.DateField(_lazy('Fecha de la orden'))
+    fecha_orden = models.DateField(_lazy('Fecha de la orden'), auto_now_add=True)
     autorizacion = models.CharField(_lazy('autorización'), max_length=50, blank=True)
     pendiente_autorizacion = models.BooleanField(_lazy('Pendiente por autorización'), default=False)
     afiliacion = models.CharField(_lazy('afiliación'), max_length=1, choices=AFILIACIONES)
@@ -237,7 +237,7 @@ class ServicioOrden(models.Model):
     servicio = models.ForeignKey('servicios.Servicio', related_name='servicios_orden', verbose_name=_lazy('servicio'))
     tipo_pago = models.CharField(_lazy('tipo de pago'), max_length=2, choices=TIPOS_PAGO, blank=True)
     valor = models.PositiveIntegerField(_lazy('valor'))
-    descuento = models.PositiveIntegerField(_lazy('descuento'))
+    descuento = models.PositiveIntegerField(_lazy('descuento'), blank=True, null=True)
     medico = models.ForeignKey('organizacional.Empleado', related_name='servicios', verbose_name=_lazy('medico'))
 
     class Meta:
@@ -252,7 +252,7 @@ class Acompanante(ParentescoMixin, models.Model):
     """Modelo que guarda la información del acompañante de un paciente según el ordenamiento."""
 
     orden = models.OneToOneField(Orden, verbose_name=_lazy('orden'))
-    asistio = models.BooleanField(_lazy('acompañante'))
+    asistio = models.BooleanField(_lazy('acompañante'), default=True)
     nombre = models.CharField(_lazy('nombre completo'), max_length=200)
     direccion = models.CharField(_lazy('dirección'), max_length=200)
     telefono = models.PositiveIntegerField(_lazy('teléfono'))

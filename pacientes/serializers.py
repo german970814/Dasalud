@@ -10,7 +10,8 @@ from . import models
 class PacienteSerializer(serializers.ModelSerializer):
     """Serializer para el modelo paciente."""
 
-    edit_link = serializers.HyperlinkedIdentityField(view_name='pacientes:editar')
+    edit_link = serializers.HyperlinkedIdentityField(view_name='pacientes:detalle')
+    ordenes_link = serializers.HyperlinkedIdentityField(view_name='pacientes:ordenes')
 
     class Meta:
         model = models.Paciente
@@ -18,8 +19,8 @@ class PacienteSerializer(serializers.ModelSerializer):
             'id', 'nombres', 'apellidos', 'tipo_documento', 'numero_documento', 'genero', 'estado_civil', 
             'fecha_nacimiento', 'zona', 'direccion', 'telefono', 'celular', 'email', 'grupo_sanguineo', 
             'grupo_etnico', 'profesion', 'lugar_nacimiento', 'lugar_residencia', 'activo', 'fecha_ingreso',
-            'nombre_responsable', 'direccion_responsable', 'telefono_responsable' , 'edit_link',
-            'identificacion_padre', 'nombre_padre', 'identificacion_madre', 'nombre_madre' 
+            'nombre_responsable', 'direccion_responsable', 'telefono_responsable' , 'edit_link', 'ordenes_link',
+            'identificacion_padre', 'nombre_padre', 'identificacion_madre', 'nombre_madre'
         ]
     
     def __init__(self, *args, **kwargs):
@@ -61,18 +62,19 @@ class CrearOrdenSerializer(OrdenSerializer):
     """Serializer para la creación de una orden."""
 
     acompanante = AcompananteSerializer()
-    servicios = ServicioOrdenSerializer(many=True)
+    servicios = ServicioOrdenSerializer(many=True, source='servicios_orden')
 
     class Meta(OrdenSerializer.Meta):
-        fields = OrdenSerializer.Meta.fields + ['acompanante', 'servicios']
+        fields = OrdenSerializer.Meta.fields + ['acompanante', 'servicios', 'paciente']
+        read_only_fields = ['paciente']
     
     def create(self, validated_data):
-        servicios_data = validated_data.pop('servicios')
+        servicios_data = validated_data.pop('servicios_orden')
         acompanante_data = validated_data.pop('acompanante')
 
         with transaction.atomic():
             orden = super().create(validated_data)
             models.Acompanante.objects.create(orden=orden, **acompanante_data)
             for servicio_data in servicios_data:
-                Servicio.objects.create(orden=orden, **servicio_data)
+                models.ServicioOrden.objects.create(orden=orden, **servicio_data)
             return orden

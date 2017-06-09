@@ -68,7 +68,7 @@
             </span>
             <div class="mdl-step__content">
                 <iron-form>
-                    <form action="{% url 'pacientes:crear_orden' 1 %}" method="POST" enctype="application/json">
+                    <form method="POST" enctype="application/json">
                         {% csrf_token %}
                         {% render_form orden_s template_pack='material-pack' %}
                     </form>
@@ -191,29 +191,37 @@
             // you can't use (register and upgrade) Stepper component at this point.
         }
 
+        function _setFormErrors(form, errors) {
+            for (let key in errors) {
+                let input = form.querySelector('*[name=' + key + ']');
+                input.errorMessage = errors[key];
+                input.invalid = true;
+            }
+        }
+
+        function _setOrdenesUrl(url) {
+            let form = stepperNode.querySelector(".mdl-step[data-step='orden'] iron-form form");
+            form.setAttribute('action', url);
+        }
+
         function _submitPaciente(activeStep, form) {
             activeStep.setAttribute('data-step-transient-message', 'Creando el paciente!!');
             activeStep.classList.add('mdl-step--transient');
-            // form.submit();
-            stepper.next();
-            let response;
+            form.submit();
+            // stepper.next();
             form.addEventListener('iron-form-error', function(e) {
                 stepper.error("Hay errores en el formulario.");
                 activeStep.classList.remove('mdl-step--transient');
-                response = e.detail.request.response;
-                for (let key in response) {
-                    let input = form.querySelector('*[name=' + key + ']');
-                    input.errorMessage = response[key];
-                    input.invalid = true;
-                    input.autofocus = true;
-                }
+                _setFormErrors(form, e.detail.request.response);
             });
 
             form.addEventListener('iron-form-response', function(e) {
                 console.log('paciente creado');
                 activeStep.classList.remove('mdl-step--transient');
-                response = e.detail.response;
+                let response = e.detail.response;
                 form.querySelector('form').setAttribute('action', response['edit_link']);
+                form.querySelector('form').setAttribute('method', 'PUT');
+                _setOrdenesUrl(response['ordenes_link']);
                 stepper.next();
             });
         }

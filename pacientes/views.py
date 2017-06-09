@@ -21,7 +21,7 @@ class PacientesList(generics.ListAPIView):
 
 class OrdenesList(generics.ListAPIView):
     queryset = Orden.objects.all()
-    serializer_class = OrdenSerializer
+    serializer_class = CrearOrdenSerializer
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -40,6 +40,11 @@ class ListarPacientesView(generics.ListCreateAPIView):
         serializer = PacienteSerializer(Paciente.objects.all(), many=True, context={'request': None})
         pacientes = JSONRenderer().render(serializer.data)
         return Response({'pacientes': pacientes, 'total_pacientes': len(serializer.data)})
+
+
+class PacienteDetalleView(generics.UpdateAPIView):
+    renderer_classes = [JSONRenderer]
+    serializer_class = PacienteSerializer
 
 
 class CrearPacienteView(APIView):
@@ -81,15 +86,17 @@ class EditarPacienteView(APIView):
         return Response({'serializer': serializer, 'VERBO': self.VERBO})
 
 
-class CrearOrdenView(generics.CreateAPIView):
+class OrdenesPacienteView(generics.CreateAPIView):
     """Permite crear una orden a un paciente."""
 
-    renderer_class = [JSONRenderer]
     serializer_class = CrearOrdenSerializer
 
     def post(self, request, *args, **kwargs):
-        print(request.POST);
-        super().post(request, *args, **kwargs)
+        self.paciente = get_object_or_404(Paciente, pk=kwargs.get('pk'))
+        return super().post(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        serializer.save(paciente=self.paciente)
 
 
 
