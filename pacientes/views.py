@@ -3,13 +3,13 @@ from django.utils.translation import ugettext_lazy as _lazy
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import generics
 
 from .models import Paciente, Orden
 from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSerializer, ServicioOrdenSerializer
 from .serializers import CrearOrdenSerializer
 
 
-from rest_framework import generics
 class PacientesList(generics.ListAPIView):
     queryset = Paciente.objects.all()
     serializer_class = PacienteSerializer
@@ -30,7 +30,7 @@ class OrdenesList(generics.ListAPIView):
 
 
 class ListarPacientesView(generics.ListCreateAPIView):
-    """Lista los pacientes."""
+    """Permite listar y crear pacientes."""
 
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'pacientes/lista_pacientes.html'
@@ -43,12 +43,13 @@ class ListarPacientesView(generics.ListCreateAPIView):
 
 
 class PacienteDetalleView(generics.UpdateAPIView):
-    renderer_classes = [JSONRenderer]
+    """Permite editar un paciente."""
+
     serializer_class = PacienteSerializer
 
 
 class CrearPacienteView(APIView):
-    """Permite crear un paciente."""
+    """Muestra el formulario de creación de un paciente."""
 
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'pacientes/paciente_form.html'

@@ -27,6 +27,7 @@
     "paper-fab": "PolymerElements/paper-fab#^2.0.0",
     "mdl-stepper": "ahlechandre/mdl-stepper#^1.1.6",
     "iron-form": "PolymerElements/iron-form#2.0-preview",
-    "vaadin-combo-box": "vaadin/vaadin-combo-box#^2.0.0"
+    "vaadin-combo-box": "vaadin/vaadin-combo-box#^2.0.0",
+    "paper-dialog": "PolymerElements/paper-dialog#^2.0.0"
   }
 }

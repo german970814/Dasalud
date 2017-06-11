@@ -71,7 +71,12 @@ class Empresa(models.Model):
     direccion = models.CharField(_lazy('dirección'), max_length=100, blank=True)
     telefono = models.PositiveIntegerField(_lazy('telefono'), blank=True, null=True)
     codigo = models.CharField(_lazy('código'), max_length=100, blank=True)
-    ciudad = models.ForeignKey('globales.Poblado', related_name='empresas', verbose_name=_lazy('ciudad'), blank=True, null=True)
+    ciudad = models.ForeignKey(
+        'globales.Poblado', related_name='empresas', verbose_name=_lazy('ciudad'), blank=True, null=True
+    )
+    instituciones = models.ManyToManyField(
+        'organizacional.Institucion', related_name='empresas', verbose_name=_lazy('instituciones')
+    )
 
     class Meta:
         verbose_name = 'empresa'

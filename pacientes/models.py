@@ -237,7 +237,7 @@ class ServicioOrden(models.Model):
     servicio = models.ForeignKey('servicios.Servicio', related_name='servicios_orden', verbose_name=_lazy('servicio'))
     tipo_pago = models.CharField(_lazy('tipo de pago'), max_length=2, choices=TIPOS_PAGO, blank=True)
     valor = models.PositiveIntegerField(_lazy('valor'))
-    descuento = models.PositiveIntegerField(_lazy('descuento'), blank=True, null=True)
+    descuento = models.PositiveIntegerField(_lazy('descuento'), default=0)
     medico = models.ForeignKey('organizacional.Empleado', related_name='servicios', verbose_name=_lazy('medico'))
 
     class Meta:

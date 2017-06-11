@@ -7,6 +7,7 @@
     <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
     <link rel="import" href="/static/bower_components/paper-fab/paper-fab.html">
     <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
 {% endblock imports %}
 
 {% block css %}
@@ -36,7 +37,6 @@
 {% endblock css %}
 
 {% block content %}
-
     <div class="card">
         <h1>{{ VERBO }} Paciente</h1>
 
@@ -132,6 +132,14 @@
             </div>
         </li>
         </ul>
+        <paper-dialog>
+            <div>
+                {% trans "Debe agregar por lo menos un servicio." %}                
+            </div>
+            <div class="buttons">
+                <paper-button  dialog-dismiss>{% trans "Cerrar" %}</paper-button>
+            </div>
+        </paper-dialog>
     </div>
 {% endblock content %}
 
@@ -145,7 +153,6 @@
         function getStepper() {
             if (!stepper) {
                 stepper = stepperNode.MaterialStepper;
-                console.log(stepper);
             }
         }
 
@@ -158,9 +165,20 @@
                 let activeStep = stepper.getActive();
                 
                 let form = activeStep.querySelector('.mdl-step__content iron-form');
+                console.log(form.serializeForm());
                 if (form.validate()) {
                     if (activeStep.dataset.step == "paciente") {
                         _submitPaciente(activeStep, form);
+                    }
+                    else if (activeStep.dataset.step == "servicios") {
+                        let servicios = activeStep.querySelectorAll('.mdl-step__content .servicio');
+                        if (servicios.length == 0) {
+                            stepper.error("Hay errores en el formulario.");
+                            document.querySelector('paper-dialog').open();
+                        }
+                        else {
+                            stepper.next();
+                        }
                     }
                     else {
                         forms[activeStep.dataset.step] = form;
@@ -184,11 +202,42 @@
             stepperNode.addEventListener('onsteppercomplete', function() {
                 console.log("terminado");
             });
+
+            let institucionNode = document.querySelector('*[name="institucion"]');
+            institucionNode.addEventListener('selected-item-changed', function(){
+                _getEmpresas(institucionNode.value);
+                _getMedicos(institucionNode.value);
+            });
         } else {
             console.log("no encontrado");
             // Material Design Lite javascript is not loaded or for another  
             // reason MDL Component Handler is not available globally and
             // you can't use (register and upgrade) Stepper component at this point.
+        }
+
+        function _getEmpresas(value) {
+            fetch("{% url 'servicios:planes' %}?institucion=" + value)
+                .then(function(response){
+                    return response.json();
+                })
+                .then(function(data){
+                    document.querySelector('*[name="plan"]').items = data;
+                });
+        }
+
+        var medicos = [];
+        function _getMedicos(value) {
+            fetch("{% url 'organizacional:medicos' %}?instituciones=" + value)
+                .then(function(response){
+                    return response.json();
+                })
+                .then(function(data){
+                    medicos = data;
+                    let medicosNodes = document.querySelectorAll('*[name="medico"]')
+                    for (let i = 0; i < medicosNodes.length; i++) {
+                        medicosNodes[i].items = data;
+                    }
+                });
         }
 
         function _setFormErrors(form, errors) {
@@ -207,8 +256,8 @@
         function _submitPaciente(activeStep, form) {
             activeStep.setAttribute('data-step-transient-message', 'Creando el paciente!!');
             activeStep.classList.add('mdl-step--transient');
+            
             form.submit();
-            // stepper.next();
             form.addEventListener('iron-form-error', function(e) {
                 stepper.error("Hay errores en el formulario.");
                 activeStep.classList.remove('mdl-step--transient');
@@ -238,7 +287,7 @@
             orden['servicios'] = servicios;
             form.headers = {'X-CSRFToken': orden['csrfmiddlewaretoken']};
             form._makeAjaxRequest(orden);
-            console.log(orden);
+
             let response;
             form.addEventListener('iron-form-error', function(e) {
                 stepper.error("Hay errores en el formulario.");
@@ -266,6 +315,7 @@
             const instance = template.content.cloneNode(true);
 
             let serviciosDiv = document.getElementById('servicios');
+            instance.querySelector('*[name="medico"]').items = medicos;
             serviciosDiv.appendChild(instance);
         }
 

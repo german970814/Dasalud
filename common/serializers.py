@@ -1,8 +1,15 @@
-class PrefixFieldSerializerNameMixin(object):
-    """Mixin que le agrega a todos campos de un serializer el nombre del serializer al que pertenece."""
+from rest_framework import serializers
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class SelectableSerializerMixin(serializers.Serializer):
+    """Mixin que le agrega campos label y value para ser usado en vaadin-combobox."""
 
-        for _, field in self.fields.items():
-            field.style.update({'serializer': self.__class__.__name__})
+    label = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
+
+    mixin_fields = ['label', 'value']
+
+    def get_label(self, obj):
+        return str(obj)
+    
+    def get_value(self, obj):
+        return obj.pk
