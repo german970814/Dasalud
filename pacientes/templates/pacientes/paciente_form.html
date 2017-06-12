@@ -177,6 +177,7 @@
                             document.querySelector('paper-dialog').open();
                         }
                         else {
+                            forms[activeStep.dataset.step] = form;
                             stepper.next();
                         }
                     }
@@ -207,6 +208,12 @@
             institucionNode.addEventListener('selected-item-changed', function(){
                 _getEmpresas(institucionNode.value);
                 _getMedicos(institucionNode.value);
+                _getServicios(institucionNode.value);
+            });
+
+            let empresaNode = document.querySelector('*[name="plan"]');
+            empresaNode.addEventListener('selected-item-changed', function(){
+                _getServicios(empresaNode.value);
             });
         } else {
             console.log("no encontrado");
@@ -233,9 +240,24 @@
                 })
                 .then(function(data){
                     medicos = data;
-                    let medicosNodes = document.querySelectorAll('*[name="medico"]')
+                    let medicosNodes = document.querySelectorAll('*[name="medico"]');
                     for (let i = 0; i < medicosNodes.length; i++) {
                         medicosNodes[i].items = data;
+                    }
+                });
+        }
+
+        var servicios_e = [];
+        function _getServicios(value) {
+            fetch("{% url 'servicios:empresas_servicios' 0 %}".replace(0, value))
+                .then(function(response){
+                    return response.json();
+                })
+                .then(function(data){
+                    servicios_e = data;
+                    let serviciosNodes = document.querySelectorAll('*[name="servicio"]');
+                    for (let i = 0; i < serviciosNodes.length; i++) {
+                        serviciosNodes[i].items = data;
                     }
                 });
         }
@@ -316,7 +338,14 @@
 
             let serviciosDiv = document.getElementById('servicios');
             instance.querySelector('*[name="medico"]').items = medicos;
+            let servicioNode = instance.querySelector('*[name="servicio"]')
+            servicioNode.items = servicios_e;
+            servicioNode.addEventListener('selected-item-changed', _setValorServicio);
             serviciosDiv.appendChild(instance);
+        }
+
+        function _setValorServicio(e) {
+            e.target.parentElement.querySelector('*[name="valor"]').value = e.detail.value.valor;
         }
 
         function _removeServicio(button) {
