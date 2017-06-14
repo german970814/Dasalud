@@ -30,6 +30,7 @@ class PacienteSerializer(serializers.ModelSerializer):
         self.fields['zona'].initial = models.Paciente.URBANO
         self.fields['grupo_etnico'].initial = models.Paciente.OTRO
 
+
 class OrdenSerializer(serializers.ModelSerializer):
     """Serializer para el modelo orden."""
 
@@ -44,7 +45,7 @@ class OrdenSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         self.fields['afiliacion'].initial = models.Orden.PARTICULAR
         self.fields['tipo_usuario'].initial = models.Orden.PARTICULAR
-        # self.fields['plan'].queryset = Plan.objects.none()
+
 
 class ServicioOrdenSerializer(serializers.ModelSerializer):
     """Serializer para el modelo servicio orden."""
@@ -52,9 +53,7 @@ class ServicioOrdenSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ServicioOrden
         fields = ['medico', 'servicio', 'tipo_pago', 'valor', 'descuento']
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+
 
 class AcompananteSerializer(serializers.ModelSerializer):
     """Serializer para el modelo acompanante."""
@@ -62,10 +61,7 @@ class AcompananteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Acompanante
         fields = ['asistio', 'nombre', 'direccion', 'telefono']
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['asistio'].initial = True
+
 
 class CrearOrdenSerializer(OrdenSerializer):
     """Serializer para la creación de una orden."""

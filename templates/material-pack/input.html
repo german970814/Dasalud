@@ -12,6 +12,6 @@
              {% if field.value %} value="{{ field.value }}" {% endif %} 
              {% if field.errors %} error-message="{{ field.errors|join:',' }}" invalid {% endif %}
              {% if style.input_type == 'text' %} char-counter maxlength="{{ field.max_length }}" {% endif %}
-             {% if field.required %} required {% endif %} name="{{ field.name }}" value="datos iniciales">
+             {% if field.required %} required {% endif %} name="{{ field.name }}">
   </paper-input>
 {% endif %}

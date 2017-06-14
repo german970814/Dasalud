@@ -8,5 +8,5 @@ class ListarMedicosView(generics.ListAPIView):
     """Permite listar planes."""
 
     serializer_class = EmpleadoSerializer
-    queryset = Empleado.objects.filter(tipo=Empleado.MEDICO)
+    queryset = Empleado.objects.medicos()
     filter_fields = ['instituciones']

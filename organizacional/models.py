@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _lazy
+from . import managers
 
 class Sucursal(models.Model):
     """Modelo para guardar las sucursales de los clientes."""
@@ -64,8 +65,11 @@ class Empleado(models.Model):
     activo = models.BooleanField(_lazy('activo'), default=True)
     registro_medico = models.CharField(_lazy('registro medico'), max_length=100, blank=True)
     firma = models.ImageField(upload_to=empleado_firma_path ,verbose_name=_lazy('firma'), blank=True)
-    tipo = models.CharField(_lazy('tipo'), max_length=2, choices=TIPOS)
+    tipo = models.CharField(_lazy('tipo'), max_length=2, choices=TIPOS, default=ADMINISTRATIVO)
     instituciones = models.ManyToManyField(Institucion, related_name='empleados', verbose_name=_lazy('instituciones'))
+
+    # Managers
+    objects = managers.EmpleadoManager()
 
     class Meta:
         verbose_name = 'empleado'

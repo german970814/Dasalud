@@ -215,6 +215,24 @@
             empresaNode.addEventListener('selected-item-changed', function(){
                 _getServicios(empresaNode.value);
             });
+
+            let asistioNode = document.querySelector('*[name="asistio"]');
+            asistioNode.addEventListener('checked-changed', function(e){
+                let parent = e.target.parentElement;
+                let inputs = parent.querySelectorAll('paper-input');
+                for (let i = 0; i < inputs.length; i++) {
+                    inputs[i].required = e.target.checked;
+                    let label = inputs[i].label;
+                    if (e.target.checked) {
+                        inputs[i].label = label + '*';
+                    }
+                    else {
+                        if(label.substr(label.length - 1) == '*') {
+                            inputs[i].label = label.substring(0, label.length - 1);
+                        }
+                    }
+                }
+            });
         } else {
             console.log("no encontrado");
             // Material Design Lite javascript is not loaded or for another  

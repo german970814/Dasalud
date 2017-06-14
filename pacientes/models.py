@@ -252,10 +252,10 @@ class Acompanante(ParentescoMixin, models.Model):
     """Modelo que guarda la información del acompañante de un paciente según el ordenamiento."""
 
     orden = models.OneToOneField(Orden, verbose_name=_lazy('orden'))
-    asistio = models.BooleanField(_lazy('acompañante'), default=True)
-    nombre = models.CharField(_lazy('nombre completo'), max_length=200)
-    direccion = models.CharField(_lazy('dirección'), max_length=200)
-    telefono = models.PositiveIntegerField(_lazy('teléfono'))
+    asistio = models.BooleanField(_lazy('asistio con acompañante'), default=True)
+    nombre = models.CharField(_lazy('nombre completo'), max_length=200, blank=True)
+    direccion = models.CharField(_lazy('dirección'), max_length=200, blank=True)
+    telefono = models.PositiveIntegerField(_lazy('teléfono'), blank=True, null=True)
 
     class Meta:
         verbose_name = _lazy('acompañate')
