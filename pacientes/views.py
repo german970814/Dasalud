@@ -1,3 +1,4 @@
+from django.urls import reverse_lazy
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _lazy
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
@@ -10,7 +11,7 @@ from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSeriali
 from .serializers import CrearOrdenSerializer
 
 
-class PacientesList(generics.ListAPIView):
+class PacientesList(generics.ListCreateAPIView):
     queryset = Paciente.objects.all()
     serializer_class = PacienteSerializer
 
@@ -19,7 +20,7 @@ class PacientesList(generics.ListAPIView):
         context['request'] = None
         return context
 
-class OrdenesList(generics.ListAPIView):
+class OrdenesList(generics.ListCreateAPIView):
     queryset = Orden.objects.all()
     serializer_class = CrearOrdenSerializer
 
@@ -46,7 +47,7 @@ class PacienteDetalleView(generics.UpdateAPIView):
     """Permite editar un paciente."""
 
     serializer_class = PacienteSerializer
-
+    queryset = Paciente.objects.all()
 
 class CrearPacienteView(APIView):
     """Muestra el formulario de creación de un paciente."""
@@ -54,37 +55,46 @@ class CrearPacienteView(APIView):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'pacientes/paciente_form.html'
     VERBO = _lazy('Crear')
+    URL = reverse_lazy('pacientes:listar')
+    MSJ = _lazy('Paciente creado correctamente')
+    METHOD = 'POST'
 
     def get(self, request):
-        paciente_s = PacienteSerializer(context={'request': None})
-        orden_s = OrdenSerializer()
-        acompanante_s = AcompananteSerializer()
-        servicios_s = ServicioOrdenSerializer()
-        return Response({
-            'paciente_s': paciente_s, 'orden_s': orden_s, 'servicios_s': servicios_s,
-            'acompanante_s': acompanante_s, 'VERBO': self.VERBO
-        })
-
+        form = PacienteSerializer(context={'request': None})
+        return Response({'form': form, 'VERBO': self.VERBO, 'URL': self.URL, 'MSJ': self.MSJ, 'METHOD': self.METHOD})
 
 class EditarPacienteView(APIView):
-    """Permite editar un paciente."""
+    """Muestra el formulario de creación de un paciente."""
 
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'pacientes/paciente_form.html'
     VERBO = _lazy('Editar')
+    MSJ = _lazy('Paciente editado correctamente')
+    METHOD = 'PUT'
+
+    def get(self, request, pk):
+        self.URL = reverse_lazy('pacientes:detalle', args=[pk])
+        paciente = get_object_or_404(Paciente, pk=pk)
+        form = PacienteSerializer(paciente, context={'request': None})
+        return Response({'form': form, 'VERBO': self.VERBO, 'URL': self.URL, 'MSJ': self.MSJ, 'METHOD': self.METHOD})
+
+
+class CrearOrdenView(APIView):
+    """Muestra el formulario de creación de una orden para un paciente."""
+
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'pacientes/orden_form.html'
+    VERBO = _lazy('Crear')
 
     def get(self, request, pk):
         paciente = get_object_or_404(Paciente, pk=pk)
-        serializer = PacienteSerializer(paciente, context={'request': None})
-        return Response({'serializer': serializer, 'VERBO': self.VERBO})
-    
-    def post(self, request, pk):
-        paciente = get_object_or_404(Paciente, pk=pk)
-        serializer = PacienteSerializer(paciente, data=request.data, context={'request': None})
-        if serializer.is_valid():
-            serializer.save()
-            return redirect('pacientes:listar_pacientes')
-        return Response({'serializer': serializer, 'VERBO': self.VERBO})
+        orden_s = OrdenSerializer()
+        acompanante_s = AcompananteSerializer()
+        servicios_s = ServicioOrdenSerializer()
+        return Response({
+            'paciente': paciente, 'orden_s': orden_s, 'servicios_s': servicios_s,
+            'acompanante_s': acompanante_s, 'VERBO': self.VERBO
+        })
 
 
 class OrdenesPacienteView(generics.CreateAPIView):

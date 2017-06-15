@@ -11,8 +11,8 @@ from . import models
 class PacienteSerializer(serializers.ModelSerializer):
     """Serializer para el modelo paciente."""
 
-    edit_link = serializers.HyperlinkedIdentityField(view_name='pacientes:detalle')
-    ordenes_link = serializers.HyperlinkedIdentityField(view_name='pacientes:ordenes')
+    edit_link = serializers.HyperlinkedIdentityField(view_name='pacientes:editar')
+    ordenes_link = serializers.HyperlinkedIdentityField(view_name='pacientes:ordenes-nueva')
 
     class Meta:
         model = models.Paciente
@@ -21,7 +21,7 @@ class PacienteSerializer(serializers.ModelSerializer):
             'fecha_nacimiento', 'zona', 'direccion', 'telefono', 'celular', 'email', 'grupo_sanguineo', 
             'grupo_etnico', 'profesion', 'lugar_nacimiento', 'lugar_residencia', 'activo', 'fecha_ingreso',
             'nombre_responsable', 'direccion_responsable', 'telefono_responsable' , 'edit_link', 'ordenes_link',
-            'identificacion_padre', 'nombre_padre', 'identificacion_madre', 'nombre_madre'
+            'identificacion_padre', 'nombre_padre', 'identificacion_madre', 'nombre_madre', 'foto'
         ]
     
     def __init__(self, *args, **kwargs):
