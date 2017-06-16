@@ -40,22 +40,7 @@
         let paciente;
         let form = document.querySelector('iron-form');
         let dialog = document.querySelector('paper-dialog');
-
-        form.addEventListener('iron-form-presubmit', function(e) {
-            this.request.method = '{{ METHOD }}'
-            this.request.headers = {'X-CSRFToken': getToken()}
-            console.log(this.request.body);
-        });
-
-        form.addEventListener('iron-form-error', function(e) {
-            _setFormErrors(form, e.detail.request.response);
-        });
-
-        form.addEventListener('iron-form-response', function(e) {
-            console.log('paciente guardado');
-            paciente = e.detail.response;
-            dialog.open();
-        });
+        let upload = document.querySelector('vaadin-upload');
 
         dialog.addEventListener('iron-overlay-closed', function(e) {
             if(e.detail.confirmed) {
@@ -71,7 +56,52 @@
         }
 
         function submit() {
-            form.submit();
+            sendForm();
+        }
+
+        function sendForm() {
+            let formData = form.serializeForm();
+            let data = new FormData();
+            for(let key in formData) {
+                if (formData[key] !== undefined) {
+                    data.append(key, formData[key]);
+                }
+            }
+
+            if (upload.files.length > 0) {
+                if (upload.files[0].progress != 100) {
+                    data.append(upload.formDataName, upload.files[0]);
+                }
+            }
+
+            let errorResponse;
+            fetch('{{ URL }}', {
+                method: '{{ METHOD }}',
+                body: data,
+                headers: {
+                    'X-CSRFToken': getToken()
+                }
+            })
+                .then(function (response){
+                    if (!response.ok) {
+                        errorResponse = response;
+                        throw Error(response.statusText);
+                    }
+                    return response;
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    paciente = data;
+                    dialog.open();
+                })
+                .catch(function (error) {
+                    return errorResponse.json();
+                })
+                .then(function (errors) {
+                    _setFormErrors(form, errors);
+                });
         }
 
         function _setFormErrors(form, errors) {

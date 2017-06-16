@@ -29,6 +29,7 @@ class PacienteSerializer(serializers.ModelSerializer):
         self.fields['activo'].initial = True
         self.fields['zona'].initial = models.Paciente.URBANO
         self.fields['grupo_etnico'].initial = models.Paciente.OTRO
+        self.fields['foto'].style.update({'attrs': 'no-auto max-files=1 accept=image/*'})
 
 
 class OrdenSerializer(serializers.ModelSerializer):

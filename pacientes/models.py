@@ -34,11 +34,11 @@ class ParentescoMixin(object):
         abstract = True
 
 def paciente_foto_path(instance, filename):
-    return 'paciente_{0}/foto_{1}'.format(instance.pk, filename)
+    return 'paciente_{0}/foto_{1}'.format(instance.numero_documento, filename)
 
 
 def paciente_firma_path(instance, filename):
-    return 'paciente_{0}/firma_{1}'.format(instance.pk, filename)
+    return 'paciente_{0}/firma_{1}'.format(instance.numero_documento, filename)
 
 
 class Paciente(ParentescoMixin, models.Model):

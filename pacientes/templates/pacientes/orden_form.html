@@ -37,8 +37,8 @@
 
 {% block content %}
     <div class="card">
-        <h1>{{ VERBO }} Paciente</h1>
-        <p>{{ paciente.nombres }}</p>
+        <h1>{{ VERBO }} Orden</h1>
+        
         <ul class="mdl-stepper mdl-stepper--horizontal " id="demo-stepper-state-error">
         <li class="mdl-step mdl-step--editable" data-step="orden">
             <span class="mdl-step__label">
@@ -185,7 +185,6 @@
             institucionNode.addEventListener('selected-item-changed', function(){
                 _getEmpresas(institucionNode.value);
                 _getMedicos(institucionNode.value);
-                _getServicios(institucionNode.value);
             });
 
             let empresaNode = document.querySelector('*[name="plan"]');
