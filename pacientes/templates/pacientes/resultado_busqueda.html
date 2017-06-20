@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block imports %}
+    <link rel="import" href="/static/bower_components/iron-list/iron-list.html">
+    <link rel="import" href="/static/components/paciente-info.html">
+{% endblock imports %}
+
+{% block content %}
+    <iron-list items='{{ pacientes }}'>
+        <template>
+            <paciente-info paciente="[[item]]"></paciente-info>
+        </template>
+    </iron-list>
+{% endblock content %}

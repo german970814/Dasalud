@@ -1,0 +1,60 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/paper-card/paper-card.html">
+<link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/static/my-icons.html">
+
+<dom-module id="paciente-info">
+    <template>
+        <style>
+            :host {
+                display: block;
+
+                --paper-card-content: {
+                    display: flex;
+                };
+            }
+
+            
+        </style>
+
+        <paper-card>
+            <div class="card-content">
+                <img src="/static/img/profile-none.png" alt="" height="150px" width="150px">
+                <div>
+                    <h4><strong>[[_nombreCompleto(paciente.nombres, paciente.apellidos)]]</strong></h4>
+                    <p><small>[[paciente.tipo_documento]] [[paciente.numero_documento]]</small></p>
+                    <p><small>Edad 23 años</small></p>
+                </div>
+            </div>
+            <div class="card-actions">
+                <paper-icon-button icon="my-icons:mode-edit"></paper-icon-button>
+            </div>
+        </paper-card>
+        
+
+    </template>
+
+    <script>
+        class PacienteInfo extends Polymer.Element {
+
+            static get is() { return 'paciente-info'; }
+
+            static get properties() {
+                return {
+                    paciente: Object
+                };
+            }
+
+            constructor() {
+                super();
+            }
+
+            _nombreCompleto(nombres, apellidos) {
+                return nombres + ' ' + apellidos;
+            }
+
+        }
+
+        window.customElements.define(PacienteInfo.is, PacienteInfo);
+    </script>
+</dom-module>

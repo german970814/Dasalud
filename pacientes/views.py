@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _lazy
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import generics
+from rest_framework import generics, filters
 
 from .models import Paciente, Orden
 from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSerializer, ServicioOrdenSerializer
@@ -14,6 +14,8 @@ from .serializers import CrearOrdenSerializer
 class PacientesList(generics.ListCreateAPIView):
     queryset = Paciente.objects.all()
     serializer_class = PacienteSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('nombres', 'apellidos', 'numero_documento')
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -36,9 +38,12 @@ class ListarPacientesView(generics.ListCreateAPIView):
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'pacientes/lista_pacientes.html'
     serializer_class = PacienteSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('nombres', 'apellidos', 'numero_documento')
 
     def get(self, request):
-        serializer = PacienteSerializer(Paciente.objects.all(), many=True, context={'request': None})
+        queryset = self.filter_queryset(Paciente.objects.all())
+        serializer = PacienteSerializer(queryset, many=True, context={'request': None})
         pacientes = JSONRenderer().render(serializer.data)
         return Response({'pacientes': pacientes, 'total_pacientes': len(serializer.data)})
 
@@ -79,6 +84,21 @@ class EditarPacienteView(APIView):
         return Response({'form': form, 'VERBO': self.VERBO, 'URL': self.URL, 'MSJ': self.MSJ, 'METHOD': self.METHOD})
 
 
+class BucarPacientesView(generics.GenericAPIView):
+    """Permite buscar un paciente según sus nombres, apellidos y número de documento."""
+
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'pacientes/resultado_busqueda.html'
+    serializer_class = PacienteSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('nombres', 'apellidos', 'numero_documento')
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(Paciente.objects.all())
+        serializer = PacienteSerializer(queryset, many=True, context={'request': None})
+        pacientes = JSONRenderer().render(serializer.data)
+        return Response({'pacientes': pacientes})
+
 class CrearOrdenView(APIView):
     """Muestra el formulario de creación de una orden para un paciente."""
 
@@ -88,12 +108,15 @@ class CrearOrdenView(APIView):
 
     def get(self, request, pk):
         paciente = get_object_or_404(Paciente, pk=pk)
+        serializer = PacienteSerializer(paciente, context={'request': None})
+        paciente_json = JSONRenderer().render(serializer.data)
         orden_s = OrdenSerializer()
         acompanante_s = AcompananteSerializer()
         servicios_s = ServicioOrdenSerializer()
+
         return Response({
-            'paciente': paciente, 'orden_s': orden_s, 'servicios_s': servicios_s,
-            'acompanante_s': acompanante_s, 'VERBO': self.VERBO
+            'paciente': paciente_json, 'orden_s': orden_s, 'servicios_s': servicios_s,
+            'acompanante_s': acompanante_s, 'VERBO': self.VERBO, 'paciente_id': pk
         })
 
 

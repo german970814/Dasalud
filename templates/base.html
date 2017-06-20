@@ -197,6 +197,11 @@
                     drawerLayout.drawer.toggle();
                 }
             })
+
+            document.querySelector('search-box').addEventListener('enter', function(e) {
+                console.log(e);
+                window.location = '{% url "pacientes:busqueda" %}?search=' + e.detail;
+            });
         </script>
 
         {% block js %}{% endblock js %}

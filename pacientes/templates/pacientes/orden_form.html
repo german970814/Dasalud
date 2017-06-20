@@ -7,6 +7,7 @@
     <link rel="import" href="/static/bower_components/paper-fab/paper-fab.html">
     <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
     <link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="/static/components/paciente-info.html">
 {% endblock imports %}
 
 {% block css %}
@@ -36,10 +37,9 @@
 {% endblock css %}
 
 {% block content %}
-    <div class="card">
-        <h1>{{ VERBO }} Orden</h1>
-        
-        <ul class="mdl-stepper mdl-stepper--horizontal " id="demo-stepper-state-error">
+    <paciente-info paciente='{{ paciente }}'></paciente-info>
+
+    <ul class="mdl-stepper mdl-stepper--horizontal " id="demo-stepper-state-error">
         <li class="mdl-step mdl-step--editable" data-step="orden">
             <span class="mdl-step__label">
                 <span class="mdl-step__title">
@@ -48,7 +48,7 @@
             </span>
             <div class="mdl-step__content">
                 <iron-form>
-                    <form action="{% url 'pacientes:ordenes' paciente.pk %}" method="POST" enctype="application/json">
+                    <form action="{% url 'pacientes:ordenes' paciente_id %}" method="POST" enctype="application/json">
                         {% csrf_token %}
                         {% render_form orden_s template_pack='material-pack' %}
                     </form>
@@ -112,6 +112,7 @@
             </div>
         </li>
         </ul>
+
         <paper-dialog>
             <div>
                 {% trans "Debe agregar por lo menos un servicio." %}                

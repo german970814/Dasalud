@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="/static/bower_components/iron-a11y-keys/iron-a11y-keys.html">
 <link rel="import" href="/static/my-icons.html">
 
 <dom-module id="search-box">
@@ -67,8 +68,10 @@
             }
         </style>
 
+        <iron-a11y-keys target="[[target]]" keys="enter" on-keys-pressed="onEnter"></iron-a11y-keys>
+
         <div id="container">
-            <input type="search" name="search" placeholder$="[[placeholder]]" on-focus="_onFocus" on-blur="_onBlur">
+            <input id="search" type="search" name="search" value="{{term::input}}" placeholder$="[[placeholder]]" on-focus="_onFocus" on-blur="_onBlur">
             <iron-icon icon="[[_icon]]"></iron-icon>
         </div>
 
@@ -81,9 +84,19 @@
 
             static get properties() {
                 return {
+                    term: {
+                        type: String,
+                        value: '',
+                        notify: true
+                    },
+
                     placeholder: {
                         type: String,
                         value: "Buscar"
+                    },
+
+                    target: {
+                        type: Object
                     },
 
                     _icon: {
@@ -99,10 +112,13 @@
 
             ready() {
                 super.ready();
+                this.target = this.$.search;
+            }
 
-                Polymer.RenderStatus.afterNextRender(this, function() {
-                    
-                });
+            onEnter() {
+                if (this.term !== '') {
+                    this.dispatchEvent(new CustomEvent('enter', {detail: this.term, bubbles: true, composed: true}));
+                }
             }
 
             _onFocus() {

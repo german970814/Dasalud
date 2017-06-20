@@ -29,6 +29,9 @@
     "iron-form": "PolymerElements/iron-form#2.0-preview",
     "vaadin-combo-box": "vaadin/vaadin-combo-box#^2.0.0",
     "paper-dialog": "PolymerElements/paper-dialog#^2.0.0",
-    "vaadin-upload": "vaadin/vaadin-upload#^2.0.0"
+    "vaadin-upload": "vaadin/vaadin-upload#^2.0.0",
+    "paper-card": "PolymerElements/paper-card#^2.0.0",
+    "iron-list": "PolymerElements/iron-list#^2.0.1",
+    "iron-a11y-keys": "PolymerElements/iron-a11y-keys#^2.0.0"
   }
 }
