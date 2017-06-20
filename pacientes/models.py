@@ -156,6 +156,7 @@ class Paciente(ParentescoMixin, models.Model):
     class Meta:
         verbose_name = _lazy('paciente')
         verbose_name_plural = _lazy('pacientes')
+        ordering = ['nombres', 'apellidos']
 
     def __str__(self):
         return '{} {}'.format(self.nombres, self.apellidos)

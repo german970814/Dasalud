@@ -176,8 +176,8 @@
                 <app-drawer slot="drawer">
                     <!--<app-toolbar>Menu</app-toolbar>-->
                     <app-menu selected="0">
-                        <a class="app-menu-item" href="{% url 'pacientes:listar' %}">
-                            <app-menu-icon-item icon="my-icons:people">{% trans "Pacientes" %}</app-menu-icon-item>
+                        <a class="app-menu-item" href="{% url 'pacientes:crear' %}">
+                            <app-menu-icon-item icon="my-icons:people">{% trans "Crear paciente" %}</app-menu-icon-item>
                         </a>
                     </app-menu>
                 </app-drawer>
@@ -200,7 +200,7 @@
 
             document.querySelector('search-box').addEventListener('enter', function(e) {
                 console.log(e);
-                window.location = '{% url "pacientes:busqueda" %}?search=' + e.detail;
+                window.location = '{% url "pacientes:listar" %}?search=' + e.detail;
             });
         </script>
 

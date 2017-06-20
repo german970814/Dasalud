@@ -33,7 +33,7 @@ class OrdenesList(generics.ListCreateAPIView):
 
 
 class ListarPacientesView(generics.ListCreateAPIView):
-    """Permite listar y crear pacientes."""
+    """Permite buscar un paciente según sus nombres, apellidos o número de documento y crear pacientes."""
 
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'pacientes/lista_pacientes.html'
@@ -45,7 +45,7 @@ class ListarPacientesView(generics.ListCreateAPIView):
         queryset = self.filter_queryset(Paciente.objects.all())
         serializer = PacienteSerializer(queryset, many=True, context={'request': None})
         pacientes = JSONRenderer().render(serializer.data)
-        return Response({'pacientes': pacientes, 'total_pacientes': len(serializer.data)})
+        return Response({'pacientes': pacientes})
 
 
 class PacienteDetalleView(generics.UpdateAPIView):
@@ -84,20 +84,7 @@ class EditarPacienteView(APIView):
         return Response({'form': form, 'VERBO': self.VERBO, 'URL': self.URL, 'MSJ': self.MSJ, 'METHOD': self.METHOD})
 
 
-class BucarPacientesView(generics.GenericAPIView):
-    """Permite buscar un paciente según sus nombres, apellidos y número de documento."""
 
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'pacientes/resultado_busqueda.html'
-    serializer_class = PacienteSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('nombres', 'apellidos', 'numero_documento')
-
-    def get(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(Paciente.objects.all())
-        serializer = PacienteSerializer(queryset, many=True, context={'request': None})
-        pacientes = JSONRenderer().render(serializer.data)
-        return Response({'pacientes': pacientes})
 
 class CrearOrdenView(APIView):
     """Muestra el formulario de creación de una orden para un paciente."""

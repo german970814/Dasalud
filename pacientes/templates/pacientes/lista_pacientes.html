@@ -2,98 +2,29 @@
 {% load i18n %}
 
 {% block imports %}
-    <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
-    <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid-sorter.html">
-    <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
-    <link rel="import" href="/static/bower_components/paper-fab/paper-fab.html">
+    <link rel="import" href="/static/bower_components/iron-list/iron-list.html">
+    <link rel="import" href="/static/components/paciente-info.html">
 {% endblock imports %}
 
 {% block css %}
-<style>
-    #fab-div {
-        overflow: auto;
-    }
+    <style>
+        iron-list {
+            height: calc(100vh - 100px);
+        }
 
-    paper-fab {
-        float: right;
-    }
-</style>  
+        paciente-info {
+            width: 410px;
+            height: 245px;
+        }
+    </style>
 {% endblock css %}
 
 {% block content %}
-    <div class="card">
-        <h1>{% trans "Pacientes" %}</h1>
-
-        <vaadin-grid items='{{ pacientes }}'>
-            <vaadin-grid-column>
-                <template class="header">
-                    <vaadin-grid-sorter path="name.first">{% trans "Nombres" %}</vaadin-grid-sorter>
-                    <!--<div class="cell">{% trans "Nombres" %}</div>-->
-                </template>
-                <template>
-                <div class="cell">[[item.nombres]]</div>
-                </template>
-            </vaadin-grid-column>
-
-            <vaadin-grid-column>
-                <template class="header">
-                <div class="cell">{% trans "Apellidos" %}</div>
-                </template>
-                <template>
-                <div class="cell">[[item.apellidos]]</div>
-                </template>
-            </vaadin-grid-column>
-
-            <vaadin-grid-column>
-                <template class="header">
-                <div class="cell numeric last">{% trans "Cédula" %}</div>
-                </template>
-                <template>
-                <div class="cell numeric last">[[item.numero_documento]]</div>
-                </template>
-            </vaadin-grid-column>
-
-            <vaadin-grid-column>
-                <template class="header">
-                <div class="cell numeric last">{% trans "Género" %}</div>
-                </template>
-                <template>
-                <div class="cell numeric last">[[item.genero]]</div>
-                </template>
-            </vaadin-grid-column>
-
-            <vaadin-grid-column>
-                <template class="header">
-                <div class="cell numeric last">{% trans "Empresa" %}</div>
-                </template>
-                <template>
-                <div class="cell numeric last">[[item.empresa]]</div>
-                </template>
-            </vaadin-grid-column>
-
-            <vaadin-grid-column>
-                <template class="header">
-                    <div class="cell last"></div>
-                </template>
-                <template>
-                    <div class="cell last">
-                        <a href="[[item.edit_link]]" tabindex="-1">
-                            <paper-icon-button icon="my-icons:mode-edit" title="{% trans 'Editar' %}"></paper-icon-button>
-                        </a>
-                        <a href="[[item.ordenes_link]]">
-                            <paper-icon-button icon="my-icons:menu" title="{% trans 'Orden' %}"></paper-icon-button>
-                        </a>
-                        <paper-icon-button icon="my-icons:menu" title="{% trans 'Historia clinica' %}"></paper-icon-button>
-                    </div>
-                </template>
-            </vaadin-grid-column>
-        </vaadin-grid>
-        <p>{{ total_pacientes }} {% trans "Pacientes" %}</p>
-
-        <div id="fab-div">
-        <a href="{% url 'pacientes:crear' %}">
-            <paper-fab icon="my-icons:add" elevation="2"></paper-fab>
-        <a>            
-        </div>
+    <div class="list-container">
+        <iron-list items='{{ pacientes }}' grid>
+            <template>
+                <paciente-info paciente="[[item]]"></paciente-info>
+            </template>
+        </iron-list>
     </div>
 {% endblock content %}
