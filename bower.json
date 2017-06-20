@@ -32,6 +32,7 @@
     "vaadin-upload": "vaadin/vaadin-upload#^2.0.0",
     "paper-card": "PolymerElements/paper-card#^2.0.0",
     "iron-list": "PolymerElements/iron-list#^2.0.1",
-    "iron-a11y-keys": "PolymerElements/iron-a11y-keys#^2.0.0"
+    "iron-a11y-keys": "PolymerElements/iron-a11y-keys#^2.0.0",
+    "iron-image": "PolymerElements/iron-image#^2.1.1"
   }
 }

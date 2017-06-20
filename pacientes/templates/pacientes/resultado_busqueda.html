@@ -6,10 +6,25 @@
     <link rel="import" href="/static/components/paciente-info.html">
 {% endblock imports %}
 
+{% block css %}
+    <style>
+        iron-list {
+            height: calc(100vh - 100px);
+        }
+
+        paciente-info {
+            width: 410px;
+            height: 245px;
+        }
+    </style>
+{% endblock css %}
+
 {% block content %}
-    <iron-list items='{{ pacientes }}'>
-        <template>
-            <paciente-info paciente="[[item]]"></paciente-info>
-        </template>
-    </iron-list>
+    <div class="list-container">
+        <iron-list items='{{ pacientes }}' grid>
+            <template>
+                <paciente-info paciente="[[item]]"></paciente-info>
+            </template>
+        </iron-list>
+    </div>
 {% endblock content %}

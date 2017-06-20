@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="/static/bower_components/paper-card/paper-card.html">
+<link rel="import" href="/static/bower_components/iron-image/iron-image.html">
 <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="/static/my-icons.html">
 
@@ -9,29 +10,40 @@
             :host {
                 display: block;
 
+                --paper-card: {
+                    width: var(--paciente-info-width, 400px);
+                };
+
                 --paper-card-content: {
                     display: flex;
                 };
             }
 
-            
+            iron-image {
+                width: 150px;
+                height: 150px;
+                margin-right: 20px;
+            }
+
+            .info > * {
+                margin: 0px;
+            }
         </style>
 
         <paper-card>
             <div class="card-content">
-                <img src="/static/img/profile-none.png" alt="" height="150px" width="150px">
-                <div>
+                <iron-image src="[[paciente.foto]]" sizing="cover" fade preload placeholder="/static/img/profile-none.png"></iron-image>
+                <div class="info">
                     <h4><strong>[[_nombreCompleto(paciente.nombres, paciente.apellidos)]]</strong></h4>
-                    <p><small>[[paciente.tipo_documento]] [[paciente.numero_documento]]</small></p>
-                    <p><small>Edad 23 años</small></p>
+                    <p><small>[[paciente.tipo_documento]]: [[paciente.numero_documento]]</small></p>
+                    <p><small>Edad: 23 años</small></p>
                 </div>
             </div>
             <div class="card-actions">
-                <paper-icon-button icon="my-icons:mode-edit"></paper-icon-button>
+                <a href="[[paciente.edit_link]]"><paper-icon-button icon="my-icons:mode-edit"></paper-icon-button></a>
+                <a href="[[paciente.ordenes_link]]"><paper-icon-button icon="my-icons:menu"></paper-icon-button></a>
             </div>
         </paper-card>
-        
-
     </template>
 
     <script>
