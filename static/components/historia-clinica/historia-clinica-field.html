@@ -19,10 +19,10 @@
         </style>
 
         <template is="dom-if" if="[[_isInput(field.tipo)]]">
-            <paper-input type=[[field.tipo]] label="[[field.nombre]]" value="{{field.value}}"></paper-input>            
+            <paper-input auto-validate type=[[field.tipo]] label="[[field.nombre]]" value="{{field.value}}"></paper-input>            
         </template>
         <template is="dom-if" if="[[_isTextArea(field.tipo)]]">
-            <paper-textarea label="[[field.nombre]]" value="{{field.value}}" rows="4"></paper-textarea>
+            <paper-textarea auto-validate label="[[field.nombre]]" value="{{field.value}}" rows="4"></paper-textarea>
         </template>
         <template is="dom-if" if="[[_isTitulo(field.tipo)]]">
             <h3>[[field.nombre]]</h3>
@@ -31,7 +31,7 @@
             <paper-toggle-button>[[field.nombre]]</paper-toggle-button>
         </template>
         <template is="dom-if" if="[[_isDate(field.tipo)]]">
-            <vaadin-date-picker label=[[field.nombre]]></vaadin-date-picker>
+            <vaadin-date-picker auto-validate label=[[field.nombre]] value="{{field.value}}"></vaadin-date-picker>
         </template>
         
 
