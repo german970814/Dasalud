@@ -172,7 +172,7 @@
                 </app-toolbar>
             </app-header>
 
-            <app-drawer-layout id="drawerLayout">
+            <app-drawer-layout force-narrow id="drawerLayout">
                 <app-drawer slot="drawer">
                     <!--<app-toolbar>Menu</app-toolbar>-->
                     <app-menu selected="0">
@@ -191,11 +191,12 @@
         <script>
             var drawerLayout = document.getElementById('drawerLayout');
             document.getElementById('menu').addEventListener('click', function() {
-                if (drawerLayout.forceNarrow || !drawerLayout.narrow) {
-                    drawerLayout.forceNarrow = !drawerLayout.forceNarrow;
-                } else {
-                    drawerLayout.drawer.toggle();
-                }
+                // if (drawerLayout.forceNarrow || !drawerLayout.narrow) {
+                //     drawerLayout.forceNarrow = !drawerLayout.forceNarrow;
+                // } else {
+                //     drawerLayout.drawer.toggle();
+                // }
+                drawerLayout.drawer.toggle();
             })
 
             document.querySelector('search-box').addEventListener('enter', function(e) {

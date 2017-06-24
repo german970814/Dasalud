@@ -14,10 +14,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="/static/bower_components/mdl-stepper/stepper.min.css">
     <style>
-        main {
-            --paciente-info-width: 100%;
-        }
-
         .mdl-stepper {
             max-width: none;
             width: 100%;
@@ -41,9 +37,9 @@
 {% endblock css %}
 
 {% block content %}
-    <paciente-info paciente='{{ paciente }}'></paciente-info>
+    <paciente-info paciente='{{ paciente }}' full-width></paciente-info>
 
-    <ul class="mdl-stepper mdl-stepper--horizontal " id="demo-stepper-state-error">
+    <ul class="mdl-stepper mdl-stepper--horizontal mdl-stepper--linear" id="demo-stepper-state-error">
         <li class="mdl-step mdl-step--editable" data-step="orden">
             <span class="mdl-step__label">
                 <span class="mdl-step__title">

@@ -119,5 +119,14 @@ class OrdenesPacienteView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(paciente=self.paciente)
 
+class HistoriasClinicasView(APIView):
+    """"""
 
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'pacientes/historias_clinicas.html'
 
+    def get(self, request, pk):
+        paciente = get_object_or_404(Paciente, pk=pk)
+        serializer = PacienteSerializer(paciente, context={'request': None})
+        paciente_json = JSONRenderer().render(serializer.data)
+        return Response({'paciente': paciente_json})

@@ -1,4 +1,4 @@
-<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
 <link rel="import" href="/static/bower_components/paper-card/paper-card.html">
 <link rel="import" href="/static/bower_components/iron-image/iron-image.html">
 <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
@@ -17,6 +17,10 @@
                 --paper-card-content: {
                     display: flex;
                 };
+            }
+
+            :host([full-width]) {
+                --paciente-info-width: 100%;
             }
 
             iron-image {
@@ -40,7 +44,7 @@
                 </div>
             </div>
             <div class="card-actions">
-                <a href="[[paciente.edit_link]]"><paper-icon-button icon="my-icons:mode-edit"></paper-icon-button></a>
+                <a href="[[paciente.edit_link]]"><paper-icon-button icon="my-icons:edit"></paper-icon-button></a>
                 <a href="[[paciente.ordenes_link]]"><paper-icon-button icon="my-icons:menu"></paper-icon-button></a>
             </div>
         </paper-card>
@@ -53,7 +57,13 @@
 
             static get properties() {
                 return {
-                    paciente: Object
+                    paciente: Object,
+
+                    fullWidth: {
+                        type: Boolean,
+                        value: false,
+                        reflectToAttribute: true
+                    }
                 };
             }
 
@@ -64,6 +74,18 @@
             _nombreCompleto(nombres, apellidos) {
                 return nombres + ' ' + apellidos;
             }
+
+            // TODO calcular la edad
+            // function getAge(dateString) {
+            //     var today = new Date();
+            //     var birthDate = new Date(dateString);
+            //     var age = today.getFullYear() - birthDate.getFullYear();
+            //     var m = today.getMonth() - birthDate.getMonth();
+            //     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            //         age--;
+            //     }
+            //     return age;
+            // }
 
         }
 

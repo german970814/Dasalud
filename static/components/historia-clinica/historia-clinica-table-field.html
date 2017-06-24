@@ -1,0 +1,94 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="/static/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/static/my-icons.html">
+<link rel="import" href="historia-clinica-field.html">
+
+<dom-module id="historia-clinica-table-field">
+    <template>
+        <style>
+            :host {
+                display: block
+            }
+
+            vaadin-grid {
+                height: 200px;
+            }
+        </style>
+
+        <template is="dom-repeat" items="{{field.fields}}" as="field">
+            <historia-clinica-field field=[[field]]></historia-clinica-field>
+        </template>
+        <paper-button on-tap="_add">Agregar</paper-button>
+
+        <br><br>
+        <vaadin-grid id="grid" items="{{field.items}}">
+            <template is="dom-repeat" items="{{field.fields}}" as="field">
+                <vaadin-grid-column>
+                    <template class="header">[[field.nombre]]</template>
+                    <template>[[get(field.nombre, item)]]</template>
+                </vaadin-grid-column>
+            </template>
+            <vaadin-grid-column>
+                <template>
+                    <paper-icon-button icon="my-icons:delete" alt="Eliminar" on-tap="_delete"></paper-icon-button>
+                </template>
+            </vaadin-grid-column>
+        </vaadin-grid>
+
+    </template>
+
+    <script>
+        class HistoriaClinicaTableField extends Polymer.Element {
+
+            static get is() { return 'historia-clinica-table-field'; }
+
+            static get properties() {
+                return {
+                    field: Object
+                };
+            }
+
+            constructor() {
+                super();
+            }
+
+            //  todo Revisar si se deben crear las columnas de forma imperativa(js).
+            // Con html hace loops innecesarios.
+            ready() {
+                super.ready();
+
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    
+                });
+            }
+
+            _add(e) {
+                console.log(e);
+                let item = {};
+                for (let i = 0; i < this.field.fields.length; i++) {
+                    if(this.field.fields[i].value != '') {
+                        item[this.field.fields[i].nombre] = this.field.fields[i].value;
+                        this.set('field.fields.0.value'.replace(0, i), '');
+                    }
+                }
+
+                this.field.items.unshift(item);
+                this.$.grid.clearCache();
+            }
+
+            _delete(e) {
+                console.log(e);
+                let index = this.field.items.indexOf(e.model.item);
+                this.field.items.splice(index, 1);
+
+                this.$.grid.clearCache();
+            }
+        }
+
+        window.customElements.define(HistoriaClinicaTableField.is, HistoriaClinicaTableField);
+    </script>
+</dom-module>

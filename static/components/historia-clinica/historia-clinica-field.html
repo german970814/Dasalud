@@ -1,0 +1,87 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="/static/bower_components/paper-input/paper-input.html">
+<link rel="import" href="/static/bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="/static/bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="/static/bower_components/vaadin-date-picker/vaadin-date-picker.html">
+
+<dom-module id="historia-clinica-field">
+    <template>
+        <style>
+            :host {
+                display: block
+            }
+
+            h3 {
+                border-bottom: 1px solid #eee;
+                padding-bottom: 9px;
+            }
+        </style>
+
+        <template is="dom-if" if="[[_isInput(field.tipo)]]">
+            <paper-input type=[[field.tipo]] label="[[field.nombre]]" value="{{field.value}}"></paper-input>            
+        </template>
+        <template is="dom-if" if="[[_isTextArea(field.tipo)]]">
+            <paper-textarea label="[[field.nombre]]" value="{{field.value}}" rows="4"></paper-textarea>
+        </template>
+        <template is="dom-if" if="[[_isTitulo(field.tipo)]]">
+            <h3>[[field.nombre]]</h3>
+        </template>
+        <template is="dom-if" if="[[_isSwitch(field.tipo)]]">
+            <paper-toggle-button>[[field.nombre]]</paper-toggle-button>
+        </template>
+        <template is="dom-if" if="[[_isDate(field.tipo)]]">
+            <vaadin-date-picker label=[[field.nombre]]></vaadin-date-picker>
+        </template>
+        
+
+    </template>
+
+    <script>
+        class HistoriaClinicaField extends Polymer.Element {
+
+            static get is() { return 'historia-clinica-field'; }
+
+            static get properties() {
+                return {
+                    field: Object
+                };
+            }
+
+            constructor() {
+                super();
+            }
+
+            ready() {
+                super.ready();
+
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    
+                });
+            }
+
+            _isInput(tipo) {
+                return tipo == 'text' || tipo == 'number';
+            }
+
+            _isTextArea(tipo) {
+                return tipo == 'textarea';
+            }
+
+            _isTitulo(tipo) {
+                return tipo == 'titulo'
+            }
+
+            _isSwitch(tipo) {
+                return tipo == 'switch'
+            }
+
+            _isDate(tipo) {
+                return tipo == 'date'
+            }
+
+        }
+
+        window.customElements.define(HistoriaClinicaField.is, HistoriaClinicaField);
+    </script>
+</dom-module>
