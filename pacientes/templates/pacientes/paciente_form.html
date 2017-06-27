@@ -79,7 +79,8 @@
                 method: '{{ METHOD }}',
                 body: data,
                 headers: {
-                    'X-CSRFToken': getToken()
+                    'X-CSRFToken': getToken(),
+                    'Accept': 'application/json'
                 }
             })
                 .then(function (response){

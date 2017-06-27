@@ -13,27 +13,29 @@
 {% block css %}
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="/static/bower_components/mdl-stepper/stepper.min.css">
-    <style>
-        .mdl-stepper {
-            max-width: none;
-            width: 100%;
-        }
+    <custom-style>
+        <style>
+            .mdl-stepper {
+                max-width: none;
+                width: 100%;
+            }
 
-        #servicios .servicio {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+            #servicios .servicio {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
 
-        #servicios .servicio .container{
-            display: flex;
-            flex-wrap: wrap;
-        }
+            #servicios .servicio .container{
+                display: flex;
+                flex-wrap: wrap;
+            }
 
-        #servicios .servicio .container > * {
-            margin-right: 20px;
-        }
-    </style>
+            #servicios .servicio .container > * {
+                margin-right: 20px;
+            }
+        </style>
+    </custom-style>
 {% endblock css %}
 
 {% block content %}

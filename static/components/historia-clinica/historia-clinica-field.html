@@ -19,22 +19,28 @@
         </style>
 
         <template is="dom-if" if="[[_isInput(field.tipo)]]">
-            <paper-input auto-validate type=[[field.tipo]] label="[[field.nombre]]" value="{{field.value}}"></paper-input>            
+            <paper-input id="input" auto-validate type=[[field.tipo]] label="[[field.nombre]]" 
+                         value="{{field.value}}" required="[[field.required]]">
+            </paper-input>            
         </template>
         <template is="dom-if" if="[[_isTextArea(field.tipo)]]">
-            <paper-textarea auto-validate label="[[field.nombre]]" value="{{field.value}}" rows="4"></paper-textarea>
+            <paper-textarea id="input" auto-validate label="[[field.nombre]]" value="{{field.value}}"
+                            required="[[field.required]]" rows="4">
+            </paper-textarea>
         </template>
         <template is="dom-if" if="[[_isTitulo(field.tipo)]]">
             <h3>[[field.nombre]]</h3>
         </template>
         <template is="dom-if" if="[[_isSwitch(field.tipo)]]">
-            <paper-toggle-button>[[field.nombre]]</paper-toggle-button>
+            <paper-toggle-button id="input" checked="{{field.checked}}" value="{{field.value}}">
+                [[field.nombre]]
+            </paper-toggle-button>
         </template>
         <template is="dom-if" if="[[_isDate(field.tipo)]]">
-            <vaadin-date-picker auto-validate label=[[field.nombre]] value="{{field.value}}"></vaadin-date-picker>
+            <vaadin-date-picker id="input" auto-validate label=[[field.nombre]] value="{{field.value}}"
+                                required="[[field.required]]">
+            </vaadin-date-picker>
         </template>
-        
-
     </template>
 
     <script>
@@ -44,20 +50,37 @@
 
             static get properties() {
                 return {
-                    field: Object
+                    field: Object,
+                    name: {
+                        type: String,
+                        readOnly: true,
+                        reflectToAttribute: true
+                    }
                 };
-            }
-
-            constructor() {
-                super();
             }
 
             ready() {
                 super.ready();
-
+                this._setName(this.field.nombre);
                 Polymer.RenderStatus.afterNextRender(this, function() {
-                    
+                    this._input = this.shadowRoot.querySelector('#input');
                 });
+            }
+
+            get value() {
+                return this.field.value;
+            }
+
+            set value(value) {
+                this._input.value = value;
+            }
+
+            get checked() {
+                return this.field.checked;
+            }
+
+            set checked(value) {
+                this._input.checked = value;
             }
 
             _isInput(tipo) {
@@ -80,6 +103,13 @@
                 return tipo == 'date'
             }
 
+            validate() {
+                if(!this._isTitulo(this.field.tipo) && !this._isSwitch(this.field.tipo)) {
+                    return this._input.validate();
+                }
+
+                return true;
+            }
         }
 
         window.customElements.define(HistoriaClinicaField.is, HistoriaClinicaField);

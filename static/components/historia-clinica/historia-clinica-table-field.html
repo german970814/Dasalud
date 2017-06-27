@@ -4,12 +4,13 @@
 <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
 <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/static/components/vaadin-grid-material-styles.html">
 <link rel="import" href="/static/my-icons.html">
 <link rel="import" href="historia-clinica-field.html">
 
 <dom-module id="historia-clinica-table-field">
     <template>
-        <style>
+        <style include="vaadin-grid-material-styles">
             :host {
                 display: block
             }
@@ -19,9 +20,14 @@
             }
         </style>
 
-        <template is="dom-repeat" items="{{field.fields}}" as="field">
-            <historia-clinica-field field=[[field]]></historia-clinica-field>
-        </template>
+        <iron-form id="form">
+            <form>
+                <template is="dom-repeat" items="{{field.fields}}" as="field">
+                    <historia-clinica-field field=[[field]]></historia-clinica-field>
+                </template>
+            </form>
+        </iron-form>
+        
         <paper-button on-tap="_add">Agregar</paper-button>
 
         <br><br>
@@ -52,40 +58,48 @@
                 };
             }
 
-            constructor() {
-                super();
-            }
-
-            //  todo Revisar si se deben crear las columnas de forma imperativa(js).
-            // Con html hace loops innecesarios.
-            ready() {
-                super.ready();
-
-                Polymer.RenderStatus.afterNextRender(this, function() {
-                    
-                });
-            }
-
             _add(e) {
-                console.log(e);
-                let item = {};
-                for (let i = 0; i < this.field.fields.length; i++) {
-                    if(this.field.fields[i].value != '') {
-                        item[this.field.fields[i].nombre] = this.field.fields[i].value;
-                        this.set('field.fields.0.value'.replace(0, i), '');
+                if (this.$.form.validate()) {
+                    let item = this.$.form.serializeForm();
+                    if (!this._isEmpty(item)) {
+                        this.field.items.unshift(item);
+                        this.$.grid.clearCache();
+                        this.$.form.reset();
                     }
                 }
-
-                this.field.items.unshift(item);
-                this.$.grid.clearCache();
+                
             }
 
             _delete(e) {
                 console.log(e);
                 let index = this.field.items.indexOf(e.model.item);
                 this.field.items.splice(index, 1);
-
                 this.$.grid.clearCache();
+            }
+
+            _isEmpty(item) {
+                let empty = true;
+                for (let key of Object.keys(item)) {
+                    if (item[key] != '' && item[key] != undefined) {
+                        empty = false;
+                        break;
+                    }
+                }
+
+                return empty;
+            }
+
+            validate() {
+                if (this.field.required) {
+                    if(this.$.grid.items.length == 0) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+
+                return true;
             }
         }
 

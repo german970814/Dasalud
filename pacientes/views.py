@@ -84,8 +84,6 @@ class EditarPacienteView(APIView):
         return Response({'form': form, 'VERBO': self.VERBO, 'URL': self.URL, 'MSJ': self.MSJ, 'METHOD': self.METHOD})
 
 
-
-
 class CrearOrdenView(APIView):
     """Muestra el formulario de creación de una orden para un paciente."""
 
