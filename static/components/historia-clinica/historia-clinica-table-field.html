@@ -18,6 +18,15 @@
             vaadin-grid {
                 height: 200px;
             }
+
+            .invalid {
+                --vaadin-grid-header-cell: {
+                    color: var(--error-color);
+                    height: 64px;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                };
+            }
         </style>
 
         <iron-form id="form">
@@ -71,7 +80,6 @@
             }
 
             _delete(e) {
-                console.log(e);
                 let index = this.field.items.indexOf(e.model.item);
                 this.field.items.splice(index, 1);
                 this.$.grid.clearCache();
@@ -92,13 +100,12 @@
             validate() {
                 if (this.field.required) {
                     if(this.$.grid.items.length == 0) {
+                        this.$.grid.classList.add('invalid');
                         return false;
-                    }
-                    else {
-                        return true;
                     }
                 }
 
+                this.$.grid.classList.remove('invalid');
                 return true;
             }
         }

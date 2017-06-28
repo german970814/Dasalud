@@ -20,17 +20,21 @@
             paper-tab {
                 text-transform: uppercase;
             }
+
+            paper-tab.invalid {
+                color: var(--error-color);
+            }
         </style>
 
-        <paper-tabs selected="{{selected}}" scrollable>
+        <paper-tabs id="tabs" selected="{{selected}}" scrollable>
             <template is="dom-repeat" items="[[formato]]">
                 <paper-tab>[[item.nombre]]</paper-tab>
             </template>
         </paper-tabs>
 
-        <iron-pages selected="{{selected}}">
+        <iron-pages id="pages" selected="{{selected}}">
             <template is="dom-repeat" items="[[formato]]">
-                <historia-clinica-content fields=[[item.fields]]></historia-clinica-content>
+                <historia-clinica-content on-validate-historia="_checkValidity" fields=[[item.fields]]></historia-clinica-content>
             </template>
         </iron-pages>
 
@@ -48,7 +52,7 @@
                         value() {
                             return [
                                 {nombre: 'Consulta', fields: [
-                                    {tipo: 'text', nombre: 'Motivo de consulta'},
+                                    {tipo: 'text', nombre: 'Motivo de consulta', required: true},
                                     {tipo: 'textarea', nombre: 'Enfermedad actual'}                                 
                                 ]},
                                 {nombre: 'Revisión por sistemas', fields: [
@@ -155,7 +159,7 @@
                                     {tipo: 'table', items: [], fields: [
                                         {tipo: 'text', nombre: 'medicamento', required: true},
                                         {tipo: 'textarea', nombre: 'uso', value: ''}
-                                    ]},
+                                    ], required: true},
                                     {tipo: 'titulo', nombre: 'Consulta, Procedimiento u otros'},
                                     {tipo: 'table', items: [], fields: [
                                         {tipo: 'text', nombre: 'ordenado'},
@@ -178,7 +182,7 @@
                     },
 
                     selected: {
-                        value: 6
+                        value: 0
                     }
                 };
             }
@@ -193,6 +197,19 @@
                 Polymer.RenderStatus.afterNextRender(this, function() {
 
                 });
+            }
+
+            _checkValidity(e) {
+                console.log(e);
+                console.log(e.target);
+                console.log(e.composedPath());
+                let index = this.$.pages.indexOf(e.target);
+                if (e.target.invalid) {
+                    this.$.tabs.items[index].classList.add('invalid');
+                }
+                else {
+                    this.$.tabs.items[index].classList.remove('invalid');
+                }
             }
         }
 
