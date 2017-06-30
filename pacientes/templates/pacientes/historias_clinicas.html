@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block imports %}
+    <link rel="import" href="/static/components/paciente-info.html">
+    <link rel="import" href="/static/components/historia-clinica/historia-clinica.html">
+{% endblock imports %}
+
+{% block content %}
+    <paciente-info paciente='{{ paciente }}' full-width></paciente-info>
+    <br>
+    <historia-clinica></historia-clinica>
+{% endblock content %}

@@ -1,0 +1,97 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="/static/bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+<link rel="import" href="historia-clinica-field.html">
+<link rel="import" href="historia-clinica-table-field.html">
+
+<dom-module id="historia-clinica-content">
+    <template>
+        <style>
+            :host {
+                display: block;
+                background-color: white;
+            }
+
+            .content {
+                padding: 16px;
+            }
+
+            .actions {
+                border-top: 1px solid #e8e8e8;
+                padding: 5px 16px;
+            }
+        </style>
+
+        <div class="content">
+            <template is="dom-repeat" items="{{fields}}" as="field">
+                <template is="dom-if" if="[[!_isTableField(field.tipo)]]">
+                    <historia-clinica-field field=[[field]]></historia-clinica-field>
+                </template>
+                <template is="dom-if" if="[[_isTableField(field.tipo)]]">
+                    <historia-clinica-table-field field=[[field]]></historia-clinica-table-field>            
+                </template>
+            </template>
+        </div>
+        <div class="actions">
+            <paper-button on-tap="validate">Guardar</paper-button>
+        </div>
+    </template>
+
+    <script>
+        class HistoriaClinicaContent extends Polymer.Element {
+
+            static get is() { return 'historia-clinica-content'; }
+
+            static get properties() {
+                return {
+                    fields: {
+                        type: Array
+                    },
+                    invalid: {
+                        type: Boolean,
+                        value: false
+                    }
+                };
+            }
+
+            constructor() {
+                super();
+            }
+
+            ready() {
+                super.ready();
+
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    
+                });
+            }
+
+            _isTableField(tipo) {
+                return tipo == 'table'
+            }
+
+            validate() {
+                let valid = true;
+                let fields = this.shadowRoot.querySelectorAll('historia-clinica-field, historia-clinica-table-field');
+                for (let i = 0; i < fields.length; i++) {
+                    if (!fields[i].validate()) {
+                        valid = false;
+                    }
+                }
+
+                this.invalid = !valid;
+                this.dispatchEvent(new CustomEvent('validate-historia'));
+                return valid;
+            }
+
+            save() {
+                if (this.validate()) {
+                    this.dispatchEvent(new CustomEvent('save-historia'));
+                }
+            }
+        }
+
+        window.customElements.define(HistoriaClinicaContent.is, HistoriaClinicaContent);
+    </script>
+</dom-module>

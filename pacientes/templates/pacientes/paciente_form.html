@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load rest_framework i18n %}
+
+{% block imports %}
+    <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
+    <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+    <link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
+{% endblock imports %}
+
+{% block content %}
+    <div class="card">
+        <h1>{{ VERBO }} {% trans "Paciente" %}</h1>
+
+        <iron-form>
+            <form action="{{ URL }}" method="POST" enctype="application/x-www-form-urlencoded">
+            <!--<form action="{{ URL }}" method="POST" enctype="multipart/form-data">-->
+                <fieldset>
+                    <legend>{% trans "Datos del paciente" %}</legend>
+                    {% csrf_token %}
+                    {% render_form form template_pack='material-pack' %}
+                </fieldset>
+            </form>
+        </iron-form>
+        <br><br>
+        <paper-button onclick="submit()">{{ VERBO }}</paper-button>
+
+        <paper-dialog>
+            <h2>{{ MSJ }}</h2>
+            <h3 align="center">{% trans "¿Quieres crearle una orden?" %}</h3>
+            <div class="buttons">
+                <paper-button  dialog-confirm >{% trans "SI" %}</paper-button>
+                <paper-button  dialog-dismiss>{% trans "NO" %}</paper-button>
+            </div>
+        </paper-dialog>
+    </div>
+{% endblock content %}
+
+{% block js %}
+    <script>
+        let paciente;
+        let form = document.querySelector('iron-form');
+        let dialog = document.querySelector('paper-dialog');
+        let upload = document.querySelector('vaadin-upload');
+
+        dialog.addEventListener('iron-overlay-closed', function(e) {
+            if(e.detail.confirmed) {
+                window.location = paciente.ordenes_link;
+            }
+            else {
+                window.location = '';
+            }
+        });
+
+        function getToken() {
+            return form.querySelector('input[name="csrfmiddlewaretoken"]').value;
+        }
+
+        function submit() {
+            sendForm();
+        }
+
+        function sendForm() {
+            let formData = form.serializeForm();
+            let data = new FormData();
+            for(let key in formData) {
+                if (formData[key] !== undefined) {
+                    data.append(key, formData[key]);
+                }
+            }
+
+            if (upload.files.length > 0) {
+                if (upload.files[0].progress != 100) {
+                    data.append(upload.formDataName, upload.files[0]);
+                }
+            }
+
+            let errorResponse;
+            fetch('{{ URL }}', {
+                method: '{{ METHOD }}',
+                credentials: 'same-origin',
+                body: data,
+                headers: {
+                    'X-CSRFToken': getToken(),
+                    'Accept': 'application/json'
+                }
+            })
+            .then(function (response){
+                if (!response.ok) {
+                    errorResponse = response;
+                    throw Error(response.statusText);
+                }
+                return response;
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                paciente = data;
+                dialog.open();
+            })
+            .catch(function (error) {
+                return errorResponse.json();
+            })
+            .then(function (errors) {
+                _setFormErrors(form, errors);
+            });
+        }
+
+        function _setFormErrors(form, errors) {
+            for (let key in errors) {
+                let input = form.querySelector('*[name=' + key + ']');
+                input.errorMessage = errors[key];
+                input.invalid = true;
+            }
+        }
+    </script>
+{% endblock js %}

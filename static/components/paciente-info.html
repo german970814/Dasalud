@@ -1,0 +1,94 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/paper-card/paper-card.html">
+<link rel="import" href="/static/bower_components/iron-image/iron-image.html">
+<link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/static/my-icons.html">
+
+<dom-module id="paciente-info">
+    <template>
+        <style>
+            :host {
+                display: block;
+
+                --paper-card: {
+                    width: var(--paciente-info-width, 400px);
+                };
+
+                --paper-card-content: {
+                    display: flex;
+                };
+            }
+
+            :host([full-width]) {
+                --paciente-info-width: 100%;
+            }
+
+            iron-image {
+                width: 150px;
+                height: 150px;
+                margin-right: 20px;
+            }
+
+            .info > * {
+                margin: 0px;
+            }
+        </style>
+
+        <paper-card>
+            <div class="card-content">
+                <iron-image src="[[paciente.foto]]" sizing="cover" fade preload placeholder="/static/img/profile-none.png"></iron-image>
+                <div class="info">
+                    <h4><strong>[[_nombreCompleto(paciente.nombres, paciente.apellidos)]]</strong></h4>
+                    <p><small>[[paciente.tipo_documento]]: [[paciente.numero_documento]]</small></p>
+                    <p><small>Edad: 23 años</small></p>
+                </div>
+            </div>
+            <div class="card-actions">
+                <a href="[[paciente.edit_link]]"><paper-icon-button icon="my-icons:edit"></paper-icon-button></a>
+                <a href="[[paciente.ordenes_link]]"><paper-icon-button icon="my-icons:menu"></paper-icon-button></a>
+            </div>
+        </paper-card>
+    </template>
+
+    <script>
+        class PacienteInfo extends Polymer.Element {
+
+            static get is() { return 'paciente-info'; }
+
+            static get properties() {
+                return {
+                    paciente: Object,
+
+                    fullWidth: {
+                        type: Boolean,
+                        value: false,
+                        reflectToAttribute: true
+                    }
+                };
+            }
+
+            constructor() {
+                super();
+            }
+
+            _nombreCompleto(nombres, apellidos) {
+                return nombres + ' ' + apellidos;
+            }
+
+            // TODO calcular la edad
+            // function getAge(dateString) {
+            //     var today = new Date();
+            //     var birthDate = new Date(dateString);
+            //     var age = today.getFullYear() - birthDate.getFullYear();
+            //     var m = today.getMonth() - birthDate.getMonth();
+            //     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            //         age--;
+            //     }
+            //     return age;
+            // }
+
+        }
+
+        window.customElements.define(PacienteInfo.is, PacienteInfo);
+    </script>
+</dom-module>

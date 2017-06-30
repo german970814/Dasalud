@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+{% load rest_framework i18n %}
+
+{% block imports %}
+    <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+    <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
+    <link rel="import" href="/static/bower_components/paper-fab/paper-fab.html">
+    <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="/static/components/paciente-info.html">
+{% endblock imports %}
+
+{% block css %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="/static/bower_components/mdl-stepper/stepper.min.css">
+    <custom-style>
+        <style>
+            .mdl-stepper {
+                max-width: none;
+                width: 100%;
+            }
+
+            #servicios .servicio {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #servicios .servicio .container{
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            #servicios .servicio .container > * {
+                margin-right: 20px;
+            }
+        </style>
+    </custom-style>
+{% endblock css %}
+
+{% block content %}
+    <paciente-info paciente='{{ paciente }}' full-width></paciente-info>
+
+    <ul class="mdl-stepper mdl-stepper--horizontal mdl-stepper--linear" id="demo-stepper-state-error">
+        <li class="mdl-step mdl-step--editable" data-step="orden">
+            <span class="mdl-step__label">
+                <span class="mdl-step__title">
+                    <span class="mdl-step__title-text">{% trans "Orden" %}</span>
+                </span>
+            </span>
+            <div class="mdl-step__content">
+                <iron-form>
+                    <form action="{% url 'pacientes:ordenes' paciente_id %}" method="POST" enctype="application/json">
+                        {% csrf_token %}
+                        {% render_form orden_s template_pack='material-pack' %}
+                    </form>
+                </iron-form>
+            </div>
+            <div class="mdl-step__actions">
+                <paper-button data-stepper-next>{% trans "Continuar" %}</paper-button>
+                <paper-button data-stepper-back>{% trans "Atras" %}</paper-button>
+            </div>
+        </li>
+        <li class="mdl-step mdl-step--editable" data-step="servicios">
+            <span class="mdl-step__label">
+                <span class="mdl-step__title">
+                    <span class="mdl-step__title-text">{% trans "Servicios" %}</span>
+                </span>
+            </span>
+            <div class="mdl-step__content">
+                <template id="servicio-template">
+                    <div class="servicio">
+                        <iron-form>
+                            <form>
+                                <div class="container">
+                                    {% render_form servicios_s template_pack='material-pack' %}
+                                </div>
+                            </form>
+                        </iron-form>
+                        <paper-icon-button onclick="_removeServicio(this)" icon="my-icons:clear"></paper-icon-button>
+                    </div>
+                </template>
+                <paper-fab mini onclick="_addServicio()" icon="my-icons:add" elevation="1"></paper-fab>
+                <br>
+                <iron-form>
+                    <form>
+                        <div id="servicios">
+                            {% csrf_token %}
+                        </div>
+                    </form>
+                </iron-form>
+            </div>
+            <div class="mdl-step__actions">
+                <paper-button data-stepper-next>{% trans "Continuar" %}</paper-button>
+                <paper-button data-stepper-back>{% trans "Atras" %}</paper-button>
+            </div>
+        </li>
+        <li class="mdl-step mdl-step--editable" data-step="acompanante">
+            <span class="mdl-step__label">
+                <span class="mdl-step__title">
+                    <span class="mdl-step__title-text">{% trans "Acompañante" %}</span>
+                </span>
+            </span>
+            <div class="mdl-step__content">
+                <iron-form>
+                    <form method="POST" enctype="application/x-www-form-urlencoded">
+                        {% render_form acompanante_s template_pack='material-pack' %}
+                    </form>
+                </iron-form>
+            </div>
+            <div class="mdl-step__actions">
+                <paper-button data-stepper-next>{% trans "Terminar" %}</paper-button>
+                <paper-button data-stepper-back>{% trans "Atras" %}</paper-button>
+            </div>
+        </li>
+        </ul>
+
+        <paper-dialog>
+            <div>
+                {% trans "Debe agregar por lo menos un servicio." %}                
+            </div>
+            <div class="buttons">
+                <paper-button  dialog-dismiss>{% trans "Cerrar" %}</paper-button>
+            </div>
+        </paper-dialog>
+    </div>
+{% endblock content %}
+
+{% block js %}
+    <script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+    <script src="/static/bower_components/mdl-stepper/stepper.min.js"></script>
+    <script>
+        var stepperNode = document.querySelector('.mdl-stepper');
+        var stepper, forms = {};
+
+        function getStepper() {
+            if (!stepper) {
+                stepper = stepperNode.MaterialStepper;
+            }
+        }
+
+        // Check if MDL Component Handler is loaded.
+        if (typeof componentHandler !== 'undefined') {
+            // Get the MaterialStepper instance of element to control it.
+            var forms = {};
+            stepperNode.addEventListener('onstepnext', function(e) {
+                getStepper();
+                let activeStep = stepper.getActive();
+                
+                let form = activeStep.querySelector('.mdl-step__content iron-form');
+                console.log(form.serializeForm());
+                if (form.validate()) {
+                    if (activeStep.dataset.step == "servicios") {
+                        let servicios = activeStep.querySelectorAll('.mdl-step__content .servicio');
+                        if (servicios.length == 0) {
+                            stepper.error("Hay errores en el formulario.");
+                            document.querySelector('paper-dialog').open();
+                        }
+                        else {
+                            forms[activeStep.dataset.step] = form;
+                            stepper.next();
+                        }
+                    }
+                    else {
+                        forms[activeStep.dataset.step] = form;
+                        stepper.next();
+                    }
+
+                    if (activeStep.dataset.step == "acompanante") {
+                        _submitOrden();
+                    }
+                }
+                else {
+                    stepper.error("Hay errores en el formulario.");
+                }
+            })
+
+            stepperNode.addEventListener('onstepback', function(e) {
+                getStepper();
+                stepper.back();
+            });
+
+            stepperNode.addEventListener('onsteppercomplete', function() {
+                console.log("terminado");
+            });
+
+            let institucionNode = document.querySelector('*[name="institucion"]');
+            institucionNode.addEventListener('selected-item-changed', function(){
+                _getEmpresas(institucionNode.value);
+                _getMedicos(institucionNode.value);
+            });
+
+            let empresaNode = document.querySelector('*[name="plan"]');
+            empresaNode.addEventListener('selected-item-changed', function(){
+                _getServicios(empresaNode.value);
+            });
+
+            let asistioNode = document.querySelector('*[name="asistio"]');
+            asistioNode.addEventListener('checked-changed', function(e){
+                let parent = e.target.parentElement;
+                let inputs = parent.querySelectorAll('paper-input');
+                for (let i = 0; i < inputs.length; i++) {
+                    inputs[i].required = e.target.checked;
+                    let label = inputs[i].label;
+                    if (e.target.checked) {
+                        inputs[i].label = label + '*';
+                    }
+                    else {
+                        if(label.substr(label.length - 1) == '*') {
+                            inputs[i].label = label.substring(0, label.length - 1);
+                        }
+                    }
+                }
+            });
+        } else {
+            console.log("no encontrado");
+            // Material Design Lite javascript is not loaded or for another  
+            // reason MDL Component Handler is not available globally and
+            // you can't use (register and upgrade) Stepper component at this point.
+        }
+
+        function _getEmpresas(value) {
+            fetch("{% url 'servicios:planes' %}?institucion=" + value, {credentials: 'same-origin'})
+                .then(function(response){
+                    return response.json();
+                })
+                .then(function(data){
+                    document.querySelector('*[name="plan"]').items = data;
+                });
+        }
+
+        var medicos = [];
+        function _getMedicos(value) {
+            fetch("{% url 'organizacional:medicos' %}?instituciones=" + value, {credentials: 'same-origin'})
+                .then(function(response){
+                    return response.json();
+                })
+                .then(function(data){
+                    medicos = data;
+                    let medicosNodes = document.querySelectorAll('*[name="medico"]');
+                    for (let i = 0; i < medicosNodes.length; i++) {
+                        medicosNodes[i].items = data;
+                    }
+                });
+        }
+
+        var servicios_e = [];
+        function _getServicios(value) {
+            fetch("{% url 'servicios:empresas_servicios' 0 %}".replace(0, value), {credentials: 'same-origin'})
+                .then(function(response){
+                    return response.json();
+                })
+                .then(function(data){
+                    servicios_e = data;
+                    let serviciosNodes = document.querySelectorAll('*[name="servicio"]');
+                    for (let i = 0; i < serviciosNodes.length; i++) {
+                        serviciosNodes[i].items = data;
+                    }
+                });
+        }
+
+        function _setFormErrors(form, errors) {
+            for (let key in errors) {
+                let input = form.querySelector('*[name=' + key + ']');
+                input.errorMessage = errors[key];
+                input.invalid = true;
+            }
+        }
+
+        function _setOrdenesUrl(url) {
+            let form = stepperNode.querySelector(".mdl-step[data-step='orden'] iron-form form");
+            form.setAttribute('action', url);
+        }
+
+        function _submitOrden() {
+            let form = forms['orden'];
+            let orden = form.serializeForm();
+            orden['acompanante'] = forms['acompanante'].serializeForm();
+            let servicios = [];
+            let servicios_ = forms['servicios'].querySelectorAll('iron-form');
+            for (var i = 0; i < servicios_.length; i++) {
+                servicios.push(servicios_[i].serializeForm());
+            }
+            orden['servicios'] = servicios;
+            form.headers = {'X-CSRFToken': orden['csrfmiddlewaretoken']};
+            form._makeAjaxRequest(orden);
+
+            let response;
+            form.addEventListener('iron-form-error', function(e) {
+                stepper.error("Hay errores en el formulario.");
+                console.log(response);
+                // response = e.detail.request.response;
+                // for (let key in response) {
+                //     let input = form.querySelector('*[name=' + key + ']');
+                //     input.errorMessage = response[key];
+                //     input.invalid = true;
+                //     input.autofocus = true;
+                // }
+            });
+
+            // form.addEventListener('iron-form-response', function(e) {
+            //     console.log('paciente creado');
+            //     activeStep.classList.remove('mdl-step--transient');
+            //     response = e.detail.response;
+            //     form.querySelector('form').setAttribute('action', response['edit_link']);
+            //     stepper.next();
+            // });
+        }
+
+        function _addServicio() {
+            const template = document.getElementById('servicio-template');
+            const instance = template.content.cloneNode(true);
+
+            let serviciosDiv = document.getElementById('servicios');
+            instance.querySelector('*[name="medico"]').items = medicos;
+            let servicioNode = instance.querySelector('*[name="servicio"]')
+            servicioNode.items = servicios_e;
+            servicioNode.addEventListener('selected-item-changed', _setValorServicio);
+            serviciosDiv.appendChild(instance);
+        }
+
+        function _setValorServicio(e) {
+            e.target.parentElement.querySelector('*[name="valor"]').value = e.detail.value.valor;
+        }
+
+        function _removeServicio(button) {
+            const parent = button.parentElement;
+            parent.parentElement.removeChild(parent);
+        }
+    </script>
+{% endblock js %}

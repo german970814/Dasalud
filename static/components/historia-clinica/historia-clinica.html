@@ -1,0 +1,218 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="/static/bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="/static/bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="/static/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="historia-clinica-content.html">
+
+<dom-module id="historia-clinica">
+    <template>
+        <style>
+            :host {
+                display: block;
+                /*--paper-tabs-selection-bar-color: var(--app-primary-color);*/
+            }
+
+            paper-tabs {
+                background: white;
+            }
+
+            paper-tab {
+                text-transform: uppercase;
+            }
+
+            paper-tab.invalid {
+                color: var(--error-color);
+            }
+        </style>
+
+        <paper-tabs id="tabs" selected="{{selected}}" scrollable>
+            <template is="dom-repeat" items="[[formato]]">
+                <paper-tab>[[item.nombre]]</paper-tab>
+            </template>
+        </paper-tabs>
+
+        <iron-pages id="pages" selected="{{selected}}">
+            <template is="dom-repeat" items="[[formato]]">
+                <historia-clinica-content on-validate-historia="_checkValidity" fields=[[item.fields]]></historia-clinica-content>
+            </template>
+        </iron-pages>
+
+    </template>
+
+    <script>
+        class HistoriaClinica extends Polymer.Element {
+
+            static get is() { return 'historia-clinica'; }
+
+            static get properties() {
+                return {
+                    formato: {
+                        type: Array,
+                        value() {
+                            return [
+                                {nombre: 'Consulta', fields: [
+                                    {tipo: 'text', nombre: 'Motivo de consulta', required: true},
+                                    {tipo: 'textarea', nombre: 'Enfermedad actual'}                                 
+                                ]},
+                                {nombre: 'Revisión por sistemas', fields: [
+                                    {tipo: 'textarea', nombre: 'Organos de los sentidos', value: 'No refiere síntomas'},
+                                    {tipo: 'textarea', nombre: 'Piel y faneras', value: 'No refiere síntomas'},
+                                    {tipo: 'textarea', nombre: 'Sistema respiratorio', value: 'No refiere síntomas'},
+                                    {tipo: 'textarea', nombre: 'Sistema cardio vascular', value: 'No refiere síntomas'},
+                                    {tipo: 'textarea', nombre: 'Sistema digestivo', value: 'No refiere síntomas'},
+                                    {tipo: 'textarea', nombre: 'Sistema genitourinario', value: 'No refiere síntomas'},
+                                    {tipo: 'textarea', nombre: 'Sistema nervioso central', value: 'No refiere síntomas'},
+                                    {tipo: 'textarea', nombre: 'Sistema locomotor y muscular', value: 'No refiere síntomas'},
+                                    {tipo: 'textarea', nombre: 'Sistema reproductivo', value: 'No refiere síntomas'},
+                                    {tipo: 'textarea', nombre: 'Otros', value: 'No refiere síntomas'},
+                                ]},
+                                {nombre: 'Antecedentes', fields: [
+                                    {tipo: 'titulo', nombre: 'Personales'},
+                                    {tipo: 'switch', nombre: 'Hipertensión'},
+                                    {tipo: 'switch', nombre: 'Diabetes'},
+                                    {tipo: 'switch', nombre: 'Taquicardia'},
+                                    {tipo: 'switch', nombre: 'Precordalgia'},
+                                    {tipo: 'switch', nombre: 'IAM'},
+                                    {tipo: 'switch', nombre: 'ECV'},
+                                    {tipo: 'switch', nombre: 'Dislipidemias'},
+                                    {tipo: 'switch', nombre: 'Hipotiroidismo'},
+                                    {tipo: 'switch', nombre: 'Hipertiroidismo'},
+                                    {tipo: 'textarea', nombre: 'Indique cuales antecedentes de los escogidos son recientes'},
+                                    {tipo: 'textarea', nombre: 'Medicos', value: 'Negativos'},
+                                    {tipo: 'textarea', nombre: 'Quirúrgicos', value: 'Negativos'},
+                                    {tipo: 'textarea', nombre: 'Transfusiones', value: 'Negativos'},
+                                    {tipo: 'textarea', nombre: 'Traumáticos', value: 'Negativos'},
+                                    {tipo: 'textarea', nombre: 'Alérgicos', value: 'Negativos'},
+                                    {tipo: 'textarea', nombre: 'Tóxicos', value: 'Negativos'},
+                                    {tipo: 'textarea', nombre: 'Ets', value: 'Negativos'},
+                                    {tipo: 'textarea', nombre: 'Famacologicos', value: 'Negativos'},
+                                    {tipo: 'titulo', nombre: 'Gineco-Obstetricos'},
+                                    {tipo: 'text', nombre: 'Menarquia', value: 11},
+                                    {tipo: 'date', nombre: 'FUM'},
+                                    {tipo: 'text', nombre: 'Gesta', value: 1},
+                                    {tipo: 'text', nombre: 'Parto', value: 1},
+                                    {tipo: 'text', nombre: 'Aborto', value: 0},
+                                    {tipo: 'text', nombre: 'Cesarea', value: 1},
+                                    {tipo: 'text', nombre: 'Ectopico', value: 0},
+                                    {tipo: 'titulo', nombre: 'Familiares'},
+                                    {tipo: 'switch', nombre: 'Hipertensión'},
+                                    {tipo: 'switch', nombre: 'Diabetes'},
+                                    {tipo: 'switch', nombre: 'IAM'},
+                                    {tipo: 'switch', nombre: 'ECV'},
+                                    {tipo: 'switch', nombre: 'Dislipidemias'},
+                                    {tipo: 'switch', nombre: 'Cáncer'},
+                                    {tipo: 'textarea', nombre: 'Parentesco'},
+                                ]},
+                                {nombre: 'Examen fisico', fields: [
+                                    {tipo: 'number', nombre: 'Peso(Kg)'},
+                                    {tipo: 'number', nombre: 'Talla(Cm)'},
+                                    {tipo: 'number', nombre: 'M. Corporal'},
+                                    {tipo: 'number', nombre: 'Peso Teorico(Kg)'},
+                                    {tipo: 'number', nombre: 'Peso Deseado(Kg)'},
+                                    {tipo: 'number', nombre: 'Peso Promedio(Kg)'},
+                                    {tipo: 'number', nombre: 'Cintura Abd(Cm)'},
+                                    {tipo: 'number', nombre: 'Cadera(Cm)'},
+                                    {tipo: 'number', nombre: 'ICC'},
+                                    {tipo: 'titulo', nombre: 'Pliegues'},
+                                    {tipo: 'number', nombre: 'Bicipital'},
+                                    {tipo: 'number', nombre: 'Tricipital'},
+                                    {tipo: 'number', nombre: 'Subscapular'},
+                                    {tipo: 'number', nombre: 'Supra iliaco'},
+                                    {tipo: 'number', nombre: '% Graso'},
+                                    {tipo: 'number', nombre: 'MG'},
+                                    {tipo: 'number', nombre: 'MM'},
+                                    {tipo: 'number', nombre: 'Grasa V'},
+                                    {tipo: 'number', nombre: 'Met Basal'},
+                                    {tipo: 'titulo', nombre: 'Triage'},
+                                    {tipo: 'number', nombre: 'PA (mmHg)'},
+                                    {tipo: 'number', nombre: 'FC (Lat/min)'},
+                                    {tipo: 'number', nombre: 'Pulso(min)'},
+                                    {tipo: 'number', nombre: 'FR (min)'},
+                                    {tipo: 'number', nombre: 'T (ºC)'},
+                                    {tipo: 'textarea', nombre: 'Descripción'},
+                                    {tipo: 'titulo', nombre: 'Examen detallado'},
+                                    {tipo: 'textarea', nombre: 'Cabeza, Cara y Cuello', value: 'No se explora'},
+                                    {tipo: 'textarea', nombre: 'ORL', value: 'No se explora'},
+                                    {tipo: 'textarea', nombre: 'Sistema Respiratorio', value: 'No se explora'},
+                                    {tipo: 'textarea', nombre: 'Sistema Cardiovascular', value: 'No se explora'},
+                                    {tipo: 'textarea', nombre: 'Sistema Digestivo', value: 'No se explora'},
+                                    {tipo: 'textarea', nombre: 'Sistema Genitourinario', value: 'No se explora'},
+                                    {tipo: 'textarea', nombre: 'Tacto Rectal', value: 'No se explora'}
+                                ]},
+                                {nombre: 'Impresión Diagnostica', fields: [
+                                    {tipo: 'textarea', nombre: 'Impresión diagnostica'},
+                                    {tipo: 'textarea', nombre: 'Análisis'}
+                                ]},
+                                {nombre: 'Plan', fields: [
+                                    {tipo: 'titulo', nombre: 'Diagnóstico'},
+                                    {tipo: 'textarea', nombre: 'Diagnóstico'},
+                                    {tipo: 'titulo', nombre: 'Terapeutico'},
+                                    {tipo: 'number', nombre: 'Calorias'},
+                                    {tipo: 'number', nombre: 'Dias de Desintoxicación'},
+                                    {tipo: 'titulo', nombre: 'Descripción Nutricional'},
+                                    {tipo: 'textarea', nombre: 'Medicación'},
+                                    {tipo: 'number', nombre: 'Cita de control (días)'},
+                                ]},
+                                {nombre: 'Conducta', fields: [
+                                    {tipo: 'titulo', nombre: 'Formulación'},
+                                    {tipo: 'table', items: [], fields: [
+                                        {tipo: 'text', nombre: 'medicamento', required: true},
+                                        {tipo: 'textarea', nombre: 'uso', value: ''}
+                                    ], required: true},
+                                    {tipo: 'titulo', nombre: 'Consulta, Procedimiento u otros'},
+                                    {tipo: 'table', items: [], fields: [
+                                        {tipo: 'text', nombre: 'ordenado'},
+                                        {tipo: 'textarea', nombre: 'Descripcion orden'},
+                                    ]},
+                                    {tipo: 'titulo', nombre: 'Laboratorios'},
+                                    {tipo: 'table', items: [], fields: [
+                                        {tipo: 'text', nombre: 'laboratorio'},
+                                        {tipo: 'textarea', nombre: 'Descripción laboratorio'},
+                                    ]}
+                                ]},
+                                {nombre: 'Remisiones', fields: [
+                                    {tipo: 'text', nombre: 'para'},
+                                    {tipo: 'textarea', nombre: 'motivo'},
+                                    {tipo: 'textarea', nombre: 'remisión interna'},
+                                ]},
+                                {nombre: 'Rips', fields: []},
+                            ]; // Tabs array
+                        } // Value
+                    },
+
+                    selected: {
+                        value: 0
+                    }
+                };
+            }
+
+            constructor() {
+                super();
+            }
+
+            ready() {
+                super.ready();
+
+                Polymer.RenderStatus.afterNextRender(this, function() {
+
+                });
+            }
+
+            _checkValidity(e) {
+                console.log(e);
+                console.log(e.target);
+                console.log(e.composedPath());
+                let index = this.$.pages.indexOf(e.target);
+                if (e.target.invalid) {
+                    this.$.tabs.items[index].classList.add('invalid');
+                }
+                else {
+                    this.$.tabs.items[index].classList.remove('invalid');
+                }
+            }
+        }
+
+        window.customElements.define(HistoriaClinica.is, HistoriaClinica);
+    </script>
+</dom-module>

@@ -1,0 +1,115 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="/static/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/static/components/vaadin-grid-material-styles.html">
+<link rel="import" href="/static/my-icons.html">
+<link rel="import" href="historia-clinica-field.html">
+
+<dom-module id="historia-clinica-table-field">
+    <template>
+        <style include="vaadin-grid-material-styles">
+            :host {
+                display: block
+            }
+
+            vaadin-grid {
+                height: 200px;
+            }
+
+            .invalid {
+                --vaadin-grid-header-cell: {
+                    color: var(--error-color);
+                    height: 64px;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                };
+            }
+        </style>
+
+        <iron-form id="form">
+            <form>
+                <template is="dom-repeat" items="{{field.fields}}" as="field">
+                    <historia-clinica-field field=[[field]]></historia-clinica-field>
+                </template>
+            </form>
+        </iron-form>
+        
+        <paper-button on-tap="_add">Agregar</paper-button>
+
+        <br><br>
+        <vaadin-grid id="grid" items="{{field.items}}">
+            <template is="dom-repeat" items="{{field.fields}}" as="field">
+                <vaadin-grid-column>
+                    <template class="header">[[field.nombre]]</template>
+                    <template>[[get(field.nombre, item)]]</template>
+                </vaadin-grid-column>
+            </template>
+            <vaadin-grid-column>
+                <template>
+                    <paper-icon-button icon="my-icons:delete" alt="Eliminar" on-tap="_delete"></paper-icon-button>
+                </template>
+            </vaadin-grid-column>
+        </vaadin-grid>
+
+    </template>
+
+    <script>
+        class HistoriaClinicaTableField extends Polymer.Element {
+
+            static get is() { return 'historia-clinica-table-field'; }
+
+            static get properties() {
+                return {
+                    field: Object
+                };
+            }
+
+            _add(e) {
+                if (this.$.form.validate()) {
+                    let item = this.$.form.serializeForm();
+                    if (!this._isEmpty(item)) {
+                        this.field.items.unshift(item);
+                        this.$.grid.clearCache();
+                        this.$.form.reset();
+                    }
+                }
+                
+            }
+
+            _delete(e) {
+                let index = this.field.items.indexOf(e.model.item);
+                this.field.items.splice(index, 1);
+                this.$.grid.clearCache();
+            }
+
+            _isEmpty(item) {
+                let empty = true;
+                for (let key of Object.keys(item)) {
+                    if (item[key] != '' && item[key] != undefined) {
+                        empty = false;
+                        break;
+                    }
+                }
+
+                return empty;
+            }
+
+            validate() {
+                if (this.field.required) {
+                    if(this.$.grid.items.length == 0) {
+                        this.$.grid.classList.add('invalid');
+                        return false;
+                    }
+                }
+
+                this.$.grid.classList.remove('invalid');
+                return true;
+            }
+        }
+
+        window.customElements.define(HistoriaClinicaTableField.is, HistoriaClinicaTableField);
+    </script>
+</dom-module>
