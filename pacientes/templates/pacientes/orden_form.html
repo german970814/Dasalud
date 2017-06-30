@@ -220,7 +220,7 @@
         }
 
         function _getEmpresas(value) {
-            fetch("{% url 'servicios:planes' %}?institucion=" + value)
+            fetch("{% url 'servicios:planes' %}?institucion=" + value, {credentials: 'same-origin'})
                 .then(function(response){
                     return response.json();
                 })
@@ -231,7 +231,7 @@
 
         var medicos = [];
         function _getMedicos(value) {
-            fetch("{% url 'organizacional:medicos' %}?instituciones=" + value)
+            fetch("{% url 'organizacional:medicos' %}?instituciones=" + value, {credentials: 'same-origin'})
                 .then(function(response){
                     return response.json();
                 })
@@ -246,7 +246,7 @@
 
         var servicios_e = [];
         function _getServicios(value) {
-            fetch("{% url 'servicios:empresas_servicios' 0 %}".replace(0, value))
+            fetch("{% url 'servicios:empresas_servicios' 0 %}".replace(0, value), {credentials: 'same-origin'})
                 .then(function(response){
                     return response.json();
                 })

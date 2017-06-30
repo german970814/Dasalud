@@ -77,32 +77,33 @@
             let errorResponse;
             fetch('{{ URL }}', {
                 method: '{{ METHOD }}',
+                credentials: 'same-origin',
                 body: data,
                 headers: {
                     'X-CSRFToken': getToken(),
                     'Accept': 'application/json'
                 }
             })
-                .then(function (response){
-                    if (!response.ok) {
-                        errorResponse = response;
-                        throw Error(response.statusText);
-                    }
-                    return response;
-                })
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(data) {
-                    paciente = data;
-                    dialog.open();
-                })
-                .catch(function (error) {
-                    return errorResponse.json();
-                })
-                .then(function (errors) {
-                    _setFormErrors(form, errors);
-                });
+            .then(function (response){
+                if (!response.ok) {
+                    errorResponse = response;
+                    throw Error(response.statusText);
+                }
+                return response;
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                paciente = data;
+                dialog.open();
+            })
+            .catch(function (error) {
+                return errorResponse.json();
+            })
+            .then(function (errors) {
+                _setFormErrors(form, errors);
+            });
         }
 
         function _setFormErrors(form, errors) {
