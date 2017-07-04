@@ -51,138 +51,58 @@
                         type: Array,
                         value() {
                             return [
-                                {nombre: 'Consulta', fields: [
-                                    {tipo: 'text', nombre: 'Motivo de consulta', required: true},
-                                    {tipo: 'textarea', nombre: 'Enfermedad actual'}                                 
+                                {nombre: 'Anamnesis Alimentaria', fields: [
+                                    {tipo: 'textarea', nombre: 'Desayuno', required: true},
+                                    {tipo: 'textarea', nombre: 'Medias mañanas', required: true},                                 
+                                    {tipo: 'textarea', nombre: 'Almuerzo', required: true},
+                                    {tipo: 'textarea', nombre: 'Medias tardes', required: true},
+                                    {tipo: 'textarea', nombre: 'Cena', required: true},
+                                    {tipo: 'textarea', nombre: 'Colacion nocturna', required: true},
+                                    {tipo: 'textarea', nombre: 'Alimentos rechazados', required: true},
+                                    {tipo: 'textarea', nombre: 'Alimentos preferidos', required: true}
                                 ]},
-                                {nombre: 'Revisión por sistemas', fields: [
-                                    {tipo: 'textarea', nombre: 'Organos de los sentidos', value: 'No refiere síntomas'},
-                                    {tipo: 'textarea', nombre: 'Piel y faneras', value: 'No refiere síntomas'},
-                                    {tipo: 'textarea', nombre: 'Sistema respiratorio', value: 'No refiere síntomas'},
-                                    {tipo: 'textarea', nombre: 'Sistema cardio vascular', value: 'No refiere síntomas'},
-                                    {tipo: 'textarea', nombre: 'Sistema digestivo', value: 'No refiere síntomas'},
-                                    {tipo: 'textarea', nombre: 'Sistema genitourinario', value: 'No refiere síntomas'},
-                                    {tipo: 'textarea', nombre: 'Sistema nervioso central', value: 'No refiere síntomas'},
-                                    {tipo: 'textarea', nombre: 'Sistema locomotor y muscular', value: 'No refiere síntomas'},
-                                    {tipo: 'textarea', nombre: 'Sistema reproductivo', value: 'No refiere síntomas'},
-                                    {tipo: 'textarea', nombre: 'Otros', value: 'No refiere síntomas'},
-                                ]},
-                                {nombre: 'Antecedentes', fields: [
-                                    {tipo: 'titulo', nombre: 'Personales'},
-                                    {tipo: 'switch', nombre: 'Hipertensión'},
-                                    {tipo: 'switch', nombre: 'Diabetes'},
-                                    {tipo: 'switch', nombre: 'Taquicardia'},
-                                    {tipo: 'switch', nombre: 'Precordalgia'},
-                                    {tipo: 'switch', nombre: 'IAM'},
-                                    {tipo: 'switch', nombre: 'ECV'},
-                                    {tipo: 'switch', nombre: 'Dislipidemias'},
-                                    {tipo: 'switch', nombre: 'Hipotiroidismo'},
-                                    {tipo: 'switch', nombre: 'Hipertiroidismo'},
-                                    {tipo: 'textarea', nombre: 'Indique cuales antecedentes de los escogidos son recientes'},
-                                    {tipo: 'textarea', nombre: 'Medicos', value: 'Negativos'},
-                                    {tipo: 'textarea', nombre: 'Quirúrgicos', value: 'Negativos'},
-                                    {tipo: 'textarea', nombre: 'Transfusiones', value: 'Negativos'},
-                                    {tipo: 'textarea', nombre: 'Traumáticos', value: 'Negativos'},
-                                    {tipo: 'textarea', nombre: 'Alérgicos', value: 'Negativos'},
-                                    {tipo: 'textarea', nombre: 'Tóxicos', value: 'Negativos'},
-                                    {tipo: 'textarea', nombre: 'Ets', value: 'Negativos'},
-                                    {tipo: 'textarea', nombre: 'Famacologicos', value: 'Negativos'},
-                                    {tipo: 'titulo', nombre: 'Gineco-Obstetricos'},
-                                    {tipo: 'text', nombre: 'Menarquia', value: 11},
-                                    {tipo: 'date', nombre: 'FUM'},
-                                    {tipo: 'text', nombre: 'Gesta', value: 1},
-                                    {tipo: 'text', nombre: 'Parto', value: 1},
-                                    {tipo: 'text', nombre: 'Aborto', value: 0},
-                                    {tipo: 'text', nombre: 'Cesarea', value: 1},
-                                    {tipo: 'text', nombre: 'Ectopico', value: 0},
-                                    {tipo: 'titulo', nombre: 'Familiares'},
-                                    {tipo: 'switch', nombre: 'Hipertensión'},
-                                    {tipo: 'switch', nombre: 'Diabetes'},
-                                    {tipo: 'switch', nombre: 'IAM'},
-                                    {tipo: 'switch', nombre: 'ECV'},
-                                    {tipo: 'switch', nombre: 'Dislipidemias'},
-                                    {tipo: 'switch', nombre: 'Cáncer'},
-                                    {tipo: 'textarea', nombre: 'Parentesco'},
-                                ]},
-                                {nombre: 'Examen fisico', fields: [
-                                    {tipo: 'number', nombre: 'Peso(Kg)'},
-                                    {tipo: 'number', nombre: 'Talla(Cm)'},
-                                    {tipo: 'number', nombre: 'M. Corporal'},
-                                    {tipo: 'number', nombre: 'Peso Teorico(Kg)'},
-                                    {tipo: 'number', nombre: 'Peso Deseado(Kg)'},
-                                    {tipo: 'number', nombre: 'Peso Promedio(Kg)'},
-                                    {tipo: 'number', nombre: 'Cintura Abd(Cm)'},
-                                    {tipo: 'number', nombre: 'Cadera(Cm)'},
-                                    {tipo: 'number', nombre: 'ICC'},
-                                    {tipo: 'titulo', nombre: 'Pliegues'},
-                                    {tipo: 'number', nombre: 'Bicipital'},
-                                    {tipo: 'number', nombre: 'Tricipital'},
-                                    {tipo: 'number', nombre: 'Subscapular'},
-                                    {tipo: 'number', nombre: 'Supra iliaco'},
-                                    {tipo: 'number', nombre: '% Graso'},
-                                    {tipo: 'number', nombre: 'MG'},
-                                    {tipo: 'number', nombre: 'MM'},
-                                    {tipo: 'number', nombre: 'Grasa V'},
-                                    {tipo: 'number', nombre: 'Met Basal'},
-                                    {tipo: 'titulo', nombre: 'Triage'},
-                                    {tipo: 'number', nombre: 'PA (mmHg)'},
-                                    {tipo: 'number', nombre: 'FC (Lat/min)'},
-                                    {tipo: 'number', nombre: 'Pulso(min)'},
-                                    {tipo: 'number', nombre: 'FR (min)'},
-                                    {tipo: 'number', nombre: 'T (ºC)'},
-                                    {tipo: 'textarea', nombre: 'Descripción'},
-                                    {tipo: 'titulo', nombre: 'Examen detallado'},
-                                    {tipo: 'textarea', nombre: 'Cabeza, Cara y Cuello', value: 'No se explora'},
-                                    {tipo: 'textarea', nombre: 'ORL', value: 'No se explora'},
-                                    {tipo: 'textarea', nombre: 'Sistema Respiratorio', value: 'No se explora'},
-                                    {tipo: 'textarea', nombre: 'Sistema Cardiovascular', value: 'No se explora'},
-                                    {tipo: 'textarea', nombre: 'Sistema Digestivo', value: 'No se explora'},
-                                    {tipo: 'textarea', nombre: 'Sistema Genitourinario', value: 'No se explora'},
-                                    {tipo: 'textarea', nombre: 'Tacto Rectal', value: 'No se explora'}
-                                ]},
-                                {nombre: 'Impresión Diagnostica', fields: [
-                                    {tipo: 'textarea', nombre: 'Impresión diagnostica'},
-                                    {tipo: 'textarea', nombre: 'Análisis'}
-                                ]},
-                                {nombre: 'Plan', fields: [
-                                    {tipo: 'titulo', nombre: 'Diagnóstico'},
-                                    {tipo: 'textarea', nombre: 'Diagnóstico'},
-                                    {tipo: 'titulo', nombre: 'Terapeutico'},
-                                    {tipo: 'number', nombre: 'Calorias'},
-                                    {tipo: 'number', nombre: 'Dias de Desintoxicación'},
-                                    {tipo: 'titulo', nombre: 'Descripción Nutricional'},
-                                    {tipo: 'textarea', nombre: 'Medicación'},
-                                    {tipo: 'number', nombre: 'Cita de control (días)'},
-                                ]},
-                                {nombre: 'Conducta', fields: [
-                                    {tipo: 'titulo', nombre: 'Formulación'},
-                                    {tipo: 'table', items: [], fields: [
-                                        {tipo: 'text', nombre: 'medicamento', required: true},
-                                        {tipo: 'textarea', nombre: 'uso', value: ''}
+                                {nombre: 'Habitos', fields: [
+                                    {tipo: 'select', nombre: 'Apetito', options: [
+                                        {value: 1, label: 'Bueno'},
+                                        {value: 2, label: 'Malo'},
+                                        {value: 3, label: 'Regular'}
                                     ], required: true},
-                                    {tipo: 'titulo', nombre: 'Consulta, Procedimiento u otros'},
-                                    {tipo: 'table', items: [], fields: [
-                                        {tipo: 'text', nombre: 'ordenado'},
-                                        {tipo: 'textarea', nombre: 'Descripcion orden'},
-                                    ]},
-                                    {tipo: 'titulo', nombre: 'Laboratorios'},
-                                    {tipo: 'table', items: [], fields: [
-                                        {tipo: 'text', nombre: 'laboratorio'},
-                                        {tipo: 'textarea', nombre: 'Descripción laboratorio'},
-                                    ]}
+                                    {tipo: 'select', nombre: 'Masticación', options: [
+                                        {value: 1, label: 'Bueno'},
+                                        {value: 2, label: 'Malo'},
+                                        {value: 3, label: 'Regular'}
+                                    ], required: true},
+                                    {tipo: 'select', nombre: 'Digestión', options: [
+                                        {value: 1, label: 'Bueno'},
+                                        {value: 2, label: 'Malo'},
+                                        {value: 3, label: 'Regular'}
+                                    ], required: true},
+                                    {tipo: 'switch', nombre: 'Habitos intestinales'},
+                                    {tipo: 'switch', nombre: 'Fuma?'},
+                                    {tipo: 'switch', nombre: 'Bebe?'},
+                                    {tipo: 'select', nombre: 'Ingesta de agua', options: [
+                                        {value: 1, label: 'Bueno'},
+                                        {value: 2, label: 'Malo'},
+                                        {value: 3, label: 'Regular'}
+                                    ], required: true},
                                 ]},
-                                {nombre: 'Remisiones', fields: [
-                                    {tipo: 'text', nombre: 'para'},
-                                    {tipo: 'textarea', nombre: 'motivo'},
-                                    {tipo: 'textarea', nombre: 'remisión interna'},
-                                ]},
-                                {nombre: 'Rips', fields: []},
+                                {nombre: 'Diagnostico', fields: [
+                                    {tipo: 'select', nombre: 'Diagnostico nutricional', options: [
+                                        {value: 1, label: 'Peso sano'},
+                                        {value: 2, label: 'Sobrepeso tipo 1'},
+                                        {value: 3, label: 'Sobrepeso tipo 2'},
+                                        {value: 4, label: 'Obesidad grado 1'},
+                                        {value: 5, label: 'Obesidad grado 2'},
+                                        {value: 6, label: 'Obesidad morbida'}
+                                    ], required: true},
+                                    {tipo: 'textarea', nombre: 'Plan de manejo', required: true}
+                                ]}
                             ]; // Tabs array
                         } // Value
                     },
 
                     selected: {
-                        value: 0
+                        value: 1
                     }
                 };
             }

@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, filters
 
-from .models import Paciente, Orden
+from .models import Paciente, Orden, ServicioOrden
 from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSerializer, ServicioOrdenSerializer
 from .serializers import CrearOrdenSerializer
 
@@ -124,7 +124,19 @@ class HistoriasClinicasView(APIView):
     template_name = 'pacientes/historias_clinicas.html'
 
     def get(self, request, pk):
-        paciente = get_object_or_404(Paciente, pk=pk)
+        servicio_orden = get_object_or_404(ServicioOrden, pk=pk)
+        paciente = servicio_orden.orden.paciente
         serializer = PacienteSerializer(paciente, context={'request': None})
         paciente_json = JSONRenderer().render(serializer.data)
-        return Response({'paciente': paciente_json})
+        formato = JSONRenderer().render(servicio_orden.servicio.formato.contenido)
+        return Response({'paciente': paciente_json, 'formato': formato})
+
+
+class CitasViews(APIView):
+    """"""
+
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'pacientes/citas.html'
+
+    def get(self, request):
+        return Response()

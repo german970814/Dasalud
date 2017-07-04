@@ -60,7 +60,8 @@ TENANT_APPS = [
 
     'pacientes',
     'servicios',
-    'organizacional'
+    'organizacional',
+    'historias'
 ]
 
 INSTALLED_APPS = SHARED_APPS + list(set(TENANT_APPS) - set(SHARED_APPS))

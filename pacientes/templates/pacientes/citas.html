@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block imports %}
+    <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
+{% endblock imports %}
+
+{% block content %}
+    <vaadin-grid>
+        <vaadin-grid-column>
+            <template class="header">
+                <div class="cell">{% trans 'Cédula' %}</div>
+            </template>
+            <template>
+                <div class="cell">[[item.paciente.numero_documento]]</div>
+            </template>
+        </vaadin-grid-column>
+        <vaadin-grid-column>
+            <template class="header">
+                <div class="cell">{% trans 'Nombre' %}</div>
+            </template>
+            <template>
+                <div class="cell">[[item.paciente.numero_documento]]</div>
+            </template>
+        </vaadin-grid-column>
+        <vaadin-grid-column>
+            <template class="header">
+                <div class="cell">{% trans 'Servicio' %}</div>
+            </template>
+            <template>
+                <div class="cell">[[item.paciente.numero_documento]]</div>
+            </template>
+        </vaadin-grid-column>
+        <vaadin-grid-column>
+            <template class="header">
+                <div class="cell">{% trans 'Entidad' %}</div>
+            </template>
+            <template>
+                <div class="cell">[[item.paciente.numero_documento]]</div>
+            </template>
+        </vaadin-grid-column>
+        <vaadin-grid-column>
+            <template class="header">
+                <div class="cell"></div>
+            </template>
+            <template>
+                <div class="cell">[[item.paciente.numero_documento]]</div>
+            </template>
+        </vaadin-grid-column>
+    </vaadin-grid>
+{% endblock content %}

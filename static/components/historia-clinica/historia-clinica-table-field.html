@@ -43,8 +43,12 @@
         <vaadin-grid id="grid" items="{{field.items}}">
             <template is="dom-repeat" items="{{field.fields}}" as="field">
                 <vaadin-grid-column>
-                    <template class="header">[[field.nombre]]</template>
-                    <template>[[get(field.nombre, item)]]</template>
+                    <template class="header">
+                        <div class="cell">[[field.nombre]]</div>
+                    </template>
+                    <template>
+                        <div class="cell">[[get(field.nombre, item)]]</div>
+                    </template>
                 </vaadin-grid-column>
             </template>
             <vaadin-grid-column>

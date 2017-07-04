@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+
 class SelectableSerializerMixin(serializers.Serializer):
     """Mixin que le agrega campos label y value para ser usado en vaadin-combobox."""
 
