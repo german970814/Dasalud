@@ -16,3 +16,6 @@ class BaseTestCase(FastTenantTestCase, TestCase):
     def _pre_setup(self):
         super()._pre_setup()
         self.client = BaseClient(self.tenant)
+    
+    def login(self, usuario):
+        self.client.login(username=usuario.username, password='adminadmin')
