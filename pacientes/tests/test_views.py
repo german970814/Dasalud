@@ -1,6 +1,4 @@
-from django.urls import reverse
 from django.test import tag
-from rest_framework import status
 from common.tests.base import BaseTestCase
 from common.tests.factories import UsuarioFactory
 from . import factories as fac
@@ -17,18 +15,17 @@ class CrearOrdenViewTest(BaseTestCase):
     def test_get_paciente_no_existe_returns_404(self):
         """Prueba que si el paciente no existe la vista devuelva un 404."""
 
-        response = self.client.get(reverse(self.URL, args=(34, )))
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.get(self.URL, 34)
+        self.response_404()
 
     def test_get_form(self):
         """Prueba que se muestre el formulario."""
 
         paciente = fac.PacienteFactory()
-        response = self.client.get(reverse(self.URL, args=(paciente.id,)))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertContains(response, 'sucursal')
+        self.get_check_200(self.URL, paciente.id)
+        self.assertResponseContains('sucursal', html=False)
 
-@tag('actual')
+
 class OrdenesPacienteViewTest(BaseTestCase):
     """Pruebas unitarias para la vista para guardar las ordenes de un paciente."""
 
@@ -67,23 +64,24 @@ class OrdenesPacienteViewTest(BaseTestCase):
     def test_post_paciente_no_existe_returns_404(self):
         """Prueba que si el paciente no existe la vista devuelva un 404."""
 
-        response = self.client.post(reverse(self.URL, args=(34, )), format='json')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.post(self.URL, 34, extra={'format': 'json'})
+        self.response_404()
     
     def test_crear_orden_invalida(self):
         """Prueba que si se envian los datos invalidos para crear una orden, la vista devuelva un 400."""
 
         paciente = fac.PacienteFactory()
-        response = self.client.post(reverse(self.URL, args=(paciente.id,)), data={}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.post(self.URL, paciente.id, data={}, extra={'format': 'json'})
+        self.response_400()
 
     def test_crear_orden_valida(self):
         """Prueba que se si se envian los datos validos para crear una orden, esta se cree."""
 
         data = self.get_data()
         paciente = fac.PacienteFactory()
-        response = self.client.post(reverse(self.URL, args=(paciente.id,)), data=data, format='json')
-
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.post(self.URL, paciente.id, data=data, extra={'format': 'json'})
+        
+        self.response_201()
         self.assertEqual(Orden.objects.count(), 1)
     
