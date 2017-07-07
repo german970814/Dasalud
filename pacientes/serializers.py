@@ -22,7 +22,7 @@ class PacienteSerializer(serializers.ModelSerializer):
             'fecha_nacimiento', 'zona', 'direccion', 'telefono', 'celular', 'email', 'grupo_sanguineo', 
             'grupo_etnico', 'profesion', 'lugar_nacimiento', 'lugar_residencia', 'activo', 'fecha_ingreso',
             'nombre_responsable', 'direccion_responsable', 'telefono_responsable' , 'edit_link', 'ordenes_link',
-            'identificacion_padre', 'nombre_padre', 'identificacion_madre', 'nombre_madre', 'foto'
+            'identificacion_padre', 'nombre_padre', 'identificacion_madre', 'nombre_madre', 'foto', 'firma'
         ]
     
     def __init__(self, *args, **kwargs):
@@ -31,6 +31,7 @@ class PacienteSerializer(serializers.ModelSerializer):
         self.fields['zona'].initial = models.Paciente.URBANO
         self.fields['grupo_etnico'].initial = models.Paciente.OTRO
         self.fields['foto'].style.update({'attrs': 'no-auto max-files=1 accept=image/*'})
+        self.fields['firma'].style.update({'attrs': 'no-auto max-files=1 accept=image/*'})
 
 
 class AcompananteSerializer(serializers.ModelSerializer):
@@ -55,7 +56,7 @@ class OrdenSerializer(FlexFieldsModelSerializer):
     
     expandable_fields = {
         'paciente': (PacienteSerializer, {'source': 'paciente'}),
-        'acompanante': (AcompananteSerializer, {'source': 'acompanante', 'required': True}),
+        'acompanante': (AcompananteSerializer, {'source': 'acompanante'}),
         'servicios': ('pacientes.ServicioOrdenSerializer', {
             'source': 'servicios_orden', 'many': True, 'fields': [
                 'medico', 'servicio', 'tipo_pago', 'valor', 'descuento', 'historias_link'
@@ -86,10 +87,11 @@ class ServicioOrdenSerializer(FlexFieldsModelSerializer):
     """Serializer para el modelo ServicioOrden."""
 
     historias_link = serializers.HyperlinkedIdentityField(view_name='pacientes:historias')
+    servicio_nombre = serializers.StringRelatedField(source='servicio')
 
     class Meta:
         model = models.ServicioOrden
-        fields = ['medico', 'servicio', 'tipo_pago', 'valor', 'descuento', 'orden', 'historias_link']
+        fields = ['medico', 'servicio', 'tipo_pago', 'valor', 'descuento', 'orden', 'historias_link', 'servicio_nombre']
     
     expandable_fields = {
         'orden': (OrdenSerializer, {'source': 'orden'})

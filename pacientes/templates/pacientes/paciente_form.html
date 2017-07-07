@@ -13,7 +13,6 @@
 
         <iron-form>
             <form action="{{ URL }}" method="POST" enctype="application/x-www-form-urlencoded">
-            <!--<form action="{{ URL }}" method="POST" enctype="multipart/form-data">-->
                 <fieldset>
                     <legend>{% trans "Datos del paciente" %}</legend>
                     {% csrf_token %}
@@ -40,7 +39,7 @@
         let paciente;
         let form = document.querySelector('iron-form');
         let dialog = document.querySelector('paper-dialog');
-        let upload = document.querySelector('vaadin-upload');
+        let uploads = document.querySelectorAll('vaadin-upload');
 
         dialog.addEventListener('iron-overlay-closed', function(e) {
             if(e.detail.confirmed) {
@@ -68,9 +67,12 @@
                 }
             }
 
-            if (upload.files.length > 0) {
-                if (upload.files[0].progress != 100) {
-                    data.append(upload.formDataName, upload.files[0]);
+            for (let i = 0; i < uploads.length; i++) {
+                let upload = uploads[i];
+                if (upload.files.length > 0) {
+                    if (upload.files[0].progress != 100) {
+                        data.append(upload.formDataName, upload.files[0]);
+                    }
                 }
             }
 
