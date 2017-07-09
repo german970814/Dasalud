@@ -5,3 +5,4 @@ psycopg2==2.7.1
 djangorestframework==3.6.3
 Pillow==4.2.1
 django-filter==1.0.4
+django-reversion==2.0.9
