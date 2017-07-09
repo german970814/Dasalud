@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load rest_framework i18n %}
+{% load rest_framework i18n static %}
 
 {% block imports %}
     <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
@@ -90,6 +90,8 @@
                         </div>
                     </form>
                 </iron-form>
+                <br>
+                <p>{% trans "TOTAL" %}: <span id="total_servicios"></span></p>
             </div>
             <div class="mdl-step__actions">
                 <paper-button data-stepper-next>{% trans "Continuar" %}</paper-button>
@@ -130,6 +132,7 @@
 {% block js %}
     <script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
     <script src="/static/bower_components/mdl-stepper/stepper.min.js"></script>
+    <script src="{% static 'js/utils.js' %}"></script>
     <script>
         var stepperNode = document.querySelector('.mdl-stepper');
         var stepper, forms = {};
@@ -149,7 +152,6 @@
                 let activeStep = stepper.getActive();
                 
                 let form = activeStep.querySelector('.mdl-step__content iron-form');
-                console.log(form.serializeForm());
                 if (form.validate()) {
                     if (activeStep.dataset.step == "servicios") {
                         let servicios = activeStep.querySelectorAll('.mdl-step__content .servicio');
@@ -260,14 +262,6 @@
                 });
         }
 
-        function _setFormErrors(form, errors) {
-            for (let key in errors) {
-                let input = form.querySelector('*[name=' + key + ']');
-                input.errorMessage = errors[key];
-                input.invalid = true;
-            }
-        }
-
         function _setOrdenesUrl(url) {
             let form = stepperNode.querySelector(".mdl-step[data-step='orden'] iron-form form");
             form.setAttribute('action', url);
@@ -286,26 +280,53 @@
             form.headers = {'X-CSRFToken': orden['csrfmiddlewaretoken']};
             form._makeAjaxRequest(orden);
 
-            let response;
             form.addEventListener('iron-form-error', function(e) {
-                stepper.error("Hay errores en el formulario.");
-                console.log(response);
-                // response = e.detail.request.response;
-                // for (let key in response) {
-                //     let input = form.querySelector('*[name=' + key + ']');
-                //     input.errorMessage = response[key];
-                //     input.invalid = true;
-                //     input.autofocus = true;
-                // }
+                console.log(e.detail);
+                let response = e.detail.request.response;
+                if ('acompanante' in response) {
+                    _setAcompananteErrors(response['acompanante']);
+                    delete response['acompanante'];
+                    stepper.goto(3);
+                    stepper.error("Hay errores en el formulario.");
+                }
+
+                if ('servicios' in response) {
+                    _setServiciosErrors(response['servicios']);
+                    delete response['servicios'];
+                    stepper.goto(2);
+                    stepper.error("Hay errores en el formulario.");
+                }
+
+                if (!(Object.keys(response).length === 0 && response.constructor === Object)) {
+                    _setOrdenErrors(response);
+                    stepper.goto(1);
+                    stepper.error("Hay errores en el formulario.");
+                }
             });
 
-            // form.addEventListener('iron-form-response', function(e) {
-            //     console.log('paciente creado');
-            //     activeStep.classList.remove('mdl-step--transient');
-            //     response = e.detail.response;
-            //     form.querySelector('form').setAttribute('action', response['edit_link']);
-            //     stepper.next();
-            // });
+            form.addEventListener('iron-form-response', function(e) {
+                console.log('orden creada');
+                window.location = '';
+            });
+        }
+
+        function _setOrdenErrors(errors) {
+            let form = stepperNode.querySelector('li[data-step="orden"] iron-form');
+            setFormErrors(form, errors);
+        }
+
+        function _setServiciosErrors(errors) {
+            let forms = stepperNode.querySelectorAll('#servicios .servicio iron-form');
+
+            for (let i = 0; i < errors.length; i++) {
+                setFormErrors(forms[i], errors[i]);
+            }
+
+        }
+
+        function _setAcompananteErrors(errors) {
+            let form = stepperNode.querySelector('li[data-step="acompanante"] iron-form');
+            setFormErrors(form, errors);
         }
 
         function _addServicio() {
@@ -317,16 +338,39 @@
             let servicioNode = instance.querySelector('*[name="servicio"]')
             servicioNode.items = servicios_e;
             servicioNode.addEventListener('selected-item-changed', _setValorServicio);
+            let valorNode = instance.querySelector('*[name="valor"]');
+            valorNode.addEventListener('value-changed', _calcularTotal);
+            let descuentoNode = instance.querySelector('*[name="descuento"]');
+            descuentoNode.addEventListener('value-changed', _calcularTotal);
             serviciosDiv.appendChild(instance);
         }
 
         function _setValorServicio(e) {
-            e.target.parentElement.querySelector('*[name="valor"]').value = e.detail.value.valor;
+            let valor = 0;
+            if (e.detail.value != null) {
+                valor = e.detail.value.valor;
+            }
+
+            e.target.parentElement.querySelector('*[name="valor"]').value = valor;
+            _calcularTotal(e);
         }
 
         function _removeServicio(button) {
             const parent = button.parentElement;
             parent.parentElement.removeChild(parent);
+        }
+
+        function _calcularTotal(e) {
+            let valor = 0;
+            let servicios = document.getElementById('servicios').querySelectorAll('.servicio');
+            for (let i = 0; i < servicios.length; i++) {
+                let servicio = servicios[i];
+                let _valor = servicio.querySelector('*[name="valor"]').value || 0;
+                let _descuento = servicio.querySelector('*[name="descuento"]').value || 0;
+                valor = valor + _valor - _descuento;
+            }
+
+            document.getElementById('total_servicios').innerHTML = Math.max(0, valor);
         }
     </script>
 {% endblock js %}
