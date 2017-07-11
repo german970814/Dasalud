@@ -40,6 +40,8 @@ class AcompananteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Acompanante
         fields = ['asistio', 'nombre', 'direccion', 'telefono']
+    
+    # TODO validar cuando asistio es True
 
 
 class OrdenSerializer(FlexFieldsModelSerializer):
@@ -68,8 +70,10 @@ class OrdenSerializer(FlexFieldsModelSerializer):
         super().__init__(*args, **kwargs)
         self.fields['afiliacion'].initial = models.Orden.PARTICULAR
         self.fields['tipo_usuario'].initial = models.Orden.PARTICULAR
+    
+    # TODO validar campos
 
-    def create(self, validated_data):
+    def create(self, validated_data):  #  TODO ver si se crea metodo create en manager de Orden
         servicios_data = validated_data.pop('servicios_orden')
         acompanante_data = validated_data.pop('acompanante')
 

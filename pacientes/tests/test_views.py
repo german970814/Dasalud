@@ -36,7 +36,7 @@ class CrearOrdenViewTest(BaseTestCase):
         self.assertEqual(paciente.ordenes.count(), 0)
         self.assertIsNone(self.last_response.data['acompanante_s'].instance)
 
-    def test_muestra_ultimo_acompanante(self, acompanante_mock):
+    def test_muestra_ultimo_acompanante(self):
         """Prueba que si el paciente tiene ordenes ingresadas se muestra un acompañante."""
 
         paciente = fac.PacienteFactory()

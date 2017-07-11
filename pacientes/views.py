@@ -114,7 +114,7 @@ class CrearOrdenView(APIView):
         })
 
 
-class OrdenesPacienteView(generics.ListCreateAPIView):
+class OrdenesPacienteView(generics.CreateAPIView):
     """Permite crear una orden a un paciente."""
 
     serializer_class = serializers.OrdenSerializer
