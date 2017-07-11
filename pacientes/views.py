@@ -106,7 +106,7 @@ class CrearOrdenView(APIView):
         paciente_json = JSONRenderer().render(serializer.data)
         orden_s = serializers.OrdenSerializer(fields=['sucursal', 'autorizacion', 'pendiente_autorizacion', 'institucion', 'plan', 'afiliacion', 'tipo_usuario', 'forma_pago'])
         servicios_s = serializers.ServicioOrdenSerializer(fields=['medico', 'servicio', 'tipo_pago', 'valor', 'descuento'])
-        acompanante_s = AcompananteSerializer()
+        acompanante_s = AcompananteSerializer(paciente.ultimo_acompanante)
 
         return Response({
             'paciente': paciente_json, 'orden_s': orden_s, 'servicios_s': servicios_s,

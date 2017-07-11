@@ -102,7 +102,7 @@
                     },
 
                     selected: {
-                        value: 1
+                        value: 0
                     }
                 };
             }
@@ -120,9 +120,6 @@
             }
 
             _checkValidity(e) {
-                console.log(e);
-                console.log(e.target);
-                console.log(e.composedPath());
                 let index = this.$.pages.indexOf(e.target);
                 if (e.target.invalid) {
                     this.$.tabs.items[index].classList.add('invalid');

@@ -1,9 +1,10 @@
+import faker
 import factory
 import datetime
 from .. import models
 
 
-class PacienteFactory(factory.django.DjangoModelFactory):
+class PacienteFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.Paciente
@@ -25,3 +26,60 @@ class PacienteFactory(factory.django.DjangoModelFactory):
     # Datos responsable
     nombre_responsable = factory.Faker('name', locale='es')
     direccion_responsable = factory.Faker('address', locale='es')
+
+
+class OrdenFactory(factory.DjangoModelFactory):
+
+    class Meta:
+        model = models.Orden
+    
+    paciente = factory.SubFactory(PacienteFactory)
+    afiliacion = models.Orden.PARTICULAR
+    tipo_usuario = models.Orden.PARTICULAR
+    forma_pago = models.Orden.EFECTIVO
+    plan = factory.SubFactory('servicios.tests.factories.PlanFactory')
+    institucion = factory.SubFactory('organizacional.tests.factories.InstitucionFactory')
+    sucursal = factory.SubFactory('organizacional.tests.factories.SucursalFactory')
+    servicios = factory.RelatedFactory('pacientes.tests.factories.ServicioOrdenFactory', 'orden')
+    acompanante = factory.RelatedFactory('pacientes.tests.factories.AcompananteFactory', 'orden')
+
+class ServicioOrdenFactory(factory.DjangoModelFactory):
+
+    class Meta:
+        model = models.ServicioOrden
+    
+    orden = factory.SubFactory(OrdenFactory)
+    servicio = factory.SubFactory('servicios.tests.factories.ServicioFactory')
+    valor = 10000
+    medico = factory.SubFactory('organizacional.tests.factories.EmpleadoFactory', medico=True)
+
+
+class AcompananteFactory(factory.DjangoModelFactory):
+
+    class Meta:
+        model = models.Acompanante
+    
+    orden = factory.SubFactory(OrdenFactory, acompanante=None)
+    asistio = True
+
+    @factory.lazy_attribute
+    def nombre(self):
+        if self.asistio:
+            return faker.Faker(locale='es').name()
+        
+        return ''
+    
+    @factory.lazy_attribute
+    def direccion(self):
+        if self.asistio:
+            return faker.Faker(locale='es').address()
+        
+        return ''
+    
+    @factory.lazy_attribute
+    def telefono(self):
+        if self.asistio:
+            return 3049459
+        
+        return None
+    
