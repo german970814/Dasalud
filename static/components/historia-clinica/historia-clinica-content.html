@@ -34,7 +34,8 @@
             </template>
         </div>
         <div class="actions">
-            <paper-button on-tap="validate">Guardar</paper-button>
+            <paper-button on-tap="save">Guardar</paper-button>
+            <paper-button on-tap="close">Cerrar</paper-button>
         </div>
     </template>
 
@@ -87,8 +88,14 @@
 
             save() {
                 if (this.validate()) {
-                    this.dispatchEvent(new CustomEvent('save-historia'));
+                    this.dispatchEvent(new CustomEvent('save-historia', {
+                        detail: {terminada: false}, bubbles: true, composed: true
+                    }));
                 }
+            }
+
+            close() {
+                this.dispatchEvent(new CustomEvent('close-historia'));
             }
         }
 

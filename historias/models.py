@@ -21,7 +21,7 @@ class Historia(models.Model):
     """Modelo que guarda las historias clinicas de un paciente."""
 
     servicio_orden = models.OneToOneField('pacientes.ServicioOrden', verbose_name=_lazy('servicio'))
-    historia = fields.JSONField()
+    contenido = fields.JSONField()
     terminada = models.BooleanField(default=False)
 
     class Meta:

@@ -105,3 +105,21 @@ class OrdenesPacienteViewTest(BaseTestCase):
 
         self.response_201()
         self.assertEqual(Orden.objects.count(), 1)
+
+@tag('actual')
+class HistoriasClinicasViewTest(BaseTestCase):
+    """Pruebas unitarias para la vista de creación de una historia clinica."""
+
+    URL = 'pacientes:historias'
+
+    def setUp(self):
+        self.login(UsuarioFactory())
+
+    def test_crear_historia_clinica(self):
+        """Prueba que si se envian datos validos, se creen la historia."""
+
+        data = {'contenido': '[]'}
+        servicio = fac.ServicioOrdenFactory()
+        self.post(self.URL, servicio.id, data=data, extra={'format': 'json'})
+        self.response_201()
+        

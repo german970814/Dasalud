@@ -1,5 +1,5 @@
 from django.urls import reverse_lazy
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _lazy
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
@@ -17,10 +17,6 @@ class PacientesList(generics.ListCreateAPIView):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('nombres', 'apellidos', 'numero_documento')
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context['request'] = None
-        return context
 
 class OrdenesList(generics.ListCreateAPIView):
     queryset = Orden.objects.all()
@@ -34,11 +30,6 @@ class OrdenesList(generics.ListCreateAPIView):
         serializer_class = self.get_serializer_class()
         kwargs['context'] = self.get_serializer_context()
         return serializer_class(*args, **kwargs)
-
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        # context['request'] = None
-        return context
 
 
 class ListarPacientesView(generics.ListCreateAPIView):
@@ -63,6 +54,7 @@ class PacienteDetalleView(generics.UpdateAPIView):
     serializer_class = PacienteSerializer
     queryset = Paciente.objects.all()
 
+
 class CrearPacienteView(APIView):
     """Muestra el formulario de creación de un paciente."""
 
@@ -76,6 +68,7 @@ class CrearPacienteView(APIView):
     def get(self, request):
         form = PacienteSerializer(context={'request': None})
         return Response({'form': form, 'VERBO': self.VERBO, 'URL': self.URL, 'MSJ': self.MSJ, 'METHOD': self.METHOD})
+
 
 class EditarPacienteView(APIView):
     """Muestra el formulario de creación de un paciente."""
@@ -123,25 +116,55 @@ class OrdenesPacienteView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         self.paciente = get_object_or_404(Paciente, pk=kwargs.get('pk'))
         return super().post(request, *args, **kwargs)
-    
+
     def get_serializer(self, *args, **kwargs):
-        fields = ['id', 'sucursal', 'autorizacion', 'pendiente_autorizacion', 'institucion', 'plan', 'afiliacion', 'tipo_usuario', 'forma_pago', 'acompanante', 'servicios']
+        fields = [
+            'id', 'sucursal', 'autorizacion', 'pendiente_autorizacion', 'institucion', 'plan', 'afiliacion',
+            'tipo_usuario', 'forma_pago', 'acompanante', 'servicios'
+        ]
         expand = ['acompanante', 'servicios']
         return super().get_serializer(fields=fields, expand=expand, *args, **kwargs)
 
     def perform_create(self, serializer):
+        """Sobreescribe para setear el paciente."""
+
         serializer.save(paciente=self.paciente)
 
-class HistoriasClinicasView(APIView):
-    """"""
 
-    renderer_classes = [TemplateHTMLRenderer]
+class HistoriasClinicasView(APIView):
+    """Permite guardar la historia de un servicio."""
+
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'pacientes/historias_clinicas.html'
+
+    def get_historia(self, servicio):
+        try:
+            historia = servicio.historia
+        except Exception:
+            historia = None
+        
+        return historia
 
     def get(self, request, pk):
         servicio_orden = get_object_or_404(ServicioOrden, pk=pk)
         paciente = servicio_orden.orden.paciente
         serializer = PacienteSerializer(paciente, context={'request': None})
         paciente_json = JSONRenderer().render(serializer.data)
-        formato = JSONRenderer().render(servicio_orden.servicio.formato.contenido)
-        return Response({'paciente': paciente_json, 'formato': formato})
+
+        historia = self.get_historia(servicio_orden)
+        if historia:
+            _formato = historia.contenido
+        else:
+            _formato = servicio_orden.servicio.formato.contenido
+
+        formato = JSONRenderer().render(_formato)
+        return Response({'paciente': paciente_json, 'formato': formato, 'servicio': servicio_orden.servicio})
+
+    def post(self, request, pk):
+        from historias.serializers import HistoriaSerializer
+        servicio_orden = get_object_or_404(ServicioOrden, pk=pk)
+        historia = self.get_historia(servicio_orden)
+        serializer = HistoriaSerializer(historia, data=request.data, fields=['id', 'contenido', 'terminada'])
+        serializer.is_valid(raise_exception=True)
+        serializer.save(servicio_orden=servicio_orden)
+        return Response(serializer.data, status=201)

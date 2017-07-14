@@ -24,18 +24,30 @@
             paper-tab.invalid {
                 color: var(--error-color);
             }
+
+            .header {
+                background-color: white;
+                border-bottom: 1px solid #e8e8e8;
+                text-transform: uppercase;
+                text-align: center;
+                padding: 10px;
+            }
         </style>
+
+        <div class="header">[[servicio]]</div>
 
         <paper-tabs id="tabs" selected="{{selected}}" scrollable>
             <template is="dom-repeat" items="[[formato]]">
                 <paper-tab>[[item.nombre]]</paper-tab>
             </template>
+            <paper-tab>Anexos</paper-tab>
         </paper-tabs>
 
         <iron-pages id="pages" selected="{{selected}}">
             <template is="dom-repeat" items="[[formato]]">
-                <historia-clinica-content on-validate-historia="_checkValidity" fields=[[item.fields]]></historia-clinica-content>
+                <historia-clinica-content on-close-historia="_close" on-validate-historia="_checkValidity" fields=[[item.fields]]></historia-clinica-content>
             </template>
+            <div></div>
         </iron-pages>
 
     </template>
@@ -53,49 +65,13 @@
                             return [
                                 {nombre: 'Anamnesis Alimentaria', fields: [
                                     {tipo: 'textarea', nombre: 'Desayuno', required: true},
-                                    {tipo: 'textarea', nombre: 'Medias mañanas', required: true},                                 
-                                    {tipo: 'textarea', nombre: 'Almuerzo', required: true},
-                                    {tipo: 'textarea', nombre: 'Medias tardes', required: true},
-                                    {tipo: 'textarea', nombre: 'Cena', required: true},
-                                    {tipo: 'textarea', nombre: 'Colacion nocturna', required: true},
-                                    {tipo: 'textarea', nombre: 'Alimentos rechazados', required: true},
-                                    {tipo: 'textarea', nombre: 'Alimentos preferidos', required: true}
-                                ]},
-                                {nombre: 'Habitos', fields: [
+                                    {tipo: 'switch', nombre: 'Habitos intestinales'},
+                                    {tipo: 'text', nombre: 'Medias mañanas', required: true},
                                     {tipo: 'select', nombre: 'Apetito', options: [
                                         {value: 1, label: 'Bueno'},
                                         {value: 2, label: 'Malo'},
                                         {value: 3, label: 'Regular'}
-                                    ], required: true},
-                                    {tipo: 'select', nombre: 'Masticación', options: [
-                                        {value: 1, label: 'Bueno'},
-                                        {value: 2, label: 'Malo'},
-                                        {value: 3, label: 'Regular'}
-                                    ], required: true},
-                                    {tipo: 'select', nombre: 'Digestión', options: [
-                                        {value: 1, label: 'Bueno'},
-                                        {value: 2, label: 'Malo'},
-                                        {value: 3, label: 'Regular'}
-                                    ], required: true},
-                                    {tipo: 'switch', nombre: 'Habitos intestinales'},
-                                    {tipo: 'switch', nombre: 'Fuma?'},
-                                    {tipo: 'switch', nombre: 'Bebe?'},
-                                    {tipo: 'select', nombre: 'Ingesta de agua', options: [
-                                        {value: 1, label: 'Bueno'},
-                                        {value: 2, label: 'Malo'},
-                                        {value: 3, label: 'Regular'}
-                                    ], required: true},
-                                ]},
-                                {nombre: 'Diagnostico', fields: [
-                                    {tipo: 'select', nombre: 'Diagnostico nutricional', options: [
-                                        {value: 1, label: 'Peso sano'},
-                                        {value: 2, label: 'Sobrepeso tipo 1'},
-                                        {value: 3, label: 'Sobrepeso tipo 2'},
-                                        {value: 4, label: 'Obesidad grado 1'},
-                                        {value: 5, label: 'Obesidad grado 2'},
-                                        {value: 6, label: 'Obesidad morbida'}
-                                    ], required: true},
-                                    {tipo: 'textarea', nombre: 'Plan de manejo', required: true}
+                                    ], required: true},    
                                 ]}
                             ]; // Tabs array
                         } // Value
@@ -103,6 +79,11 @@
 
                     selected: {
                         value: 0
+                    }, 
+
+                    servicio: {
+                        type: String,
+                        value: 'historia clinica'
                     }
                 };
             }
@@ -126,6 +107,21 @@
                 }
                 else {
                     this.$.tabs.items[index].classList.remove('invalid');
+                }
+            }
+
+            _close(e) {
+                console.log(e);
+                let valid = true;
+                let historias = this.shadowRoot.querySelectorAll('historia-clinica-content');
+                [].slice.call(historias).forEach(function(element) {
+                    if (!element.validate()) {
+                        valid = false;
+                    }
+                });
+
+                if (valid) {
+                    this.dispatchEvent(new CustomEvent('save-historia', {detail: {terminada: true}}));
                 }
             }
         }

@@ -1,13 +1,44 @@
 {% extends "base.html" %}
+{% load i18n static %}
 
 {% block imports %}
     <link rel="import" href="/static/components/paciente-info.html">
     <link rel="import" href="/static/components/historia-clinica/historia-clinica.html">
     <link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
+    <link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html"> 
 {% endblock imports %}
 
 {% block content %}
     <paciente-info paciente='{{ paciente }}' full-width></paciente-info>
     <br>
-    <historia-clinica formato='{{ formato }}'></historia-clinica>
+
+    <iron-ajax id="request" url="{% url "pacientes:historias" servicio.pk %}" method="POST" handle-as="json"
+                content-type="application/json">
+    </iron-ajax>
+    <historia-clinica id="historia" formato='{{ formato }}' servicio="{{ servicio }}"></historia-clinica>
 {% endblock content %}
+
+{% block js %}
+    <script src="{% static 'js/utils.js' %}"></script>
+    <script>
+        let historia = document.getElementById('historia');
+        historia.addEventListener('save-historia', function(e) {
+            e.stopPropagation();
+
+            let request = document.getElementById('request');
+            request.headers = {'X-CSRFToken': getCsrfToken() }
+            request.body = {contenido: historia.formato, terminada: e.detail.terminada}
+            request.generateRequest();
+
+            request.addEventListener('error', function(e) {
+                console.log('error');
+                console.log(e);
+            });
+
+            request.addEventListener('response', function(e) {
+                console.log('response');
+                console.log(e);
+            });
+        });
+    </script>
+{% endblock js %}
