@@ -4,6 +4,7 @@
 <link rel="import" href="/static/bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="/static/bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="historia-clinica-content.html">
+<link rel="import" href="historia-clinica-anexos.html">
 
 <dom-module id="historia-clinica">
     <template>
@@ -47,7 +48,7 @@
             <template is="dom-repeat" items="[[formato]]">
                 <historia-clinica-content on-close-historia="_close" on-validate-historia="_checkValidity" fields=[[item.fields]]></historia-clinica-content>
             </template>
-            <div></div>
+            <historia-clinica-anexos></historia-clinica-anexos>
         </iron-pages>
 
     </template>
@@ -78,7 +79,7 @@
                     },
 
                     selected: {
-                        value: 0
+                        value: 9
                     }, 
 
                     servicio: {

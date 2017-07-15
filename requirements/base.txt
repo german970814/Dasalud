@@ -6,3 +6,4 @@ djangorestframework==3.6.3
 Pillow==4.2.1
 django-filter==1.0.4
 django-reversion==2.0.9
+drf-flex-fields==0.2.2

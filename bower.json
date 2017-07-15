@@ -5,7 +5,7 @@
   ],
   "private": true,
   "dependencies": {
-    "polymer": "Polymer/polymer#^2.0.1",
+    "polymer": "Polymer/polymer#^2.0.2",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^2.0.0",
     "iron-media-query": "PolymerElements/iron-media-query#^2.0.0",
     "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^2.0.1",
