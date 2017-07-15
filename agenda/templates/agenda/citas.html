@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block imports %}
+    <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
+    <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+{% endblock imports %}
+
+{% block content %}
+    <vaadin-grid items='{{citas}}'>
+        <vaadin-grid-column>
+            <template class="header">
+                <div class="cell">{% trans 'Cédula' %}</div>
+            </template>
+            <template>
+                <div class="cell">[[item.orden.paciente.numero_documento]]</div>
+            </template>
+        </vaadin-grid-column>
+        <vaadin-grid-column>
+            <template class="header">
+                <div class="cell">{% trans 'Nombre' %}</div>
+            </template>
+            <template>
+                <div class="cell">[[item.orden.paciente.nombres]] [[item.orden.paciente.apellidos]]</div>
+            </template>
+        </vaadin-grid-column>
+        <vaadin-grid-column>
+            <template class="header">
+                <div class="cell">{% trans 'Servicio' %}</div>
+            </template>
+            <template>
+                <div class="cell">[[item.servicio_nombre]]</div>
+            </template>
+        </vaadin-grid-column>
+        <vaadin-grid-column>
+            <template class="header">
+                <div class="cell">{% trans 'Empresa' %}</div>
+            </template>
+            <template>
+                <div class="cell">[[item.orden.empresa]]</div>
+            </template>
+        </vaadin-grid-column>
+        <vaadin-grid-column>
+            <template class="header">
+                <div class="cell"></div>
+            </template>
+            <template>
+                <div class="cell last">
+                    <a href="[[item.historias_link]]" tabindex="-1">
+                        <paper-icon-button icon="my-icons:menu" title="{% trans 'Historias' %}"></paper-icon-button>
+                    </a>
+                </div>
+            </template>
+        </vaadin-grid-column>
+    </vaadin-grid>
+{% endblock content %}

@@ -1,0 +1,62 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="historia-clinica-relationship-field">
+    <template>
+        <style>
+            :host {
+                display: block
+            }
+        </style>
+
+        <iron-ajax url="[[field.url]]=[[filter]]" last-response="{{response}}" loading="{{loading}}" handle-as="json" debounce-duration="500" auto></iron-ajax>
+
+        <vaadin-combo-box id="select" filtered-items="[[response]]" filter="{{filter}}" loading=[[loading]]
+                            auto-validate label=[[field.nombre]] value="{{field.value}}" required="[[field.required]]">
+        </vaadin-combo-box>
+        
+
+    </template>
+
+    <script>
+        class HistoriaClinicaRelationshipField extends Polymer.Element {
+
+            static get is() { return 'historia-clinica-relationship-field'; }
+
+            static get properties() {
+                return {
+                    field: Object,
+                    name: String
+                };
+            }
+
+            constructor() {
+                super();
+            }
+
+            ready() {
+                super.ready();
+
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    
+                });
+            }
+
+            get value() {
+                return this.field.value;
+            }
+
+            set value(value) {
+                this.$.select.value = value;
+            }
+
+            validate() {
+                return this.$.select.validate();
+            }
+
+        }
+
+        window.customElements.define(HistoriaClinicaRelationshipField.is, HistoriaClinicaRelationshipField);
+    </script>
+</dom-module>

@@ -1,17 +1,22 @@
 from django.contrib import admin
+from reversion.admin import VersionAdmin
 from . import models
+
 
 class AcompananteInline(admin.StackedInline):
     model = models.Acompanante
+
 
 class ServiciosOrdenInline(admin.TabularInline):
     model = models.ServicioOrden
 
 
-class OrdenAdmin(admin.ModelAdmin):
+@admin.register(models.Orden)
+class OrdenAdmin(VersionAdmin):
     inlines = [AcompananteInline, ServiciosOrdenInline]
 
 
-admin.site.register(models.Paciente)
-admin.site.register(models.Orden, OrdenAdmin)
+@admin.register(models.Paciente)
+class PacienteAdmin(VersionAdmin):
+    pass
 

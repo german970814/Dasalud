@@ -22,6 +22,9 @@ class Servicio(models.Model):
     cups = models.CharField(_lazy('cups'), max_length=100, blank=True)
     costo = models.PositiveIntegerField(_lazy('costo'), blank=True, null=True)
     tipo = models.ForeignKey(Tipo, related_name='servicios', verbose_name=_lazy('tipo'))
+    formato = models.ForeignKey(
+        'historias.Formato', related_name='servicios', verbose_name=_lazy('formato'), blank=True, null=True
+    )
 
     class Meta:
         verbose_name = 'servicio'

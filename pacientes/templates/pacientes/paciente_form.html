@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load rest_framework i18n %}
+{% load rest_framework i18n static %}
 
 {% block imports %}
     <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
@@ -13,7 +13,6 @@
 
         <iron-form>
             <form action="{{ URL }}" method="POST" enctype="application/x-www-form-urlencoded">
-            <!--<form action="{{ URL }}" method="POST" enctype="multipart/form-data">-->
                 <fieldset>
                     <legend>{% trans "Datos del paciente" %}</legend>
                     {% csrf_token %}
@@ -36,11 +35,12 @@
 {% endblock content %}
 
 {% block js %}
+    <script src="{% static 'js/utils.js' %}"></script>
     <script>
         let paciente;
         let form = document.querySelector('iron-form');
         let dialog = document.querySelector('paper-dialog');
-        let upload = document.querySelector('vaadin-upload');
+        let uploads = document.querySelectorAll('vaadin-upload');
 
         dialog.addEventListener('iron-overlay-closed', function(e) {
             if(e.detail.confirmed) {
@@ -68,9 +68,12 @@
                 }
             }
 
-            if (upload.files.length > 0) {
-                if (upload.files[0].progress != 100) {
-                    data.append(upload.formDataName, upload.files[0]);
+            for (let i = 0; i < uploads.length; i++) {
+                let upload = uploads[i];
+                if (upload.files.length > 0) {
+                    if (upload.files[0].progress != 100) {
+                        data.append(upload.formDataName, upload.files[0]);
+                    }
                 }
             }
 
@@ -102,16 +105,8 @@
                 return errorResponse.json();
             })
             .then(function (errors) {
-                _setFormErrors(form, errors);
+                setFormErrors(form, errors);
             });
-        }
-
-        function _setFormErrors(form, errors) {
-            for (let key in errors) {
-                let input = form.querySelector('*[name=' + key + ']');
-                input.errorMessage = errors[key];
-                input.invalid = true;
-            }
         }
     </script>
 {% endblock js %}

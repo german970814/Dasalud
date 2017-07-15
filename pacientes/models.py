@@ -1,3 +1,4 @@
+from contextlib import suppress
 from django.db import models
 from django.utils.translation import ugettext_lazy as _lazy
 
@@ -33,11 +34,16 @@ class ParentescoMixin(object):
     class Meta:
         abstract = True
 
+
 def paciente_foto_path(instance, filename):
+    """Path para la foto de un paciente."""
+
     return 'paciente_{0}/foto_{1}'.format(instance.numero_documento, filename)
 
 
 def paciente_firma_path(instance, filename):
+    """Path para la firma de un paciente."""
+
     return 'paciente_{0}/firma_{1}'.format(instance.numero_documento, filename)
 
 
@@ -136,7 +142,7 @@ class Paciente(ParentescoMixin, models.Model):
     grupo_sanguineo = models.CharField(_lazy('grupo sanguineo'), max_length=3, choices=GRUPOS_SANGUINEOS, blank=True)
     grupo_etnico = models.CharField(_lazy('grupo etnico'), max_length=1, choices=GRUPOS_ETNICOS, blank=True)
     activo = models.BooleanField(_lazy('activo'), default=True)
-    profesion = models.ForeignKey('globales.Profesion', related_name='pacientes', verbose_name=_lazy('profesión'),  null=True, blank=True)
+    profesion = models.ForeignKey('globales.Profesion', related_name='pacientes', verbose_name=_lazy('profesión'), null=True, blank=True)
     lugar_nacimiento = models.ForeignKey('globales.Poblado', related_name='pacientes_nacidos_en', verbose_name=_lazy('nacio en'))
     lugar_residencia = models.ForeignKey('globales.Poblado', related_name='pacientes_viven_en', verbose_name=_lazy('donde vive'))
     foto = models.ImageField(upload_to=paciente_foto_path, verbose_name=_lazy('foto'), blank=True)
@@ -160,6 +166,20 @@ class Paciente(ParentescoMixin, models.Model):
 
     def __str__(self):
         return '{} {}'.format(self.nombres, self.apellidos)
+
+    @property
+    def ultimo_acompanante(self):
+        """
+        :returns:
+            Retorna el ultimo acompañante con el que ha venido el paciente. Si el paciente no tiene ninguna orden
+            registrada devuelve ``None``.
+        """
+
+        with suppress(models.ObjectDoesNotExist):
+            ultima_orden = self.ordenes.latest('fecha_orden')
+            return ultima_orden.acompanante
+
+        return None
 
 
 class Orden(models.Model):
@@ -219,7 +239,7 @@ class Orden(models.Model):
     class Meta:
         verbose_name = 'orden'
         verbose_name_plural = 'ordenes'
-    
+
     def __str__(self):
         return '{0} - {1}'.format(str(self.paciente), self.pk)
 
@@ -244,7 +264,7 @@ class ServicioOrden(models.Model):
     class Meta:
         verbose_name = 'servicio orden'
         verbose_name_plural = 'servicios orden'
-    
+
     def __str__(self):
         return '{} - {}'.format(self.orden.pk, self.servicio.nombre)
 
@@ -253,7 +273,7 @@ class Acompanante(ParentescoMixin, models.Model):
     """Modelo que guarda la información del acompañante de un paciente según el ordenamiento."""
 
     orden = models.OneToOneField(Orden, verbose_name=_lazy('orden'))
-    asistio = models.BooleanField(_lazy('asistio con acompañante'), default=True)
+    asistio = models.BooleanField(_lazy('asistio con acompañante'), default=False)
     nombre = models.CharField(_lazy('nombre completo'), max_length=200, blank=True)
     direccion = models.CharField(_lazy('dirección'), max_length=200, blank=True)
     telefono = models.PositiveIntegerField(_lazy('teléfono'), blank=True, null=True)
@@ -261,6 +281,6 @@ class Acompanante(ParentescoMixin, models.Model):
     class Meta:
         verbose_name = _lazy('acompañate')
         verbose_name_plural = _lazy('acompañates')
-    
+
     def __str__(self):
         return self.nombre

@@ -21,6 +21,9 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='base.html')),
+    url(r'^agenda/', include('agenda.urls', namespace='agenda')),
+    url(r'^globales/', include('globales.urls', namespace='globales')),
+    url(r'^historias/', include('historias.urls', namespace='historias')),
     url(r'^pacientes/', include('pacientes.urls', namespace='pacientes')),
     url(r'^servicios/', include('servicios.urls', namespace='servicios')),
     url(r'^organizacional/', include('organizacional.urls', namespace='organizacional')),

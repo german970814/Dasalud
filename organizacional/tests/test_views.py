@@ -2,6 +2,7 @@ from unittest import mock
 from django.urls import reverse
 from rest_framework import status
 from common.tests.base import BaseTestCase
+from common.tests.factories import UsuarioFactory
 from . import factories as fac
 
 
@@ -9,6 +10,9 @@ class MedicosViewTest(BaseTestCase):
     """Pruebas unitarias para la vista que permite listar medicos."""
 
     URL = 'organizacional:medicos'
+
+    def setUp(self):
+        self.login(UsuarioFactory())
 
     def test_get_medicos(self):
         """Prueba que se listen los medicos."""

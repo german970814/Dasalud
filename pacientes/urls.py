@@ -1,8 +1,5 @@
 from django.conf.urls import url
-from django.contrib import admin
 from . import views
-
-from django.views.generic import TemplateView
 
 urlpatterns = [
     url(r'^$', views.ListarPacientesView.as_view(), name='listar'),
@@ -11,8 +8,7 @@ urlpatterns = [
     url(r'^(?P<pk>\d+)/editar/$', views.EditarPacienteView.as_view(), name='editar'),
     url(r'^(?P<pk>\d+)/ordenes/$', views.OrdenesPacienteView.as_view(), name='ordenes'),
     url(r'^(?P<pk>\d+)/ordenes/nueva/$', views.CrearOrdenView.as_view(), name='ordenes-nueva'),
-    url(r'^(?P<pk>\d+)/historias/$', views.HistoriasClinicasView.as_view(), name='historias'),
-
+    url(r'^ordenes/(?P<pk>\d+)/historias/$', views.HistoriasClinicasView.as_view(), name='historias'),
 
 
     url(r'^list/$', views.PacientesList.as_view()),
