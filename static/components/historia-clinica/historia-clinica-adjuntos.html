@@ -1,0 +1,88 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/vaadin-upload/vaadin-upload.html">
+<link rel="import" href="/static/bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+<link rel="import" href="historia-clinica-file.html">
+
+<dom-module id="historia-clinica-adjuntos">
+    <template>
+        <style>
+            :host {
+                display: block;
+                background-color: white;
+            }
+
+            .content {
+                padding: 16px;
+            }
+
+            .actions {
+                border-top: 1px solid #e8e8e8;
+                padding: 5px 16px;
+            }
+
+            #fileList {
+                position: relative;
+            }
+        </style>
+
+        <div class="content">
+            <vaadin-upload id="upload" files="{{files}}" target="/historias/2/adjuntos/" on-file-show="showFile" 
+                            on-upload-success="success" form-data-name="archivo" accept=".pdf,image/*">
+                <div slot="file-list">
+                    <div id="fileList">
+                        <template is="dom-repeat" items="[[files]]" as="file">
+                            <historia-clinica-file file="[[file]]"></historia-clinica-file>
+                        </template>
+                    </div>
+                </div>
+            </vaadin-upload>
+        </div>
+
+        <paper-dialog id="dialog" with-backdrop style="width: 75%; height: 90%;">
+            <div style="width: 90%; height: 90%;">  
+                <object width="100%" height="100%" data="/static/a.pdf"></object>
+            </div>
+        </paper-dialog>
+    </template>
+
+    <script>
+        class HistoriaClinicaAdjuntos extends Polymer.Element {
+
+            static get is() { return 'historia-clinica-adjuntos'; }
+
+            static get properties() {
+                return {
+                    
+                };
+            }
+
+            constructor() {
+                super();
+            }
+
+            ready() {
+                super.ready();
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    this.$.upload.headers = {'X-CSRFToken': getCsrfToken()};
+                });
+            }
+
+            success(e) {
+                let file = e.detail.file;
+                let response = JSON.parse(e.detail.xhr.response);
+                file.url = response.archivo;
+            }
+
+            showFile(e) {
+                this.$.dialog.querySelector('object').data = e.detail.file.url;
+                document.body.appendChild(this.$.dialog);
+                this.$.dialog.open();
+            }
+
+        }
+
+        window.customElements.define(HistoriaClinicaAdjuntos.is, HistoriaClinicaAdjuntos);
+    </script>
+</dom-module>

@@ -4,7 +4,7 @@
 <link rel="import" href="/static/bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="/static/bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="historia-clinica-content.html">
-<link rel="import" href="historia-clinica-anexos.html">
+<link rel="import" href="historia-clinica-adjuntos.html">
 
 <dom-module id="historia-clinica">
     <template>
@@ -41,14 +41,14 @@
             <template is="dom-repeat" items="[[formato]]">
                 <paper-tab>[[item.nombre]]</paper-tab>
             </template>
-            <paper-tab>Anexos</paper-tab>
+            <paper-tab>Adjuntos</paper-tab>
         </paper-tabs>
 
         <iron-pages id="pages" selected="{{selected}}">
             <template is="dom-repeat" items="[[formato]]">
                 <historia-clinica-content on-close-historia="_close" on-validate-historia="_checkValidity" fields=[[item.fields]]></historia-clinica-content>
             </template>
-            <historia-clinica-anexos></historia-clinica-anexos>
+            <historia-clinica-adjuntos></historia-clinica-adjuntos>
         </iron-pages>
 
     </template>
