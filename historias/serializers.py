@@ -26,6 +26,12 @@ class HistoriaSerializer(FlexFieldsModelSerializer):
 class AdjuntoSerializer(FlexFieldsModelSerializer):
     """"Serializer para el modelo Adjunto."""
 
+    nombre = serializers.SerializerMethodField()
+
     class Meta:
         model = models.Adjunto
-        fields = ['id', 'archivo']
+        fields = ['id', 'archivo', 'nombre']
+    
+    def get_nombre(self, obj):
+        split_name = obj.archivo.name.split('/')
+        return split_name[-1]

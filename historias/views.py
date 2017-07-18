@@ -31,7 +31,8 @@ class AdjuntosHistoriaView(generics.ListCreateAPIView):
     def get_servicio(self, servicio):
         self.servicio = get_object_or_404(ServicioOrden, pk=servicio)
 
-    def get_queryset(self):  #  TODO ver si se hace metodo en modelo ServicioOrden para que devuelva la historia
+    #  TODO ver si se hace metodo en modelo ServicioOrden para que devuelva la historia
+    def get_queryset(self):
         return self.servicio.historia.adjuntos.all()
 
     def get(self, request, servicio, *args, **kwargs):        

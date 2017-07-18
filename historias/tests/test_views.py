@@ -4,7 +4,7 @@ from pacientes.tests.factories import ServicioOrdenFactory
 from .factories import AdjuntoFactory
 from django.test import tag
 
-@tag('actual')
+
 class AdjuntosHistoriaViewTest(BaseTestCase):
     """Pruebas unitarias para la vista de adjuntos de una historia."""
 

@@ -3,6 +3,7 @@
 <link rel="import" href="/static/bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="historia-clinica-file.html">
 
 <dom-module id="historia-clinica-adjuntos">
@@ -28,8 +29,11 @@
         </style>
 
         <div class="content">
+
+            <iron-ajax url="/historias/2/adjuntos/" handle-as="json" on-response="handleResponse" auto></iron-ajax>
+
             <vaadin-upload id="upload" files="{{files}}" target="/historias/2/adjuntos/" on-file-show="showFile" 
-                            on-upload-success="success" form-data-name="archivo" accept=".pdf,image/*">
+                            on-upload-success="handleSuccess" form-data-name="archivo" accept=".pdf,image/*">
                 <div slot="file-list">
                     <div id="fileList">
                         <template is="dom-repeat" items="[[files]]" as="file">
@@ -54,7 +58,7 @@
 
             static get properties() {
                 return {
-                    
+                                        
                 };
             }
 
@@ -69,7 +73,17 @@
                 });
             }
 
-            success(e) {
+            handleResponse(e) {
+                let response = e.detail.response;
+                let files = [];
+                response.forEach(function(element) {
+                    files.push({name: element.nombre, url: element.archivo, complete: true, progress: 100});
+                }, this);
+
+                this.$.upload.files = files;
+            }
+
+            handleSuccess(e) {
                 let file = e.detail.file;
                 let response = JSON.parse(e.detail.xhr.response);
                 file.url = response.archivo;
