@@ -25,3 +25,39 @@ class PacienteModelTest(BaseTestCase):
             fac.OrdenFactory(paciente=self.paciente)
 
         self.assertEqual(self.paciente.ultimo_acompanante, orden_nueva.acompanante)
+
+
+class ServicioOrdenModelTest(BaseTestCase):
+    """Pruebas unitarias para el modelo ServicioOrden."""
+
+    def setUp(self):
+        self.servicio_orden = fac.ServicioOrdenFactory()
+
+    def test_get_historia_returns_None(self):
+        """Prueba que devuelva None si el servicio no tiene historia guardada."""
+
+        from historias.models import Historia
+
+        historia = self.servicio_orden.get_historia()
+        self.assertIsNone(historia)
+    
+    def test_get_historia(self):
+        """Prueba que devuelva la historia del servicio si ya la tiene guardada."""
+
+        from historias.tests.factories import HistoriaFactory
+
+        h = HistoriaFactory(servicio_orden=self.servicio_orden)
+        historia = self.servicio_orden.get_historia()
+        self.assertIsNotNone(historia)
+        self.assertEqual(h, historia)
+    
+    def test_get_historia_returns_instance(self):
+        """Prueba que devuelva una instancia de historia si el servicio no tiene historia guardada."""
+
+        from historias.models import Historia
+
+        historia = self.servicio_orden.get_historia(force_instance=True)
+        self.assertIsInstance(historia, Historia)
+        self.assertEqual(historia.contenido, self.servicio_orden.servicio.formato.contenido)
+
+

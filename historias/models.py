@@ -29,4 +29,25 @@ class Historia(models.Model):
         verbose_name_plural = 'historias'
     
     def __str__(self):
-        return ''.format(self.servicio_orden)
+        return '{0} - {1}'.format(self.pk, self.servicio_orden)
+
+
+def archivo_adjunto_path(instance, filename):
+    """Path para el archivo adjunto."""
+
+    return 'historia_{0}/adjuntos/{1}'.format(instance.historia_id, filename)
+
+
+class Adjunto(models.Model):
+    """Modelo que guarda los archivos adjuntos de una historia clinica."""
+
+    archivo = models.FileField(upload_to=archivo_adjunto_path, verbose_name=_lazy('archivo'))
+    historia = models.ForeignKey(Historia, related_name='adjuntos', verbose_name=_lazy('historia'))
+
+    class Meta:
+        verbose_name = 'adjunto'
+        verbose_name_plural = 'adjuntos'
+    
+
+    def __str__(self):
+        return '{0} - {1}'.format(self.historia, self.pk)

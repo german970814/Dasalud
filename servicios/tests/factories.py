@@ -21,6 +21,7 @@ class ServicioFactory(factory.django.DjangoModelFactory):
     codigo = factory.sequence(lambda n: '123456%02d' % n)
     abreviatura = 'CPV'
     tipo = factory.SubFactory(TipoFactory)
+    formato = factory.SubFactory('historias.tests.factories.FormatoFactory')
 
 
 class TarifaFactory(factory.django.DjangoModelFactory):

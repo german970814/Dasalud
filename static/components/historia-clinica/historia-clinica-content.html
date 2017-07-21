@@ -2,6 +2,7 @@
 <link rel="import" href="/static/bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="/static/bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="historia-clinica-field.html">
 <link rel="import" href="historia-clinica-table-field.html">
 
@@ -37,6 +38,15 @@
             <paper-button on-tap="save">Guardar</paper-button>
             <paper-button on-tap="close">Cerrar</paper-button>
         </div>
+
+        <paper-dialog on-iron-overlay-closed="confirmClose" id="dialog">
+            <h2>¿Estás seguro que deseas cerrar la historia?</h2>
+            <p>Recuerda que si cierras la historia no podrás seguir editandola.</p>
+            <div class="actions">
+                <paper-button dialog-dismiss>NO</paper-button>
+                <paper-button dialog-confirm autofocus>SI</paper-button>
+            </div>
+        </paper-dialog>
     </template>
 
     <script>
@@ -95,7 +105,13 @@
             }
 
             close() {
-                this.dispatchEvent(new CustomEvent('close-historia'));
+                this.$.dialog.open();
+            }
+
+            confirmClose(e) {
+                if (e.detail.confirmed) {
+                    this.dispatchEvent(new CustomEvent('close-historia'));
+                }
             }
         }
 

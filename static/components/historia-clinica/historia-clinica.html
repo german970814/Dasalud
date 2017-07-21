@@ -4,7 +4,7 @@
 <link rel="import" href="/static/bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="/static/bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="historia-clinica-content.html">
-<link rel="import" href="historia-clinica-anexos.html">
+<link rel="import" href="historia-clinica-adjuntos.html">
 
 <dom-module id="historia-clinica">
     <template>
@@ -35,20 +35,20 @@
             }
         </style>
 
-        <div class="header">[[servicio]]</div>
+        <div class="header">[[historia.nombre_servicio]]</div>
 
         <paper-tabs id="tabs" selected="{{selected}}" scrollable>
-            <template is="dom-repeat" items="[[formato]]">
+            <template is="dom-repeat" items="[[historia.contenido]]">
                 <paper-tab>[[item.nombre]]</paper-tab>
             </template>
-            <paper-tab>Anexos</paper-tab>
+            <paper-tab>Adjuntos</paper-tab>
         </paper-tabs>
 
         <iron-pages id="pages" selected="{{selected}}">
-            <template is="dom-repeat" items="[[formato]]">
+            <template is="dom-repeat" items="[[historia.contenido]]">
                 <historia-clinica-content on-close-historia="_close" on-validate-historia="_checkValidity" fields=[[item.fields]]></historia-clinica-content>
             </template>
-            <historia-clinica-anexos></historia-clinica-anexos>
+            <historia-clinica-adjuntos url="[[historia.adjuntos_link]]"></historia-clinica-adjuntos>
         </iron-pages>
 
     </template>
@@ -60,31 +60,29 @@
 
             static get properties() {
                 return {
-                    formato: {
-                        type: Array,
+                    historia: {
+                        type: Object,
                         value() {
-                            return [
-                                {nombre: 'Anamnesis Alimentaria', fields: [
-                                    {tipo: 'textarea', nombre: 'Desayuno', required: true},
-                                    {tipo: 'switch', nombre: 'Habitos intestinales'},
-                                    {tipo: 'text', nombre: 'Medias mañanas', required: true},
-                                    {tipo: 'select', nombre: 'Apetito', options: [
-                                        {value: 1, label: 'Bueno'},
-                                        {value: 2, label: 'Malo'},
-                                        {value: 3, label: 'Regular'}
-                                    ], required: true},    
-                                ]}
-                            ]; // Tabs array
-                        } // Value
+                            return {
+                                nombre_servicio: 'HISTORIA CLINICA',
+                                contenido: [
+                                    {nombre: 'Anamnesis Alimentaria', fields: [
+                                        {tipo: 'textarea', nombre: 'Desayuno', required: true},
+                                        {tipo: 'switch', nombre: 'Habitos intestinales'},
+                                        {tipo: 'text', nombre: 'Medias mañanas', required: true},
+                                        {tipo: 'select', nombre: 'Apetito', options: [
+                                            {value: 1, label: 'Bueno'},
+                                            {value: 2, label: 'Malo'},
+                                            {value: 3, label: 'Regular'}
+                                        ], required: true},    
+                                    ]}
+                                ] // Tabs Array
+                            } // Value
+                        }
                     },
 
                     selected: {
-                        value: 9
-                    }, 
-
-                    servicio: {
-                        type: String,
-                        value: 'historia clinica'
+                        value: 0
                     }
                 };
             }
@@ -97,7 +95,6 @@
                 super.ready();
 
                 Polymer.RenderStatus.afterNextRender(this, function() {
-
                 });
             }
 
@@ -122,6 +119,7 @@
                 });
 
                 if (valid) {
+                    this.historia.terminada = true;
                     this.dispatchEvent(new CustomEvent('save-historia', {detail: {terminada: true}}));
                 }
             }
