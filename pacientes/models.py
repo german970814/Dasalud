@@ -266,7 +266,25 @@ class ServicioOrden(models.Model):
         verbose_name_plural = 'servicios orden'
 
     def __str__(self):
-        return '{} - {}'.format(self.orden.pk, self.servicio.nombre)
+        return '{} - {} - {}'.format(self.orden.pk, self.pk, self.servicio.nombre)
+
+    def get_historia(self, force_instance=False):
+        """
+        :returns:
+            Retorna la historia del servicio. Si el servicio no tiene historia guardada, devuelve  ``None`` o una
+            instancia de Historia dependiendo de force_instance.
+        
+        :param bool force_instance:
+            Fuerza que devuelva una instancia de Historia
+        """
+        from historias.models import Historia
+
+        try:
+            return self.historia
+        except:
+            if force_instance:
+                return Historia(contenido=self.servicio.formato.contenido)
+            return None
 
 
 class Acompanante(ParentescoMixin, models.Model):

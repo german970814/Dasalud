@@ -146,25 +146,23 @@ class HistoriasClinicasView(APIView):
         return historia
 
     def get(self, request, pk):
+        from historias.serializers import HistoriaSerializer
         servicio_orden = get_object_or_404(ServicioOrden, pk=pk)
         paciente = servicio_orden.orden.paciente
         serializer = PacienteSerializer(paciente, context={'request': None})
         paciente_json = JSONRenderer().render(serializer.data)
 
-        historia = self.get_historia(servicio_orden)
-        if historia:
-            _formato = historia.contenido
-        else:
-            _formato = servicio_orden.servicio.formato.contenido
+        _historia = servicio_orden.get_historia(force_instance=True)
+        h_serializer = HistoriaSerializer(_historia, context={'request': request})
 
-        formato = JSONRenderer().render(_formato)
-        return Response({'paciente': paciente_json, 'formato': formato, 'servicio': servicio_orden.servicio})
+        historia = JSONRenderer().render(h_serializer.data)
+        return Response({'paciente': paciente_json, 'historia': historia, 'pk': pk})
 
     def post(self, request, pk):
         from historias.serializers import HistoriaSerializer
         servicio_orden = get_object_or_404(ServicioOrden, pk=pk)
-        historia = self.get_historia(servicio_orden)
-        serializer = HistoriaSerializer(historia, data=request.data, fields=['id', 'contenido', 'terminada'])
+        historia = servicio_orden.get_historia()
+        serializer = HistoriaSerializer(historia, data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save(servicio_orden=servicio_orden)
         return Response(serializer.data, status=201)

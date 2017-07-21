@@ -12,22 +12,25 @@
     <paciente-info paciente='{{ paciente }}' full-width></paciente-info>
     <br>
 
-    <iron-ajax id="request" url="{% url "pacientes:historias" servicio.pk %}" method="POST" handle-as="json"
+    <iron-ajax id="request" url="{% url "pacientes:historias" pk %}" method="POST" handle-as="json"
                 content-type="application/json">
     </iron-ajax>
-    <historia-clinica id="historia" formato='{{ formato }}' servicio="{{ servicio }}"></historia-clinica>
+    <historia-clinica id="historia" historia='{{ historia }}'></historia-clinica>
 {% endblock content %}
 
 {% block js %}
     <script src="{% static 'js/utils.js' %}"></script>
     <script>
-        let historia = document.getElementById('historia');
-        historia.addEventListener('save-historia', function(e) {
+        let historiaNode = document.getElementById('historia');
+        historiaNode.addEventListener('save-historia', function(e) {
             e.stopPropagation();
 
             let request = document.getElementById('request');
             request.headers = {'X-CSRFToken': getCsrfToken()}
-            request.body = {contenido: historia.formato, terminada: e.detail.terminada}
+            // TODO modificar el terminada dentro de la historia en el componente y solo enviar la historia.
+            // TODO Evitar que se modifique si ya ha sido terminada
+            historiaNode.historia.terminada = e.detail.terminada;
+            request.body = historiaNode.historia;
             request.generateRequest();
 
             request.addEventListener('error', function(e) {
@@ -37,7 +40,7 @@
 
             request.addEventListener('response', function(e) {
                 console.log('response');
-                console.log(e);
+                historiaNode.historia = e.detail.response;
             });
         });
     </script>

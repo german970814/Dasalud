@@ -29,7 +29,7 @@ class Historia(models.Model):
         verbose_name_plural = 'historias'
     
     def __str__(self):
-        return ''.format(self.servicio_orden)
+        return '{0} - {1}'.format(self.pk, self.servicio_orden)
 
 
 def archivo_adjunto_path(instance, filename):

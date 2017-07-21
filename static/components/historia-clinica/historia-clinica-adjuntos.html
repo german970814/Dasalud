@@ -30,9 +30,9 @@
 
         <div class="content">
 
-            <iron-ajax url="/historias/2/adjuntos/" handle-as="json" on-response="handleResponse" auto></iron-ajax>
+            <iron-ajax url="[[url]]" handle-as="json" on-response="handleResponse" auto></iron-ajax>
 
-            <vaadin-upload id="upload" files="{{files}}" target="/historias/2/adjuntos/" on-file-show="showFile" 
+            <vaadin-upload id="upload" files="{{files}}" target="[[url]]" on-file-show="showFile" 
                             on-upload-success="handleSuccess" form-data-name="archivo" accept=".pdf,image/*">
                 <div slot="file-list">
                     <div id="fileList">
@@ -58,7 +58,7 @@
 
             static get properties() {
                 return {
-                                        
+                    url: String                                        
                 };
             }
 
