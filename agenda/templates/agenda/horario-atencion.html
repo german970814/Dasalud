@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block imports %}
+    <link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
+    <link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
+{% endblock imports %}
+
+{% block css %}
+    <link rel='stylesheet' href='{% static "bower_components/fullcalendar/dist/fullcalendar.min.css" %}' />
+    <style>
+        .filtros {
+            display: flex;
+        }
+
+        .filtros > * {
+            flex: 1;
+            margin: auto 10px;
+        }
+    </style>
+{% endblock css %}
+
+{% block content %}
+    <header class="header-title">
+        <h1>{% trans "horario de atención" %}</h1>
+        <small>{% trans "Ingresa el horario de atención que tendra un medico para atender pacientes en una sucursal." %}</small>
+    </header>
+
+    <div class="card">
+        <div class="filtros">
+            <vaadin-combo-box id="sucursales" label="{% trans 'Sucursal' %}" items='{{ sucursales }}'></vaadin-combo-box>
+            <vaadin-combo-box id="medicos" label="{% trans 'Medico' %}" items='{{ medicos }}'></vaadin-combo-box>
+        </div>
+        <br><br>
+        <iron-ajax id="save-event-request" url="{% url "agenda:horario-atencion" %}" method="POST" handle-as="json"
+                content-type="application/json">
+        <div id="calendar"></div>
+    </div>
+{% endblock content %}
+
+{% block js %}
+    <script src="{% static 'js/utils.js' %}"></script>
+    <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'bower_components/moment/min/moment.min.js' %}"></script>
+    <script src="{% static 'bower_components/fullcalendar/dist/fullcalendar.min.js' %}"></script>
+    <script src="{% static 'bower_components/fullcalendar/dist/locale/es.js' %}"></script>
+    
+    <script>
+        const calendar = $('#calendar');
+        calendar.fullCalendar({
+            header: {
+                'left': 'prev,next, today',
+                'center': 'title',
+                'right': 'month,agendaWeek,agendaDay'
+            },
+            allDaySlot: false,
+            slotLabelFormat: 'h(:mm)a',
+            navLinks: true,
+            dayClick: function (date, jsEvent, view) {
+                dayClick(date, jsEvent, view);
+            }
+        });
+
+        const medicosNode = document.getElementById('medicos');
+        const sucursalesNode = document.getElementById('sucursales');
+
+        medicosNode.addEventListener('selected-item-changed', function(e) {
+            if (this.selectedItem != null) {
+                cambiarDuracion(this.selectedItem);
+            }
+        });
+
+        function cambiarDuracion(item) {
+            if (item.duracion_cita != null) {
+                calendar.fullCalendar('option', 'slotDuration', item.duracion_cita);
+            }
+        }
+
+        function refrescarEventos() {
+            calendar.fullCalendar('refetchEvents');
+        }
+
+        function dayClick(date, event, view) {
+            if (view.name == 'month') {  // If click on month view change to agendaWeek on the day clicked
+                calendar.fullCalendar('changeView', 'agendaWeek', date.format());
+            }
+            else {
+                if (!medicosNode.selectedItem || !sucursalesNode.selectedItem) {
+                    alert('Por favor escoge un medico y una sucursal');
+                }
+                else {
+                    let event = createEvent(date);
+                    saveEvent(event);
+                }
+            }
+        }
+
+        function createEvent(date) {
+            const FORMAT = 'YYYY-MM-DD HH:mm';
+            let duracion = moment.duration(medicosNode.selectedItem.duracion_cita);
+            let event = {
+                start: date.format(FORMAT),
+                end: date.add(duracion).format(FORMAT),
+                medico: medicosNode.selectedItem.value,
+                sucursal: sucursalesNode.selectedItem.value,
+            }
+
+            return event;
+        }
+
+        const saveEventRequest = document.getElementById('save-event-request');
+        function saveEvent(event) {            
+            saveEventRequest.headers = {'X-CSRF{Token': getCsrfToken()}
+            saveEventRequest.body = event;
+            saveEventRequest.generateRequest();
+        }
+
+        saveEventRequest.addEventListener('response', function(e) {
+            console.log('response');
+            console.log(e.detail.response);
+            refrescarEventos();
+        });
+
+        saveEventRequest.addEventListener('error', function(e) {
+            console.log('error');
+        });
+    </script>
+{% endblock js %}

@@ -49,6 +49,11 @@
                     padding: 24px;
                 }
 
+                paper-button {
+                    background: var(--app-primary-color);
+                    color: white;
+                }
+
                 .card {
                     padding: 16px;
                     color: #757575;
@@ -57,10 +62,28 @@
                     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
                 }
 
-                paper-button {
-                    background: var(--app-primary-color);
-                    color: white;
+                .header-title {
+                    margin-bottom: 1rem;
+                    padding: 1rem 1rem 0;
+                    position: relative;
                 }
+
+                .header-title > h1 {
+                    margin: 0;
+                    color: #676767;
+                    line-height: 100%;
+                    font-weight: 400;
+                    font-size: 1.15rem;
+                    text-transform: uppercase;
+                }
+
+                .header-title > small {
+                    font-size: 1rem;
+                    display: block;
+                    margin-top: .8rem;
+                    color: #959595;
+                }
+                
             </style>    
         </custom-style>
 
@@ -75,6 +98,9 @@
                     </a>
                     <a class="app-menu-item" href="{% url 'agenda:citas' %}">
                         <app-menu-icon-item icon="my-icons:people">{% trans "Citas" %}</app-menu-icon-item>
+                    </a>
+                    <a class="app-menu-item" href="{% url 'agenda:horario-atencion' %}">
+                        <app-menu-icon-item icon="my-icons:people">{% trans "Horario de atención" %}</app-menu-icon-item>
                     </a>
                 </app-menu>
             </app-drawer>

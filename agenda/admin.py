@@ -1,3 +1,8 @@
 from django.contrib import admin
+from reversion.admin import VersionAdmin
+from . import models
 
-# Register your models here.
+
+@admin.register(models.HorarioAtencion)
+class HorarioAtencion(VersionAdmin):
+    pass

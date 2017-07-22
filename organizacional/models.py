@@ -67,6 +67,9 @@ class Empleado(models.Model):
     firma = models.ImageField(upload_to=empleado_firma_path ,verbose_name=_lazy('firma'), blank=True)
     tipo = models.CharField(_lazy('tipo'), max_length=2, choices=TIPOS, default=ADMINISTRATIVO)
     instituciones = models.ManyToManyField(Institucion, related_name='empleados', verbose_name=_lazy('instituciones'))
+    duracion_cita = models.DurationField(
+        _lazy('duración de las citas'), null=True, blank=True, help_text=_lazy('Ingresar duración de la forma HH:MM:SS')
+    )
 
     # Managers
     objects = managers.EmpleadoManager()

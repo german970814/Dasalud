@@ -17,7 +17,7 @@ class Servicio(models.Model):
     """Modelo para guardar la información de los servicios que ofrece un cliente."""
 
     nombre = models.CharField(_lazy('nombre'), max_length=200)
-    codigo = models.CharField(_lazy('código'), max_length=100)
+    codigo = models.CharField(_lazy('código'), max_length=100, blank=True)
     abreviatura = models.CharField(_lazy('abreviatura'), max_length=100)
     cups = models.CharField(_lazy('cups'), max_length=100, blank=True)
     costo = models.PositiveIntegerField(_lazy('costo'), blank=True, null=True)

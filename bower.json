@@ -40,6 +40,7 @@
     "vaadin-date-picker": "vaadin/vaadin-date-picker#2.0.0-alpha1",
     "paper-styles": "PolymerElements/paper-styles#^2.0.0",
     "paper-progress": "PolymerElements/paper-progress#^2.0.1",
-    "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^2.1.0"
+    "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^2.1.0",
+    "fullcalendar": "^3.4.0"
   }
 }

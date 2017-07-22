@@ -1,7 +1,8 @@
 import factory
+import datetime
 from .. import models
 
-class EmpleadoFactory(factory.django.DjangoModelFactory):
+class EmpleadoFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.Empleado
@@ -11,10 +12,18 @@ class EmpleadoFactory(factory.django.DjangoModelFactory):
     cedula = factory.sequence(lambda n: '123456%02d' % n)
 
     class Params:
-        medico = factory.Trait(tipo=models.Empleado.MEDICO)
+        medico = factory.Trait(
+            tipo=models.Empleado.MEDICO,
+            registro_medico=factory.sequence(lambda n: 'RM123456%02d' % n),
+            duracion_cita=datetime.timedelta(minutes=30)
+        )
 
 
-class SucursalFactory(factory.django.DjangoModelFactory):
+class MedicoFactory(EmpleadoFactory):
+    medico = True
+
+
+class SucursalFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.Sucursal
@@ -23,7 +32,7 @@ class SucursalFactory(factory.django.DjangoModelFactory):
     nombre = 'NORTE'
 
 
-class InstitucionFactory(factory.django.DjangoModelFactory):
+class InstitucionFactory(factory.DjangoModelFactory):
     
     class Meta:
         model = models.Institucion
