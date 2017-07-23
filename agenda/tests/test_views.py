@@ -21,6 +21,13 @@ class HorarioAtencionMedicosViewTest(BaseTestCase):
 
         self.get_check_200(self.URL)
         self.assertResponseContains('horario de atención', html=False)
+        self.assertEqual(self.last_response.accepted_media_type, 'text/html')
+    
+    def test_get_horario_atencion_json(self):
+        """Prueba que la vista devuelva en json los horarios de atencion."""
+
+        self.get_check_200(self.URL, extra={'HTTP_ACCEPT': 'Application/json'})
+        
     
     def test_post_horario_atencion_invalido(self):
         """Prueba que si se envia una POST con datos invalidos no se guarde nada."""

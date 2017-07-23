@@ -2,9 +2,10 @@ from django.shortcuts import render
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import generics
+from rest_framework import generics, filters
 from pacientes.serializers import ServicioOrdenSerializer
 from .serializers import HorarioAtencionSerializer
+from .models import HorarioAtencion
 
 
 class CitasViews(APIView):
@@ -21,14 +22,26 @@ class CitasViews(APIView):
         return Response({'citas': citas_json})
 
 
-class HorarioAtencionMedicosView(generics.CreateAPIView):
+class HorarioAtencionMedicosView(generics.ListCreateAPIView):
     """Permite a un administrador agendar el horario de atención de los medicos."""
 
-    renderer_classes = [TemplateHTMLRenderer]
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'agenda/horario-atencion.html'
     serializer_class = HorarioAtencionSerializer
+    queryset = HorarioAtencion.objects.all()
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('medico', 'sucursal')
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
+        print(request.META.get('HTTP_ACCEPT'))
+        if request.META.get('HTTP_ACCEPT', '').lower() == 'application/json':
+            return super().get(request, *args, **kwargs)
+        else:
+            data = self.html_response()
+            return Response(data)
+        
+
+    def html_response(self):
         from organizacional.serializers import SucursalSerializer, EmpleadoSerializer
         from organizacional.models import Sucursal, Empleado
 
@@ -40,5 +53,4 @@ class HorarioAtencionMedicosView(generics.CreateAPIView):
 
         sucursales = JSONRenderer().render(sucursales_s.data)
         medicos = JSONRenderer().render(medicos_s.data)
-
-        return Response({'sucursales': sucursales, 'medicos': medicos})
+        return {'sucursales': sucursales, 'medicos': medicos}

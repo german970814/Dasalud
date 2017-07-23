@@ -33,20 +33,23 @@
         </div>
         <br><br>
         <iron-ajax id="save-event-request" url="{% url "agenda:horario-atencion" %}" method="POST" handle-as="json"
-                content-type="application/json">
+                content-type="application/json"></iron-ajax>
         <div id="calendar"></div>
     </div>
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'js/utils.js' %}"></script>
     <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
     <script src="{% static 'bower_components/moment/min/moment.min.js' %}"></script>
     <script src="{% static 'bower_components/fullcalendar/dist/fullcalendar.min.js' %}"></script>
     <script src="{% static 'bower_components/fullcalendar/dist/locale/es.js' %}"></script>
+    <script src="{% static 'js/utils.js' %}"></script>
     
     <script>
         const calendar = $('#calendar');
+        const medicosNode = document.getElementById('medicos');
+        const sucursalesNode = document.getElementById('sucursales');
+
         calendar.fullCalendar({
             header: {
                 'left': 'prev,next, today',
@@ -56,17 +59,31 @@
             allDaySlot: false,
             slotLabelFormat: 'h(:mm)a',
             navLinks: true,
+            events: {
+                url: '{% url "agenda:horario-atencion" %}',
+                headers: {ACCEPT: 'application/json'},
+                data: function() {
+                    return dataEvents();
+                }
+            },
             dayClick: function (date, jsEvent, view) {
                 dayClick(date, jsEvent, view);
             }
         });
 
-        const medicosNode = document.getElementById('medicos');
-        const sucursalesNode = document.getElementById('sucursales');
-
         medicosNode.addEventListener('selected-item-changed', function(e) {
             if (this.selectedItem != null) {
                 cambiarDuracion(this.selectedItem);
+            }
+
+            if (medicosNode.selectedItem && sucursalesNode.selectedItem) {
+                refrescarEventos();
+            }
+        });
+
+        sucursalesNode.addEventListener('selected-item-changed', function(e) {
+            if (medicosNode.selectedItem && sucursalesNode.selectedItem) {
+                refrescarEventos();
             }
         });
 
@@ -78,6 +95,21 @@
 
         function refrescarEventos() {
             calendar.fullCalendar('refetchEvents');
+        }
+
+        function dataEvents() {
+            if (!medicosNode.selectedItem || !sucursalesNode.selectedItem) {
+                return {
+                    medico: 0,
+                    sucursal: 0
+                };
+            }
+            else {
+                return {
+                    medico: medicosNode.selectedItem.value,
+                    sucursal: sucursalesNode.selectedItem.value,
+                }
+            }
         }
 
         function dayClick(date, event, view) {
@@ -110,7 +142,7 @@
 
         const saveEventRequest = document.getElementById('save-event-request');
         function saveEvent(event) {            
-            saveEventRequest.headers = {'X-CSRF{Token': getCsrfToken()}
+            saveEventRequest.headers = {'X-CSRFToken': getCsrfToken()}
             saveEventRequest.body = event;
             saveEventRequest.generateRequest();
         }
