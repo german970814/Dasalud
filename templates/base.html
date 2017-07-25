@@ -96,11 +96,14 @@
                     <a class="app-menu-item" href="{% url 'pacientes:crear' %}">
                         <app-menu-icon-item icon="my-icons:people">{% trans "Crear paciente" %}</app-menu-icon-item>
                     </a>
-                    <a class="app-menu-item" href="{% url 'agenda:citas' %}">
-                        <app-menu-icon-item icon="my-icons:people">{% trans "Citas" %}</app-menu-icon-item>
+                    <a class="app-menu-item" href="{% url 'agenda:listar' %}">
+                        <app-menu-icon-item icon="my-icons:people">{% trans "Agenda" %}</app-menu-icon-item>
                     </a>
                     <a class="app-menu-item" href="{% url 'agenda:horario-atencion' %}">
                         <app-menu-icon-item icon="my-icons:people">{% trans "Horario de atención" %}</app-menu-icon-item>
+                    </a>
+                    <a class="app-menu-item" href="{% url 'agenda:citas' %}">
+                        <app-menu-icon-item icon="my-icons:people">{% trans "Agendar citas" %}</app-menu-icon-item>
                     </a>
                 </app-menu>
             </app-drawer>
@@ -121,6 +124,8 @@
                 </main>
             </app-header-layout>
         </app-drawer-layout>
+
+        {% block dialogs %}{% endblock dialogs %}
 
         <script>
             document.querySelector('search-box').addEventListener('enter', function(e) {

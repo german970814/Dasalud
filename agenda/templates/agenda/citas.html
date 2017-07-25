@@ -1,57 +1,201 @@
 {% extends "base.html" %}
-{% load i18n %}
-
+{% load i18n static rest_framework common_tags %}
 
 {% block imports %}
-    <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
-    <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="/static/bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+    <link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
+    <link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+    <link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
+    <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
 {% endblock imports %}
 
+{% block css %}
+    <link rel='stylesheet' href='{% static "bower_components/fullcalendar/dist/fullcalendar.min.css" %}' />
+    <style>
+        .filtros {
+            display: flex;
+        }
+
+        .filtros > * {
+            flex: 1;
+            margin: auto 10px;
+        }
+
+        #cita-dialog {
+            width: 75%;
+        }
+        
+        #cita-dialog paper-dialog-scrollable {
+            height: 500px;
+        }
+    </style>
+{% endblock css %}
+
 {% block content %}
-    <vaadin-grid items='{{citas}}'>
-        <vaadin-grid-column>
-            <template class="header">
-                <div class="cell">{% trans 'Cédula' %}</div>
-            </template>
-            <template>
-                <div class="cell">[[item.orden.paciente.numero_documento]]</div>
-            </template>
-        </vaadin-grid-column>
-        <vaadin-grid-column>
-            <template class="header">
-                <div class="cell">{% trans 'Nombre' %}</div>
-            </template>
-            <template>
-                <div class="cell">[[item.orden.paciente.nombres]] [[item.orden.paciente.apellidos]]</div>
-            </template>
-        </vaadin-grid-column>
-        <vaadin-grid-column>
-            <template class="header">
-                <div class="cell">{% trans 'Servicio' %}</div>
-            </template>
-            <template>
-                <div class="cell">[[item.servicio_nombre]]</div>
-            </template>
-        </vaadin-grid-column>
-        <vaadin-grid-column>
-            <template class="header">
-                <div class="cell">{% trans 'Empresa' %}</div>
-            </template>
-            <template>
-                <div class="cell">[[item.orden.empresa]]</div>
-            </template>
-        </vaadin-grid-column>
-        <vaadin-grid-column>
-            <template class="header">
-                <div class="cell"></div>
-            </template>
-            <template>
-                <div class="cell last">
-                    <a href="[[item.historias_link]]" tabindex="-1">
-                        <paper-icon-button icon="my-icons:menu" title="{% trans 'Historias' %}"></paper-icon-button>
-                    </a>
-                </div>
-            </template>
-        </vaadin-grid-column>
-    </vaadin-grid>
+    <header class="header-title">
+        <h1>{% trans "agendar citas" %}</h1>
+    </header>
+
+    <div class="card">
+        <div class="filtros">
+            <vaadin-combo-box id="sucursales" label="{% trans 'Sucursal' %}" items='{{ sucursales }}'></vaadin-combo-box>
+            <vaadin-combo-box id="medicos" label="{% trans 'Medico' %}" items='{{ medicos }}'></vaadin-combo-box>
+        </div>
+        <br><br>
+        <iron-ajax id="save-event-request" url="{% url "agenda:citas" %}" method="POST" handle-as="json"
+                content-type="application/json"></iron-ajax>
+        <div id="calendar"></div>
+    </div>    
 {% endblock content %}
+
+{% block dialogs %}
+    <paper-dialog id="cita-dialog" modal>
+        <h2>{% trans "AGENDAR CITA" %}</h2>
+           <paper-dialog-scrollable>
+               <iron-form>
+                   <form action="{% url "agenda:citas" %}" method="POST" enctype="application/x-www-form-urlencoded">
+                       {% csrf_token %}
+                       {% render_form form template_pack='material-pack' %}
+                   </form>
+               </iron-form>    
+           </paper-dialog-scrollable>   
+        <div class="buttons">
+            <paper-button dialog-dismiss>{% trans "Cancelar" %}</paper-button>
+            <paper-button id="save-cita">{% trans "Guardar" %}</paper-button>
+        </div>
+    </paper-dialog>
+{% endblock dialogs %}
+
+{% block js %}
+    <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'bower_components/moment/min/moment.min.js' %}"></script>
+    <script src="{% static 'bower_components/fullcalendar/dist/fullcalendar.min.js' %}"></script>
+    <script src="{% static 'bower_components/fullcalendar/dist/locale/es.js' %}"></script>
+    <script src="{% static 'js/utils.js' %}"></script>
+
+    <script>
+        const calendar = $('#calendar');
+        const medicosNode = document.getElementById('medicos');
+        const sucursalesNode = document.getElementById('sucursales');
+        const citaDialog = document.getElementById('cita-dialog');
+        const form = citaDialog.querySelector('iron-form');
+        let bEvent;
+
+        calendar.fullCalendar({
+            header: {
+                'left': 'prev,next, today',
+                'center': 'title',
+                'right': 'month,agendaWeek,agendaDay'
+            },
+            allDaySlot: false,
+            slotLabelFormat: 'h(:mm)a',
+            navLinks: true,
+            selectable: true,
+            eventSources: [
+                {
+                    url: '{% url "agenda:horario-atencion" %}',
+                    headers: {ACCEPT: 'application/json'},
+                    data: function() {
+                        return dataEvents();
+                    },
+                    rendering: 'background'
+                },
+                {
+                    url: '{% url "agenda:citas" %}',
+                    headers: {ACCEPT: 'application/json'},
+                    data: function() {
+                        return dataEvents();
+                    }
+                }
+            ],
+            dayClick: function(date, jsEvent, view) {
+                dayClick(date, jsEvent, view);
+            },
+            eventClick: function(calEvent, jsEvent, view) {
+                console.log('event clicked');
+            },
+            selectOverlap: function(event) {
+                if (calendar.fullCalendar('getView').name != 'month') {
+                    if (event.source.rendering == 'background') {
+                        console.log(event);
+                        bEvent = event;
+                        // TODO limpiar formulario antes de mostrar dialogo
+                        citaDialog.open();
+                    }
+                }
+            }
+        });
+
+        medicosNode.addEventListener('selected-item-changed', function(e) {
+            if (this.selectedItem != null) {
+                cambiarDuracion(this.selectedItem);
+            }
+
+            if (medicosNode.selectedItem && sucursalesNode.selectedItem) {
+                refrescarEventos();
+            }
+        });
+
+        sucursalesNode.addEventListener('selected-item-changed', function(e) {
+            if (medicosNode.selectedItem && sucursalesNode.selectedItem) {
+                refrescarEventos();
+            }
+        });
+
+        citaDialog.querySelector('#save-cita').addEventListener('click', function(e) {
+            if (form.validate()) {
+                form.submit();
+            }
+        });
+
+        citaDialog.addEventListener('iron-overlay-closed', function(e) {
+            if(e.detail.confirmed) {
+                //
+            }
+        });
+
+        form.addEventListener('iron-form-presubmit', function(e) {
+            console.log('presubmit');
+            this.request.body.horario = bEvent.id;
+            console.log(this.request.body);
+        });
+
+        form.addEventListener('iron-form-response', function(e) {
+            console.log('cita creada');
+            citaDialog.close();
+            refrescarEventos();
+        });
+
+        function cambiarDuracion(item) {
+            if (item.duracion_cita != null) {
+                calendar.fullCalendar('option', 'slotDuration', item.duracion_cita);
+            }
+        }
+
+        function refrescarEventos() {
+            calendar.fullCalendar('refetchEvents');
+        }
+
+        function dataEvents() {
+            if (!medicosNode.selectedItem || !sucursalesNode.selectedItem) {
+                return {
+                    medico: 0,
+                    sucursal: 0
+                };
+            }
+            else {
+                return {
+                    medico: medicosNode.selectedItem.value,
+                    sucursal: sucursalesNode.selectedItem.value,
+                }
+            }
+        }
+
+        function dayClick(date, event, view) {
+            if (view.name == 'month') {  // If click on month view change to agendaWeek on the day clicked
+                calendar.fullCalendar('changeView', 'agendaWeek', date.format());
+            }
+        }
+    </script>
+{% endblock js %}
