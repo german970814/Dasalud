@@ -283,7 +283,7 @@ class ServicioOrden(models.Model):
             return self.historia
         except:
             if force_instance:
-                return Historia(contenido=self.servicio.formato.contenido)
+                return Historia(contenido=self.servicio.formato.contenido, servicio_orden=self)
             return None
 
 
