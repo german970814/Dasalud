@@ -23,7 +23,7 @@
                 };
 
                 --vaadin-grid-body-row-hover-cell: {
-                    background-color: var(--paper-grey-200);
+                      background-color: var(--paper-grey-200);  
                 };
 
                 --vaadin-grid-body-row-selected-cell: {
@@ -38,12 +38,15 @@
 
             vaadin-grid .cell {
                 overflow: hidden;
-                text-overflow: ellipsis;
+                /* text-overflow: ellipsis;  */
                 padding-right: 56px;
             }
 
             vaadin-grid .cell.last {
-                padding-right: 24px;
+                  padding-right: 24px; 
+            }
+            vaadin-grid .cell.first {
+                  padding-left: 24px; 
             }
 
             vaadin-grid .cell.numeric {

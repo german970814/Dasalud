@@ -1,0 +1,142 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="/static/components/vaadin-grid-material-styles.html">
+<link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<link rel="import" href="/static/bower_components/paper-input/paper-input.html">
+<link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/static/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="detalle-servicio.html">
+
+
+<dom-module id="servicios-orden">
+    <template>
+        <style include="vaadin-grid-material-styles">
+            :host {
+                display: block
+            }
+        </style>
+
+        <iron-ajax id="request" url="{% url "pacientes:historias" pk %}" method="POST" handle-as="json"
+                        content-type="application/json">
+        </iron-ajax>
+
+        <iron-form>
+            <form>
+                <vaadin-combo-box label="Medico*" required></vaadin-combo-box>
+                <vaadin-combo-box label="Servicio*" required></vaadin-combo-box>
+                <paper-input label="# de sesiones" type="number" min="0"></paper-input>
+                <paper-input label="Valor de la sesión" type="number" min="0"></paper-input>
+                <paper-input label="Coopago/Moderadora" type="number" min="0"></paper-input>
+            </form>
+        </iron-form>
+        <paper-button>Agregar</paper-button>
+
+        <vaadin-grid id="grid" items='[{"medico": "hola", "servicio": "consulta de primera vez"}, {"medico": "hola2", "servicio": "wrwer"}]'>
+
+            <template class="row-details">
+                <div>
+                    <detalle-servicio></detalle-servicio>                    
+                </div>
+            </template>
+
+            <vaadin-grid-column flex-grow="0">
+                <template class="header"></template>
+                <template>
+                    <div class="cell first">
+                        <input id="checkBox" type="checkbox" hidden checked="{{expanded::change}}">
+                        <paper-icon-button icon="my-icons:keyboard-arrow-down" on-tap="_showDetail"></paper-icon-button>
+                    </div>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column>
+                <template class="header">
+                    <div class="cell">Medico</div>
+                </template>
+                <template>
+                    <div class="cell">[[item.medico]]</div>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column>
+                <template class="header">
+                    <div class="cell">Servicio</div>
+                </template>
+                <template>
+                    <div class="cell">[[item.servicio]]</div>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column>
+                <template class="header">
+                    <div class="cell"># de sesiones</div>
+                </template>
+                <template>
+                    <div class="cell numeric">[[item.servicio]]</div>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column>
+                <template class="header">
+                    <div class="cell">Valor sesión</div>
+                </template>
+                <template>
+                    <div class="cell numeric">[[item.servicio]]</div>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column>
+                <template class="header">
+                    <div class="cell">Coopago/Moderadora</div>
+                </template>
+                <template>
+                    <div class="cell numeric">[[item.servicio]]</div>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column flex-grow="0">
+                <template class="header">
+                    <div class="cell last"></div>
+                </template>
+                <template>
+                    <div class="cell last">
+                        <a href="#" tabindex="-1">
+                            <paper-icon-button icon="my-icons:delete" title="{% trans 'Eliminar' %}"></paper-icon-button>
+                        </a>
+                    </div>
+                </template>
+            </vaadin-grid-column>
+            
+        </vaadin-grid>
+
+    </template>
+
+    <script src="{% static 'js/utils.js' %}"></script>
+    <script>
+        class ServiciosOrden extends Polymer.Element {
+
+            static get is() { return 'servicios-orden'; }
+
+            static get properties() {
+                return {
+                    
+                };
+            }
+
+            constructor() {
+                super();
+            }
+
+            ready() {
+                super.ready();
+                this._csrf = getCsrfToken();
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    
+                });
+            }
+
+            _showDetail(e) {
+                e.model.expanded = !e.model.expanded;
+            }
+
+        }
+
+        window.customElements.define(ServiciosOrden.is, ServiciosOrden);
+    </script>
+</dom-module>
