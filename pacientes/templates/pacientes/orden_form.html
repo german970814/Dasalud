@@ -241,6 +241,7 @@
 
         var medicos = [];
         function _getMedicos(value) {
+            document.querySelector('servicios-orden').institucion = value;
             fetch("{% url 'organizacional:medicos' %}?instituciones=" + value, {credentials: 'same-origin'})
                 .then(function(response){
                     return response.json();
@@ -256,6 +257,7 @@
 
         var servicios_e = [];
         function _getServicios(value) {
+            document.querySelector('servicios-orden').empresa = value;
             fetch("{% url 'servicios:empresas_servicios' 0 %}".replace(0, value), {credentials: 'same-origin'})
                 .then(function(response){
                     return response.json();

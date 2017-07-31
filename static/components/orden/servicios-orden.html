@@ -1,43 +1,84 @@
 <link rel="import" href="/static/bower_components/polymer/polymer-element.html">
 <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
-<link rel="import" href="/static/components/vaadin-grid-material-styles.html">
 <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<link rel="import" href="/static/bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="/static/bower_components/paper-input/paper-input.html">
 <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
 <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/static/bower_components/paper-time-input/paper-time-input.html">
 <link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/static/components/vaadin-grid-material-styles.html">
+<link rel="import" href="/static/components/ig-iron-ajax.html">
 <link rel="import" href="detalle-servicio.html">
 
 
 <dom-module id="servicios-orden">
-    <template>
+    <template strip-whitespace>
         <style include="vaadin-grid-material-styles">
             :host {
                 display: block
             }
+            
+            .row {
+                display: flex;
+            }
+
+            .row > paper-time-input {
+                flex: 0;
+            }
+            .row > * {
+                flex: 1;
+                margin-right: 5px;
+            }
+
+            .detail {
+                padding: 10px;
+            }
         </style>
 
-        <iron-ajax id="request" url="{% url "pacientes:historias" pk %}" method="POST" handle-as="json"
-                        content-type="application/json">
-        </iron-ajax>
+        <ig-iron-ajax url="/organizacional/medicos/?instituciones=[[institucion]]" handle-as="json" last-response="{{_medicos}}"
+                            content-type="application/json" auto></ig-iron-ajax>
+        <ig-iron-ajax url="/servicios/empresas/[[empresa]]/servicios/" handle-as="json" last-response="{{_servicios}}"
+                            content-type="application/json" auto></ig-iron-ajax>
+        <ig-iron-ajax url="/organizacional/sucursales/" handle-as="json" last-response="{{_sucursales}}"
+                            content-type="application/json" auto></ig-iron-ajax>
 
-        <iron-form>
+        <iron-form id="form">
             <form>
-                <vaadin-combo-box label="Medico*" required></vaadin-combo-box>
-                <vaadin-combo-box label="Servicio*" required></vaadin-combo-box>
-                <paper-input label="# de sesiones" type="number" min="0"></paper-input>
-                <paper-input label="Valor de la sesión" type="number" min="0"></paper-input>
-                <paper-input label="Coopago/Moderadora" type="number" min="0"></paper-input>
+                 <div class="row"> 
+                    <vaadin-combo-box name="medico" label="Medico*" required items="[[_medicos]]" auto-validate
+                        selected-item="{{servicioActual.medico}}"></vaadin-combo-box>
+                    <vaadin-combo-box name="servicio" label="Servicio*" required items="[[_servicios]]" auto-validate
+                        selected-item="{{servicioActual.servicio}}"></vaadin-combo-box>
+                 </div> 
+                 <div class="row"> 
+                    <paper-input name="numero_sesiones" label="# de sesiones*" type="number" required auto-validate 
+                        min="1" value="{{servicioActual.numero_sesiones}}"></paper-input>
+                    <paper-input name="valor" label="Valor de la sesión*" type="number" required auto-validate 
+                        min="0" value="{{servicioActual.valor}}"></paper-input>
+                    <paper-input name="coopago" label="Coopago/Moderadora" type="number" auto-validate min="0"
+                         value="{{servicioActual.coopago}}"></paper-input>
+                 </div>
+                 <div class="row">
+                    <vaadin-date-picker name="fecha" label="Fecha" required auto-validate 
+                        value="{{sesionActual.fecha}}"></vaadin-date-picker>
+                    <paper-time-input name="hora" label="Hora" value="{{sesionActual.hora}}"></paper-time-input>
+                    <paper-input name="autorización" label="Autorización" value="{{sesionActual.autorizacion}}"></paper-input>
+                    <vaadin-date-picker name="fecha_autorizacion" label="Fecha autorización" 
+                        value="{{sesionActual.fecha_autorizacion}}"></vaadin-date-picker>
+                    <vaadin-combo-box name="sucursal" label="Sucursal" items="[[_sucursales]]"
+                        selected-item="{{sesionActual.sucursal}}"></vaadin-combo-box>
+                 </div>
             </form>
         </iron-form>
-        <paper-button>Agregar</paper-button>
-
-        <vaadin-grid id="grid" items='[{"medico": "hola", "servicio": "consulta de primera vez"}, {"medico": "hola2", "servicio": "wrwer"}]'>
+        <paper-button on-tap="_add">Agregar</paper-button>
+        <br><br>
+        <vaadin-grid id="grid" items="[[servicios]]">
 
             <template class="row-details">
-                <div>
-                    <detalle-servicio></detalle-servicio>                    
+                <div class="detail">
+                    <detalle-servicio sesiones="[[item.sesiones]]"></detalle-servicio>                    
                 </div>
             </template>
 
@@ -55,7 +96,7 @@
                     <div class="cell">Medico</div>
                 </template>
                 <template>
-                    <div class="cell">[[item.medico]]</div>
+                    <div class="cell">[[item.medico.label]]</div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column>
@@ -63,7 +104,7 @@
                     <div class="cell">Servicio</div>
                 </template>
                 <template>
-                    <div class="cell">[[item.servicio]]</div>
+                    <div class="cell">[[item.servicio.label]]</div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column>
@@ -71,7 +112,7 @@
                     <div class="cell"># de sesiones</div>
                 </template>
                 <template>
-                    <div class="cell numeric">[[item.servicio]]</div>
+                    <div class="cell numeric">[[item.numero_sesiones]]</div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column>
@@ -79,7 +120,7 @@
                     <div class="cell">Valor sesión</div>
                 </template>
                 <template>
-                    <div class="cell numeric">[[item.servicio]]</div>
+                    <div class="cell numeric">[[item.valor]]</div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column>
@@ -87,7 +128,7 @@
                     <div class="cell">Coopago/Moderadora</div>
                 </template>
                 <template>
-                    <div class="cell numeric">[[item.servicio]]</div>
+                    <div class="cell numeric">[[item.coopago]]</div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column flex-grow="0">
@@ -97,7 +138,7 @@
                 <template>
                     <div class="cell last">
                         <a href="#" tabindex="-1">
-                            <paper-icon-button icon="my-icons:delete" title="{% trans 'Eliminar' %}"></paper-icon-button>
+                            <paper-icon-button icon="my-icons:delete" on-tap="_delete"></paper-icon-button>
                         </a>
                     </div>
                 </template>
@@ -107,7 +148,6 @@
 
     </template>
 
-    <script src="{% static 'js/utils.js' %}"></script>
     <script>
         class ServiciosOrden extends Polymer.Element {
 
@@ -115,8 +155,47 @@
 
             static get properties() {
                 return {
+                    servicioActual: {
+                        type: Object,
+                        value() {
+                            return {
+                                medico: null,
+                                servicio: null,
+                                numero_sesiones: 1,
+                                valor: 0,
+                                coopago: 0,
+                                sesiones: []
+                            };
+                        }
+                    },
+                    servicios: {
+                        type: Array,
+                        value() {
+                            return [
+                                {valor: 3000, sesiones: [{hora: '4:00PM', autorizacion: '3345'}, {hora: '4:00PM', autorizacion: '334434sfsfsfsfsfsdsdd5'}]}
+                            ];
+                        }
+                    },
+                    sesionActual: {
+                        type: Object,
+                        value() {
+                            return {};
+                        }
+                    },
+                    institucion: {
+                        type: Number,
+                        value: 1
+                    },
+                    empresa: {
+                        type: Number,
+                        value: 1
+                    }
                     
                 };
+            }
+
+            static get observers() {
+                return ['_setValorServicio(servicioActual.servicio)'];
             }
 
             constructor() {
@@ -125,7 +204,6 @@
 
             ready() {
                 super.ready();
-                this._csrf = getCsrfToken();
                 Polymer.RenderStatus.afterNextRender(this, function() {
                     
                 });
@@ -133,6 +211,42 @@
 
             _showDetail(e) {
                 e.model.expanded = !e.model.expanded;
+            }
+
+            _setValorServicio(servicio) {
+                if (servicio) {
+                    this.set('servicioActual.valor', servicio.valor);
+                }
+            }
+
+            _add() {
+                console.log(this.servicioActual);
+                if (this.$.form.validate()){ 
+                    let item = this.$.form.serializeForm();
+                    let actual = JSON.parse(JSON.stringify(this.servicioActual));
+                    actual.sesiones = this._createSessions(actual.numero_sesiones);
+                    this.servicios.unshift(actual);
+                    this.$.grid.clearCache();
+                    this.$.form.reset();
+                    console.log(actual);
+                    console.log(item);
+                }
+                console.log(this.servicioActual);
+            }
+
+            _delete(e) {
+                let index = this.servicios.indexOf(e.model.item);
+                this.servicios.splice(index, 1);
+                this.$.grid.clearCache();
+            }
+
+            _createSessions(number) {
+                let sessions = [];
+                for (var i = 0; i < number; i++) {
+                    sessions.unshift(JSON.parse(JSON.stringify(this.sesionActual)));                    
+                }
+
+                return sessions;
             }
 
         }

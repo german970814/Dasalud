@@ -1,5 +1,11 @@
 <link rel="import" href="/static/bower_components/polymer/polymer-element.html">
 <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/static/bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="/static/bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="/static/bower_components/paper-time-input/paper-time-input.html">
+<link rel="import" href="/static/bower_components/paper-input/paper-input.html">
 <link rel="import" href="/static/components/vaadin-grid-material-styles.html">
 
 <dom-module id="detalle-servicio">
@@ -8,15 +14,40 @@
             :host {
                 display: block
             }
+
+            vaadin-date-picker {
+                /* height: 20px; */
+            }
         </style>
 
-        <vaadin-grid items='[{"servicio": "sfsfsfs"}, {"servicio": "sfsfsfs"}]'>
+        <paper-checkbox checked="{{editing}}">Editar</paper-checkbox>
+        <paper-button on-tap="_openAgenda">Ver agenda</paper-button>
+
+        <vaadin-grid items="[[sesiones]]">
             <vaadin-grid-column>
                 <template class="header">
-                    <div class="cell">Fecha</div>
+                    <div class="cell first">Fecha</div>
                 </template>
                 <template>
-                    <div class="cell">[[item.servicio]]</div>
+                    <div class="cell first">
+                        <span hidden$="[[!editing]]">
+                            <input type="date" value="{{item.fecha::input}}">
+                        </span>
+                        <span hidden$="[[editing]]">[[item.fecha]]</span>
+                    </div>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column>
+                <template class="header">
+                    <div class="cell">Hora</div>
+                </template>
+                <template>
+                    <div class="cell">
+                        <span hidden$="[[!editing]]">
+                            <input type="time" value="{{item.hora::input}}">
+                        </span>
+                        <span hidden$="[[editing]]">[[item.hora]]</span>
+                    </div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column>
@@ -24,7 +55,7 @@
                     <div class="cell">Estado</div>
                 </template>
                 <template>
-                    <div class="cell">[[item.servicio]]</div>
+                    <div class="cell">[[item.estado]]</div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column>
@@ -32,7 +63,12 @@
                     <div class="cell">Autorización</div>
                 </template>
                 <template>
-                    <div class="cell">[[item.servicio]]</div>
+                    <div class="cell">
+                        <span hidden$="[[!editing]]">
+                            <input type="text" value="{{item.autorizacion::input}}">
+                        </span>
+                        <span hidden$="[[editing]]">[[item.autorizacion]]</span>
+                    </div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column>
@@ -40,7 +76,12 @@
                     <div class="cell">Fecha de autorización</div>
                 </template>
                 <template>
-                    <div class="cell">[[item.servicio]]</div>
+                    <div class="cell">
+                        <span hidden$="[[!editing]]">
+                            <input type="date" value="{{item.fecha_autorizacion::input}}">
+                        </span>
+                        <span hidden$="[[editing]]">[[item.fecha_autorizacion]]</span>
+                    </div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column>
@@ -48,10 +89,15 @@
                     <div class="cell">Sucursal</div>
                 </template>
                 <template>
-                    <div class="cell">[[item.servicio]]</div>
+                    <div class="cell">[[item.sucursal.label]]</div>
                 </template>
             </vaadin-grid-column>
         </vaadin-grid>
+
+        <paper-dialog modal>
+            <h2>Agenda</h2>
+
+        </paper-dialog>
 
     </template>
 
@@ -62,6 +108,13 @@
 
             static get properties() {
                 return {
+                    sesiones: {
+                        type: Array
+                    },
+                    editing: {
+                        type: Boolean,
+                        value: false
+                    }
                     
                 };
             }
@@ -76,6 +129,10 @@
                 Polymer.RenderStatus.afterNextRender(this, function() {
                     
                 });
+            }
+
+            _openAgenda() {
+                console.log(this.sesiones);
             }
 
         }

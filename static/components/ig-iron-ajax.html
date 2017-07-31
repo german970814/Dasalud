@@ -1,0 +1,53 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/polymer/lib/utils/flattened-nodes-observer.html">
+<link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
+
+
+<dom-module id="ig-iron-ajax">
+
+    <script>
+        // TODO modificar por la clase cuando iron-ajax cambie a usar clases tambien.
+        class IGIronAjax extends customElements.get('iron-ajax') {
+
+            static get is() { return 'ig-iron-ajax'; }
+
+            static get properties() {
+                return {
+                    
+                };
+            }
+
+            constructor() {
+                super();
+                
+            }
+
+            ready() {
+                super.ready();
+                if (!this.headers['X-CSRFToken']) {
+                    this.headers['X-CSRFToken'] = this.getCsrfToken();
+                }
+
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    
+
+                });
+            }
+
+            // Original JavaScript code by Chirp Internet: www.chirp.com.au
+            // Please acknowledge use of this code by including this header.
+            getCookie(name) {
+                let re = new RegExp(name + "=([^;]+)");
+                let value = re.exec(document.cookie);
+                return (value != null) ? unescape(value[1]) : null;
+            }
+
+            getCsrfToken() {
+                return this.getCookie('csrftoken');
+            }
+
+        }
+
+        window.customElements.define(IGIronAjax.is, IGIronAjax);
+    </script>
+</dom-module>
