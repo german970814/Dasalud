@@ -6,6 +6,7 @@
     <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
     <link rel="import" href="/static/bower_components/paper-fab/paper-fab.html">
     <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="/static/bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
     <link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
     <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
     <link rel="import" href="/static/components/paciente-info.html">
@@ -15,6 +16,7 @@
 {% block css %}
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="/static/bower_components/mdl-stepper/stepper.min.css">
+    <link rel='stylesheet' href='{% static "bower_components/fullcalendar/dist/fullcalendar.min.css" %}' />
     <custom-style>
         <style>
             .mdl-stepper {
@@ -86,7 +88,7 @@
                         <paper-icon-button onclick="_removeServicio(this)" icon="my-icons:clear"></paper-icon-button>
                     </div>
                 </template>
-                <paper-fab mini onclick="_addServicio()" icon="my-icons:add" elevation="1"></paper-fab>
+                <!-- <paper-fab mini onclick="_addServicio()" icon="my-icons:add" elevation="1"></paper-fab> -->
                 <br>
                 <iron-form>
                     <form>
@@ -134,6 +136,19 @@
         </paper-dialog>
     </div>
 {% endblock content %}
+
+{% block dialogs %}
+    <paper-dialog id="calendario" modal style="width: 75%; height: 90%;">
+        <h2>{% trans "Citas" %}</h2>
+
+        <div style="height: 80%">
+            <div id="calendar"></div>
+        </div>
+        <div class="buttons">
+            <paper-button dialog-dismiss>{% trans "Cerrar" %}</paper-button>
+        </div>
+    </paper-dialog>
+{% endblock dialogs %}
 
 {% block js %}
     <script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
@@ -380,6 +395,93 @@
             }
 
             document.getElementById('total_servicios').innerHTML = Math.max(0, valor);
+        }
+    </script>
+
+    <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'bower_components/moment/min/moment.min.js' %}"></script>
+    <script src="{% static 'bower_components/fullcalendar/dist/fullcalendar.min.js' %}"></script>
+    <script src="{% static 'bower_components/fullcalendar/dist/locale/es.js' %}"></script>
+
+    <script>
+        const calendar = $('#calendar');
+        const medicosNode = document.getElementById('medicos');
+        const sucursalesNode = document.getElementById('sucursales');
+        const citaDialog = document.getElementById('cita-dialog');
+        // const form = citaDialog.querySelector('iron-form');
+        const serviciosOrden = document.querySelector('servicios-orden');
+        const calendarioDialog = document.getElementById('calendario');
+        var medico = 0, sucursal = 0, servicio, sesion;
+        let bEvent;
+
+        calendar.fullCalendar({
+            header: {
+                'left': 'prev,next, today',
+                'center': 'title',
+                'right': 'agendaWeek,agendaDay'
+            },
+            height: 'parent',
+            allDaySlot: false,
+            slotLabelFormat: 'h(:mm)a',
+            navLinks: true,
+            selectable: true,
+            eventSources: [
+                {
+                    url: '{% url "agenda:horario-atencion" %}',
+                    headers: {ACCEPT: 'application/json'},
+                    data: function() {
+                        return dataEvents();
+                    },
+                    rendering: 'background'
+                },
+                {
+                    url: '{% url "agenda:citas" %}',
+                    headers: {ACCEPT: 'application/json'},
+                    data: function() {
+                        return dataEvents();
+                    }
+                }
+            ],
+            dayClick: function(date, jsEvent, view) {
+                dayClick(date, jsEvent, view);
+            },
+            selectOverlap: function(event) {
+                if (calendar.fullCalendar('getView').name != 'month') {
+                    if (event.source.rendering == 'background') {
+                        seleccionCita(event);
+                    }
+                }
+            }
+        });
+
+        function dayClick(date, event, view) {
+            if (view.name == 'month') {  // If click on month view change to agendaWeek on the day clicked
+                calendar.fullCalendar('changeView', 'agendaWeek', date.format());
+            }
+        }
+
+        serviciosOrden.addEventListener('open-calendar', function(e) {
+            console.log(e);
+            medico = e.detail.servicio.item.medico.value;
+            sucursal = e.detail.sesion.item.sucursal.value;
+            servicio = e.detail.servicio.index;
+            sesion = e.detail.sesion.index;
+            calendarioDialog.open();
+            calendar.fullCalendar('refetchEvents');
+        });
+
+        function dataEvents() {
+            return {
+                medico: medico,
+                sucursal: sucursal
+            }
+        }
+
+        function seleccionCita(cita) {
+            cita.fecha = cita.start.format('MM/DD/YYYY');
+            cita.hora = cita.start.format('hh:mm A');
+            serviciosOrden.updateCita(servicio, sesion, cita);
+            calendarioDialog.close();
         }
     </script>
 {% endblock js %}

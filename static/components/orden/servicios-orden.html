@@ -67,7 +67,7 @@
                     <paper-input name="autorización" label="Autorización" value="{{sesionActual.autorizacion}}"></paper-input>
                     <vaadin-date-picker name="fecha_autorizacion" label="Fecha autorización" 
                         value="{{sesionActual.fecha_autorizacion}}"></vaadin-date-picker>
-                    <vaadin-combo-box name="sucursal" label="Sucursal" items="[[_sucursales]]"
+                    <vaadin-combo-box name="sucursal" label="Sucursal" items="[[_sucursales]]" required auto-validate
                         selected-item="{{sesionActual.sucursal}}"></vaadin-combo-box>
                  </div>
             </form>
@@ -78,7 +78,7 @@
 
             <template class="row-details">
                 <div class="detail">
-                    <detalle-servicio sesiones="[[item.sesiones]]"></detalle-servicio>                    
+                    <detalle-servicio sesiones="[[item.sesiones]]" on-open-calendar="_openCalendar"></detalle-servicio>                    
                 </div>
             </template>
 
@@ -137,13 +137,10 @@
                 </template>
                 <template>
                     <div class="cell last">
-                        <a href="#" tabindex="-1">
-                            <paper-icon-button icon="my-icons:delete" on-tap="_delete"></paper-icon-button>
-                        </a>
+                        <paper-icon-button icon="my-icons:delete" on-tap="_delete"></paper-icon-button>
                     </div>
                 </template>
-            </vaadin-grid-column>
-            
+            </vaadin-grid-column>            
         </vaadin-grid>
 
     </template>
@@ -247,6 +244,17 @@
                 }
 
                 return sessions;
+            }
+
+            _openCalendar(e) {
+                console.log(e);
+                this.dispatchEvent(new CustomEvent('open-calendar', {detail: {servicio: e.model, sesion: e.detail}}));
+            }
+
+            updateCita(servicio, sesion, cita) {
+                this.servicios[servicio].sesiones[sesion].fecha = cita.fecha;
+                this.servicios[servicio].sesiones[sesion].hora = cita.hora;
+                this.$.grid.clearCache();
             }
 
         }
