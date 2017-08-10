@@ -16,7 +16,7 @@ class PersonaSerializer(FlexFieldsModelSerializer):
 
     class Meta:
         model = models.Persona
-        fields = ['id', 'numero_documento', 'tipo_documento', 'nombres', 'apellidos', 'telefono', 'celular']
+        fields = ['id', 'numero_documento', 'tipo_documento', 'nombres', 'apellidos', 'telefono', 'celular', 'direccion']
 
 
 class CitaSerializer(FlexFieldsModelSerializer):
@@ -38,7 +38,6 @@ class CitaSerializer(FlexFieldsModelSerializer):
         super().__init__(*args, **kwargs)
 
         if isinstance(self.fields['paciente'], PersonaSerializer):
-            print(self.fields['paciente'].fields['numero_documento'])
             self.fields['paciente'].fields['numero_documento'].validators = []
 
     def create(self, validated_data):  #  TODO ver si se crea metodo en manager de Cita

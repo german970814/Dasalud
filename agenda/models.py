@@ -47,6 +47,7 @@ class Persona(models.Model):
     numero_documento = models.CharField(_lazy('número de documento'), max_length=20, unique=True)
     telefono = models.PositiveIntegerField(_lazy('telefono'), null=True, blank=True)
     celular = models.IntegerField(_lazy('celular'), null=True, blank=True)
+    direccion = models.CharField(_lazy('dirección'), max_length=200, blank=True)
 
     class Meta:
         verbose_name = 'persona'

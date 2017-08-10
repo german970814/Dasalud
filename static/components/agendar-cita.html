@@ -1,0 +1,169 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/static/bower_components/paper-input/paper-input.html">
+<link rel="import" href="/static/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<link rel="import" href="/static/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="/static/bower_components/show-json/show-json.html">
+
+
+<dom-module id="agendar-cita">
+    <template>
+        <style include="iron-flex iron-flex-alignment">
+            :host {
+                display: block;
+            }
+
+            paper-dialog {
+                width: 75%;
+            }
+
+            h3 {
+                margin-bottom: 0;
+            }
+
+            .row {
+                display: flex;
+                align-items: flex-end;
+            }
+
+            .row > * {
+                flex: 1;
+                margin-right: 15px;
+            }
+        </style>
+
+        <iron-ajax id="pacienteInfo" url="[[pacienteInfoUrl]]" handle-as="json" content-type="application/json"
+            on-response="_setPacienteInfo" on-error="_pacienteInfoNotfound"></iron-ajax>
+
+        <paper-dialog id="dialog" modal opened="{{opened}}">
+            <h2>AGENDAR CITA</h2>
+            <paper-dialog-scrollable>
+                <iron-form id="form">
+                    <form>
+                        <h3>Datos del paciente</h3>
+                        <div class="row">
+                            <paper-input name="numero_documento" label="Número de documento*" required auto-validate
+                                value="{{cita.paciente.numero_documento}}" on-blur="_requestPacienteInfo"></paper-input>
+                            <vaadin-combo-box name="tipo_documento" label="Tipo de documento*" items="[[tiposDocumento]]" 
+                                auto-validate required value="{{cita.paciente.tipo_documento}}"></vaadin-combo-box>
+                        </div>
+                        <div class="row">
+                            <paper-input name="nombres" label="Nombres*" required auto-validate
+                                value="{{cita.paciente.nombres}}"></paper-input>
+                            <paper-input name="apellidos" label="Apellidos*" required auto-validate
+                                value="{{cita.paciente.apellidos}}"></paper-input>
+                        </div>
+                        <div class="row">
+                            <paper-input name="telefono" label="Telefono" type="number" min="0" auto-validate
+                                value="{{cita.paciente.telefono}}"></paper-input>
+                            <paper-input name="celular" label="Celular" type="number" min="0" auto-validate
+                                value="{{cita.paciente.celular}}"></paper-input>
+                            <paper-input name="direccion" label="Dirección" auto-validate
+                                value="{{cita.paciente.direccion}}"></paper-input>
+                        </div>
+                        <h3>Datos de la cita</h3>
+                        <p>Fecha: [[_formatFecha(fecha)]]</p>
+                        <div class="row">
+                            <vaadin-combo-box name="servicio" label="Servicio*" items="[[servicios]]" auto-validate required
+                                value="{{cita.servicio}}"></vaadin-combo-box>
+                            <vaadin-combo-box name="estado" label="Estado*" items="[[estados]]" auto-validate required
+                                value="{{cita.estado}}"></vaadin-combo-box>
+                        </div>
+                        <show-json json="[[cita]]"></show-json>
+                    </form>
+                </iron-form>
+            </paper-dialog-scrollable>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancelar</paper-button>
+                <paper-button on-tap="saveCita">Guardar</paper-button>
+            </div>
+        </paper-dialog>
+
+    </template>
+
+    <script>
+        class AgendarCita extends Polymer.Element {
+
+            static get is() { return 'agendar-cita'; }
+
+            static get properties() {
+                return {
+                    tiposDocumento: Array,
+                    servicios: Array,
+                    estados: Array,
+                    pacienteInfoUrl: String,
+
+                    opened: {
+                        type: Boolean,
+                        value: false
+                    },
+
+                    bgEvent: Number,
+
+                    fecha: Date,
+
+                    cita: {
+                        type: Object,
+                        value() {
+                            return {
+                                paciente: {
+                                }
+                            };
+                        }
+                    }
+                };
+            }
+
+            constructor() {
+                super();
+            }
+
+            ready() {
+                super.ready();
+
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    
+                });
+            }
+
+            open() {
+                this.$.dialog.open();
+            }
+
+            _formatFecha(fecha) {
+                return fecha.format('dddd, DD/MM/YYYY hh:mm A');
+            }
+
+            _requestPacienteInfo() {
+                let numero = this.cita.paciente.numero_documento;
+                if (numero != '' && numero != undefined) {
+                    this.$.pacienteInfo.params = {q: numero};
+                    this.$.pacienteInfo.generateRequest();
+                }
+            }
+
+            _setPacienteInfo(e) {
+                let response = e.detail.response;
+                this.set('cita.paciente', response);
+            }
+
+            _pacienteInfoNotfound() {
+                this.set('cita.paciente', {numero_documento: this.cita.paciente.numero_documento})
+            }
+
+            validate() {
+                return this.$.form.validate();
+            }
+
+            saveCita() {
+                this.validate();
+            }
+
+        }
+
+        window.customElements.define(AgendarCita.is, AgendarCita);
+    </script>
+</dom-module>

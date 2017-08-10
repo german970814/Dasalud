@@ -1,12 +1,14 @@
-from django.shortcuts import render
+from django.http import Http404
+from django.shortcuts import render, get_object_or_404
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, filters
+from pacientes.models import Paciente
 from pacientes.serializers import ServicioOrdenSerializer
-from .serializers import HorarioAtencionSerializer, CitaSerializer
+from .serializers import HorarioAtencionSerializer, CitaSerializer, PersonaSerializer
 from .filters import CitaFilter
-from .models import HorarioAtencion, Cita
+from .models import HorarioAtencion, Cita, Persona
 
 
 class AgendaView(APIView):
@@ -76,10 +78,6 @@ class CitasView(generics.ListCreateAPIView):
         return super().post(request, *args, **kwargs)
 
     def get_serializer(self, *args, **kwargs):
-        fields = [
-            'id', 'sucursal', 'autorizacion', 'pendiente_autorizacion', 'institucion', 'plan', 'afiliacion',
-            'tipo_usuario', 'forma_pago', 'acompanante', 'servicios'
-        ]
         expand = ['paciente']
         return super().get_serializer(expand=expand, *args, **kwargs)
 
@@ -98,3 +96,33 @@ class CitasView(generics.ListCreateAPIView):
 
         form = CitaSerializer(fields=['paciente', 'servicio', 'estado'], expand=['paciente'])
         return {'sucursales': sucursales, 'medicos': medicos, 'form': form}
+
+
+class CitaDetailView(generics.RetrieveUpdateAPIView):
+    """Permite editar una cita."""
+
+    serializer_class = CitaSerializer
+    queryset = Cita.objects.all()
+
+    def get_serializer(self, *args, **kwargs):
+        return super().get_serializer(expand=['paciente'], *args, **kwargs)
+
+
+class BuscarPersonaView(APIView):
+    """Permite buscar una persona por numero de documento.
+    
+    La persona se busca primero como un paciente y luego como una persona."""
+
+    def get(self, request):
+        numero = request.GET.get('q', None)
+
+        if not numero:
+            raise Http404
+
+        try:
+            persona = get_object_or_404(Paciente, numero_documento=numero)
+        except:
+            persona = get_object_or_404(Persona, numero_documento=numero)
+    
+        serializer = PersonaSerializer(persona)
+        return Response(serializer.data)
