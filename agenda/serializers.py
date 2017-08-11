@@ -1,6 +1,7 @@
 from django.db import transaction
-from rest_framework import serializers
 from rest_flex_fields import FlexFieldsModelSerializer
+from rest_framework import serializers
+
 from . import models
 
 
@@ -25,10 +26,11 @@ class CitaSerializer(FlexFieldsModelSerializer):
     title = serializers.CharField(source='paciente.__str__', read_only=True)
     start = serializers.DateTimeField(source='horario.start', read_only=True)
     end = serializers.DateTimeField(source='horario.end', read_only=True)
+    edit_link = serializers.HyperlinkedIdentityField(view_name='agenda:citas-detail')
 
     class Meta:
         model = models.Cita
-        fields = ['id', 'paciente', 'servicio', 'estado', 'horario', 'start', 'end', 'title']
+        fields = ['id', 'paciente', 'servicio', 'estado', 'horario', 'start', 'end', 'title', 'edit_link']
     
     expandable_fields = {
         'paciente': (PersonaSerializer, {'source': 'paciente'})
@@ -48,5 +50,13 @@ class CitaSerializer(FlexFieldsModelSerializer):
             paciente, _ = models.Persona.objects.get_or_create(numero_documento=documento, defaults=paciente_data)
             validated_data.update({'paciente': paciente})
             return super().create(validated_data)
+    
+    def update(self, instance, validated_data):  #  TODO ver si se crea metodo en manager de Cita
+        paciente_data = validated_data.pop('paciente')
+        paciente = instance.paciente
 
-
+        with transaction.atomic():
+            paciente.update(**paciente_data)
+            instance.update(**validated_data)
+        
+        return instance

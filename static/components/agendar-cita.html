@@ -7,6 +7,7 @@
 <link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
 <link rel="import" href="/static/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="/static/bower_components/show-json/show-json.html">
+<link rel="import" href="/static/components/ig-iron-ajax.html">
 
 
 <dom-module id="agendar-cita">
@@ -35,8 +36,11 @@
             }
         </style>
 
-        <iron-ajax id="pacienteInfo" url="[[pacienteInfoUrl]]" handle-as="json" content-type="application/json"
-            on-response="_setPacienteInfo" on-error="_pacienteInfoNotfound"></iron-ajax>
+        <ig-iron-ajax id="pacienteInfo" url="[[pacienteInfoUrl]]" handle-as="json" content-type="application/json"
+            on-response="_setPacienteInfo" on-error="_pacienteInfoNotfound"></ig-iron-ajax>
+        
+        <ig-iron-ajax id="saveCitaRequest" body="[[cita]]" handle-as="json" content-type="application/json"
+            on-response="_citaGuardada"></ig-iron-ajax>
 
         <paper-dialog id="dialog" modal opened="{{opened}}">
             <h2>AGENDAR CITA</h2>
@@ -95,13 +99,12 @@
                     servicios: Array,
                     estados: Array,
                     pacienteInfoUrl: String,
+                    newCitaUrl: String,
 
                     opened: {
                         type: Boolean,
                         value: false
                     },
-
-                    bgEvent: Number,
 
                     fecha: Date,
 
@@ -123,7 +126,6 @@
 
             ready() {
                 super.ready();
-
                 Polymer.RenderStatus.afterNextRender(this, function() {
                     
                 });
@@ -131,6 +133,10 @@
 
             open() {
                 this.$.dialog.open();
+            }
+
+            close() {
+                this.$.dialog.close();
             }
 
             _formatFecha(fecha) {
@@ -154,12 +160,48 @@
                 this.set('cita.paciente', {numero_documento: this.cita.paciente.numero_documento})
             }
 
-            validate() {
-                return this.$.form.validate();
+            _resetCita() {
+                this.cita = {
+                    paciente: {}
+                };
+            }
+
+            _setPost() {
+                this.$.saveCitaRequest.url = this.newCitaUrl;
+                this.$.saveCitaRequest.method = "POST";
+                console.log(this.$.saveCitaRequest.url);
+            }
+
+            _setPut() {
+                this.$.saveCitaRequest.url = this.cita.edit_link;
+                this.$.saveCitaRequest.method = "PUT";
+            }
+
+            _citaGuardada(e) {
+                console.log(e);
+                this.dispatchEvent(new CustomEvent('cita-saved'));
+                this.close();
+            }
+
+            nuevaCita(event) {
+                this._resetCita();
+                this.set('cita.horario', event.id);
+                this.fecha = event.start;
+                this._setPost();
+                this.open();
+            }
+
+            verCita(cita) {
+                this.cita = JSON.parse(JSON.stringify(cita));
+                this.fecha = cita.start;
+                this._setPut();
+                this.open();
             }
 
             saveCita() {
-                this.validate();
+                if(this.$.form.validate()) {
+                    this.$.saveCitaRequest.generateRequest();
+                }
             }
 
         }

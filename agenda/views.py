@@ -1,14 +1,16 @@
 from django.http import Http404
-from django.shortcuts import render, get_object_or_404
-from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from django.shortcuts import get_object_or_404, render
+from rest_framework import filters, generics
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import generics, filters
+
 from pacientes.models import Paciente
 from pacientes.serializers import ServicioOrdenSerializer
-from .serializers import HorarioAtencionSerializer, CitaSerializer, PersonaSerializer
+
 from .filters import CitaFilter
-from .models import HorarioAtencion, Cita, Persona
+from .models import Cita, HorarioAtencion, Persona
+from .serializers import (CitaSerializer, HorarioAtencionSerializer, PersonaSerializer)
 
 
 class AgendaView(APIView):

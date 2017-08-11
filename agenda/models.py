@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _lazy
+from common.models import UpdateModelMixin
 
 
 class HorarioAtencion(models.Model):
@@ -19,7 +20,7 @@ class HorarioAtencion(models.Model):
         return '{} - {} - {}'.format(self.sucursal, self.medico, self.start)
 
 
-class Persona(models.Model):
+class Persona(UpdateModelMixin, models.Model):
     """Modelo para guardar información basica de la persona que esta agendando la cita."""
 
     MENOR_NN = 'MN'
@@ -57,7 +58,7 @@ class Persona(models.Model):
         return '{} {}'.format(self.nombres, self.apellidos)
 
 
-class Cita(models.Model):
+class Cita(UpdateModelMixin, models.Model):
     """Modelo para guardar las citas de un medico."""
 
     CUMPLIDA = 'CU'

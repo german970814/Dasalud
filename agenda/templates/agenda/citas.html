@@ -51,25 +51,11 @@
 {% endblock content %}
 
 {% block dialogs %}
-    <agendar-cita tipos-documento='{{ form.fields.paciente.tipo_documento|to_json }}' paciente-info-url="{% url 'agenda:persona-search' %}"
-        servicios='{{ form.fields.servicio|to_json }}' estados='{{ form.fields.estado|to_json }}' opened></agendar-cita>
-    <iron-ajax id="get-paciente" url="{% url "agenda:persona-search" %}" handle-as="json"
-                content-type="application/json"></iron-ajax>
-    <paper-dialog id="cita-dialog" modal>
-        <h2>{% trans "AGENDAR CITA" %}</h2>
-        <paper-dialog-scrollable>
-            <iron-form>
-                <form action="{% url 'agenda:citas' %}" method="POST" enctype="application/x-www-form-urlencoded">
-                    {% csrf_token %}
-                    {% render_form form template_pack='material-pack' %}
-                </form>
-            </iron-form>
-        </paper-dialog-scrollable>   
-        <div class="buttons">
-            <paper-button dialog-dismiss>{% trans "Cancelar" %}</paper-button>
-            <paper-button id="save-cita">{% trans "Guardar" %}</paper-button>
-        </div>
-    </paper-dialog>
+    <agendar-cita tipos-documento='{{ form.fields.paciente.tipo_documento|to_json }}' 
+        paciente-info-url="{% url 'agenda:persona-search' %}" new-cita-url="{% url 'agenda:citas' %}"
+        servicios='{{ form.fields.servicio|to_json }}' estados='{{ form.fields.estado|to_json }}' 
+        >
+    </agendar-cita>
 {% endblock dialogs %}
 
 {% block js %}
@@ -83,10 +69,7 @@
         const calendar = $('#calendar');
         const medicosNode = document.getElementById('medicos');
         const sucursalesNode = document.getElementById('sucursales');
-        const citaDialog = document.getElementById('cita-dialog');
-        const form = citaDialog.querySelector('iron-form');
-        const citaDialog2 = document.querySelector('agendar-cita');
-        let bEvent;
+        const citaDialog = document.querySelector('agendar-cita');
 
         calendar.fullCalendar({
             header: {
@@ -121,18 +104,12 @@
             eventClick: function(calEvent, jsEvent, view) {
                 console.log('event clicked');
                 console.log(calEvent);
-                setFormEditarcita(calEvent.id);
-                llenarCita(calEvent);
-                citaDialog.open();
+                showCita(calEvent);
             },
             selectOverlap: function(event) {
                 if (calendar.fullCalendar('getView').name != 'month') {
                     if (event.source.rendering == 'background') {
                         console.log(event);
-                        bEvent = event;
-                        // setFormCrearcita();
-                        // limpiarCita();
-                        // citaDialog.open();
                         showCitaFromBgEvent(event);
                     }
                 }
@@ -151,56 +128,10 @@
             refrescarEventos();
         });
 
-        citaDialog.querySelector('#save-cita').addEventListener('click', function(e) {
-            if (form.validate()) {
-                form.submit();
-            }
-        });
-
-        citaDialog.addEventListener('iron-overlay-closed', function(e) {
-            if(e.detail.confirmed) {
-                //
-            }
-        });
-
-        form.addEventListener('iron-form-presubmit', function(e) {
-            console.log('presubmit');
-            if (this.request.method == "POST") {
-                this.request.body.horario = bEvent.id;
-            }
-            console.log(this.request.body);
-        });
-
-        form.addEventListener('iron-form-response', function(e) {
-            console.log('cita creada');
-            citaDialog.close();
+        citaDialog.addEventListener('cita-saved', function(e) {
+            console.log('cita guardada');
             refrescarEventos();
         });
-
-        form.querySelector('*[name="paciente.numero_documento"]').addEventListener('blur', function() {
-            let request = document.getElementById('get-paciente');
-            request.params = {numero_documento: this.value};
-            request.generateRequest();
-        });
-
-        document.getElementById('get-paciente').addEventListener('response', function(e) {
-            let pacientes = e.detail.response;
-            if (pacientes.length > 0) {
-                llenarInfoPaciente(pacientes[0]);
-            }
-        });
-
-        function setFormCrearcita() {
-            let innerForm = form.querySelector('form');
-            innerForm.action = "{% url 'agenda:citas' %}";
-            innerForm.method = 'POST';
-        }
-
-        function setFormEditarcita(id) {
-            let innerForm = form.querySelector('form');
-            innerForm.action = "{% url 'agenda:citas-detail' 0 %}".replace(id);
-            innerForm.method = 'PUT';
-        }
 
         function cambiarDuracion(item) {
             if (item.duracion_cita != null) {
@@ -236,36 +167,11 @@
         // --------- Cita Functions --------------------
 
         function showCitaFromBgEvent(event) {
-            citaDialog2.bgEvent = event.id;
-            citaDialog2.fecha = event.start;
-            // citaDialog2.cita = undefined;
-            citaDialog2.open();
+            citaDialog.nuevaCita(event);
         }
 
-        function llenarCita(cita) {
-            form.querySelector('*[name="paciente.numero_documento"]').value = cita.paciente.numero_documento;
-            form.querySelector('*[name="servicio"]').value = cita.servicio;
-            form.querySelector('*[name="estado"]').value = cita.estado;
-            llenarInfoPaciente(cita.paciente);
-        }
-
-        function llenarInfoPaciente(paciente) {
-            form.querySelector('*[name="paciente.tipo_documento"]').value = paciente.tipo_documento;
-            form.querySelector('*[name="paciente.nombres"]').value = paciente.nombres;
-            form.querySelector('*[name="paciente.apellidos"]').value = paciente.apellidos;
-            form.querySelector('*[name="paciente.telefono"]').value = paciente.telefono;
-            form.querySelector('*[name="paciente.celular"]').value = paciente.celular;
-        }
-
-        function limpiarCita() {
-            form.querySelector('*[name="paciente.numero_documento"]').value = '';
-            form.querySelector('*[name="paciente.tipo_documento"]').value = '';
-            form.querySelector('*[name="paciente.nombres"]').value = '';
-            form.querySelector('*[name="paciente.apellidos"]').value = '';
-            form.querySelector('*[name="paciente.telefono"]').value = '';
-            form.querySelector('*[name="paciente.celular"]').value = '';
-            form.querySelector('*[name="servicio"]').value = '';
-            form.querySelector('*[name="estado"]').value = '';
+        function showCita(event) {
+            citaDialog.verCita(event);
         }
     </script>
 {% endblock js %}
