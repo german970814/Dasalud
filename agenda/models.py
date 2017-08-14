@@ -87,3 +87,7 @@ class Cita(UpdateModelMixin, models.Model):
     
     def __str__(self):
         return '{}'.format(self.paciente)
+
+    @property
+    def cumplida(self):
+        return self.estado == self.CUMPLIDA

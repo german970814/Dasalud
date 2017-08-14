@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, filters
 
+from agenda.models import Cita
 from .models import Paciente, Orden, ServicioOrden
 from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSerializer, ServicioOrdenSerializer
 from . import serializers
@@ -14,8 +15,9 @@ from . import serializers
 class PacientesList(generics.ListCreateAPIView):
     queryset = Paciente.objects.all()
     serializer_class = PacienteSerializer
-    filter_backends = (filters.SearchFilter,)
+    filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
     search_fields = ('nombres', 'apellidos', 'numero_documento')
+    filter_fields = ('numero_documento',)
 
 
 class OrdenesList(generics.ListCreateAPIView):
@@ -38,14 +40,19 @@ class ListarPacientesView(generics.ListCreateAPIView):
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'pacientes/lista_pacientes.html'
     serializer_class = PacienteSerializer
-    filter_backends = (filters.SearchFilter,)
+    queryset = Paciente.objects.all()
+    filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
     search_fields = ('nombres', 'apellidos', 'numero_documento')
+    filter_fields = ('numero_documento',)
 
-    def get(self, request):
-        queryset = self.filter_queryset(Paciente.objects.all())
-        serializer = PacienteSerializer(queryset, many=True, context={'request': None})
-        pacientes = JSONRenderer().render(serializer.data)
-        return Response({'pacientes': pacientes})
+    def get(self, request, *args, **kwargs):
+        if request.META.get('HTTP_ACCEPT', '').lower() == 'application/json':
+            return super().get(request, *args, **kwargs)
+        else:
+            queryset = self.filter_queryset(self.get_queryset())
+            serializer = PacienteSerializer(queryset, many=True, context={'request': None})
+            pacientes = JSONRenderer().render(serializer.data)
+            return Response({'pacientes': pacientes})
 
 
 class PacienteDetalleView(generics.UpdateAPIView):
@@ -66,7 +73,11 @@ class CrearPacienteView(APIView):
     METHOD = 'POST'
 
     def get(self, request):
-        form = PacienteSerializer(context={'request': None})
+        paciente = None
+        cita = request.session.get('cita', None)
+        if cita:
+            paciente = Paciente(**cita['paciente'])
+        form = PacienteSerializer(paciente, context={'request': None})
         return Response({'form': form, 'VERBO': self.VERBO, 'URL': self.URL, 'MSJ': self.MSJ, 'METHOD': self.METHOD})
 
 

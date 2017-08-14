@@ -179,7 +179,7 @@
 
             _citaGuardada(e) {
                 console.log(e);
-                this.dispatchEvent(new CustomEvent('cita-saved'));
+                this.dispatchEvent(new CustomEvent('cita-saved', {detail: e.detail.response}));
                 this.close();
             }
 

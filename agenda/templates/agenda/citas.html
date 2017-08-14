@@ -130,7 +130,13 @@
 
         citaDialog.addEventListener('cita-saved', function(e) {
             console.log('cita guardada');
-            refrescarEventos();
+            console.log(e.detail);
+            if (e.detail.redirecciona) {
+                window.location = e.detail.redirecciona_link;
+            }
+            else {
+                refrescarEventos();
+            }
         });
 
         function cambiarDuracion(item) {

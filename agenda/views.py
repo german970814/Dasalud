@@ -79,6 +79,11 @@ class CitasView(generics.ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
 
+    def perform_create(self, serializer):
+        super().perform_create(serializer)
+        if serializer.data['redirecciona']:
+            self.request.session['cita'] = serializer.data['id']
+
     def get_serializer(self, *args, **kwargs):
         expand = ['paciente']
         return super().get_serializer(expand=expand, *args, **kwargs)
@@ -108,6 +113,11 @@ class CitaDetailView(generics.RetrieveUpdateAPIView):
 
     def get_serializer(self, *args, **kwargs):
         return super().get_serializer(expand=['paciente'], *args, **kwargs)
+
+    def perform_update(self, serializer):
+        super().perform_update(serializer)
+        if serializer.data['redirecciona']:
+            self.request.session['cita'] = serializer.data
 
 
 class BuscarPersonaView(APIView):

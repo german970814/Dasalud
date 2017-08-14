@@ -1,7 +1,9 @@
 from django.db import transaction
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 
+from pacientes.models import Paciente
 from . import models
 
 
@@ -23,14 +25,19 @@ class PersonaSerializer(FlexFieldsModelSerializer):
 class CitaSerializer(FlexFieldsModelSerializer):
     """Serializer para el modelo Cita."""
 
+    end = serializers.DateTimeField(source='horario.end', read_only=True)
     title = serializers.CharField(source='paciente.__str__', read_only=True)
     start = serializers.DateTimeField(source='horario.start', read_only=True)
-    end = serializers.DateTimeField(source='horario.end', read_only=True)
+    redirecciona = serializers.BooleanField(source='cumplida', read_only=True)
     edit_link = serializers.HyperlinkedIdentityField(view_name='agenda:citas-detail')
+    redirecciona_link = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Cita
-        fields = ['id', 'paciente', 'servicio', 'estado', 'horario', 'start', 'end', 'title', 'edit_link']
+        fields = [
+            'id', 'paciente', 'servicio', 'estado', 'horario', 'start', 'end', 'title', 'redirecciona',
+            'redirecciona_link', 'edit_link'
+        ]
     
     expandable_fields = {
         'paciente': (PersonaSerializer, {'source': 'paciente'})
@@ -60,3 +67,14 @@ class CitaSerializer(FlexFieldsModelSerializer):
             instance.update(**validated_data)
         
         return instance
+    
+    def get_redirecciona_link(self, obj):
+        # if not obj.cumplida:
+        #     return None
+        
+        request = self.context.get('request', None)
+        try:
+            Paciente.objects.get(numero_documento=obj.paciente.numero_documento)
+        except:
+            return reverse('pacientes:crear', request=request)
+
