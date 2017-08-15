@@ -8,7 +8,7 @@
     <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
     <link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
     <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
-    <link rel="import" href="/static/components/agendar-cita.html">
+    <link rel="import" href="/static/components/form-cita.html">
 {% endblock imports %}
 
 {% block css %}
@@ -51,11 +51,11 @@
 {% endblock content %}
 
 {% block dialogs %}
-    <agendar-cita tipos-documento='{{ form.fields.paciente.tipo_documento|to_json }}' 
+    <form-cita tipos-documento='{{ form.fields.paciente.tipo_documento|to_json }}' 
         paciente-info-url="{% url 'agenda:persona-search' %}" new-cita-url="{% url 'agenda:citas' %}"
         servicios='{{ form.fields.servicio|to_json }}' estados='{{ form.fields.estado|to_json }}' 
         >
-    </agendar-cita>
+    </form-cita>
 {% endblock dialogs %}
 
 {% block js %}
@@ -69,7 +69,7 @@
         const calendar = $('#calendar');
         const medicosNode = document.getElementById('medicos');
         const sucursalesNode = document.getElementById('sucursales');
-        const citaDialog = document.querySelector('agendar-cita');
+        const citaDialog = document.querySelector('form-cita');
 
         calendar.fullCalendar({
             header: {

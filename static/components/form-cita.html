@@ -10,7 +10,7 @@
 <link rel="import" href="/static/components/ig-iron-ajax.html">
 
 
-<dom-module id="agendar-cita">
+<dom-module id="form-cita">
     <template>
         <style include="iron-flex iron-flex-alignment">
             :host {
@@ -89,9 +89,9 @@
     </template>
 
     <script>
-        class AgendarCita extends Polymer.Element {
+        class FormCita extends Polymer.Element {
 
-            static get is() { return 'agendar-cita'; }
+            static get is() { return 'form-cita'; }
 
             static get properties() {
                 return {
@@ -206,6 +206,6 @@
 
         }
 
-        window.customElements.define(AgendarCita.is, AgendarCita);
+        window.customElements.define(FormCita.is, FormCita);
     </script>
 </dom-module>
