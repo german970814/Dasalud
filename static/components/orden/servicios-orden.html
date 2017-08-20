@@ -11,6 +11,7 @@
 <link rel="import" href="/static/components/vaadin-grid-material-styles.html">
 <link rel="import" href="/static/components/ig-iron-ajax.html">
 <link rel="import" href="detalle-servicio.html">
+<link rel="import" href="agenda-citas.html">
 
 
 <dom-module id="servicios-orden">
@@ -22,6 +23,7 @@
             
             .row {
                 display: flex;
+                align-items: flex-end;
             }
 
             .row > paper-time-input {
@@ -37,6 +39,8 @@
             }
         </style>
 
+        <agenda-citas citas-url="/agenda/citas/"></agenda-citas>
+
         <ig-iron-ajax url="/organizacional/medicos/?instituciones=[[institucion]]" handle-as="json" last-response="{{_medicos}}"
                             content-type="application/json" auto></ig-iron-ajax>
         <ig-iron-ajax url="/servicios/empresas/[[empresa]]/servicios/" handle-as="json" last-response="{{_servicios}}"
@@ -46,7 +50,9 @@
 
         <iron-form id="form">
             <form>
-                 <div class="row"> 
+                 <div class="row">
+                    <vaadin-combo-box name="sucursal" label="Sucursal" items="[[_sucursales]]" required auto-validate 
+                        selected-item="{{sesionActual.sucursal}}"></vaadin-combo-box>
                     <vaadin-combo-box name="medico" label="Medico*" required items="[[_medicos]]" auto-validate
                         selected-item="{{servicioActual.medico}}"></vaadin-combo-box>
                     <vaadin-combo-box name="servicio" label="Servicio*" required items="[[_servicios]]" auto-validate
@@ -67,8 +73,6 @@
                     <paper-input name="autorización" label="Autorización" value="{{sesionActual.autorizacion}}"></paper-input>
                     <vaadin-date-picker name="fecha_autorizacion" label="Fecha autorización" 
                         value="{{sesionActual.fecha_autorizacion}}"></vaadin-date-picker>
-                    <vaadin-combo-box name="sucursal" label="Sucursal" items="[[_sucursales]]" required auto-validate
-                        selected-item="{{sesionActual.sucursal}}"></vaadin-combo-box>
                  </div>
             </form>
         </iron-form>

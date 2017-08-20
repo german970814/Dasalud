@@ -1,0 +1,128 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+<script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/static/bower_components/moment/min/moment.min.js"></script>
+<script src="/static/bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
+<script src="/static/bower_components/fullcalendar/dist/locale/es.js"></script>
+
+<dom-module id="agenda-citas">
+    <link rel="import" type="css" href="/static/bower_components/fullcalendar/dist/fullcalendar.min.css">
+    <template>
+        <style>
+            :host {
+                display: block
+            }
+
+            paper-dialog {
+                width: 60%;
+                height: 75%;
+            }
+
+            #parent {
+                height: 70%;
+            }
+        </style>
+
+        <paper-dialog opened>
+            <h2>Citas No Asociadas</h2>
+            <div id="parent">
+                <div id="calendar"></div>
+            </div>
+            <div class="actions">
+                <paper-button dialog-dismiss>Cerrar</paper-button>
+            </div>
+        </paper-dialog>
+
+    </template>
+
+    <script>
+        class AgendaCitas extends Polymer.Element {
+
+            static get is() { return 'agenda-citas'; }
+
+            static get properties() {
+                return {
+                    citasUrl: String,
+                    paciente: {
+                        type: String,
+                        value: ''
+                    },
+                    fecha: {
+                        type: Date,
+                        value: ''
+                    }                   
+                };
+            }
+
+            constructor() {
+                super();
+            }
+
+            ready() {
+                super.ready();
+                Polymer.RenderStatus.afterNextRender(this, () => {
+                    this._initialize();
+                });
+            }
+
+            _initialize() {
+                let calendar = this.$.calendar;
+                this._jCalendar = jQuery(calendar);
+                this._jCalendar.fullCalendar({
+                    header: {
+                        'left': 'prev,next, today',
+                        'center': 'title',
+                        'right': 'listMonth'
+                    },
+                    defaultView: 'listMonth',
+                    height: 'parent',
+                    views: {
+                        listWeek: {
+                            buttonText: 'Semana'
+                        },
+                        listDay: {
+                            buttonText: 'Dia'
+                        }
+                    },
+                    eventSources: [
+                        {
+                            url: this.citasUrl,
+                            headers: {ACCEPT: 'application/json'},
+                            data: () => {
+                                return {
+                                    paciente: this.paciente,
+                                    since: this.fecha
+                                }
+                            }
+                        }
+                    ],
+                    eventClick: (event, jsEvent, view) => {
+                        console.log(event);
+                        // this.close();
+                        this.dispatchEvent(new CustomEvent('cita-selected', {detail: event}));
+                    },
+                    eventRender: (event, element, view) => {
+                        console.log(element);
+                        // element.children('.fc-list-item-title').html('<a></a>');
+                    }
+                });
+            }
+
+            open() {
+                this.$.dialog.open();
+            }
+
+            close() {
+                this.$.dialog.close();
+            }
+
+            _refetchCitas(paciente, fecha) {
+                this._jCalendar.fullCalendar('refecthEvents');
+            }
+
+        }
+
+        window.customElements.define(AgendaCitas.is, AgendaCitas);
+    </script>
+</dom-module>

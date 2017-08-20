@@ -8,8 +8,10 @@ class CitaFilter(filters.FilterSet):
 
     medico = django_filters.ModelChoiceFilter(name='horario__medico', queryset=Empleado.objects.medicos())
     sucursal = django_filters.ModelChoiceFilter(name='horario__sucursal', queryset=Sucursal.objects.all())
+    paciente = django_filters.CharFilter(name='paciente__numero_documento')
+    since = django_filters.DateFilter(name='horario__start', lookup_expr='gte')
 
     class Meta:
         model = models.Cita
-        fields = ['medico', 'sucursal']
+        fields = ['medico', 'sucursal', 'paciente', 'since']
 
