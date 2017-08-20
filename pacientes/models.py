@@ -220,13 +220,10 @@ class Orden(models.Model):
 
     paciente = models.ForeignKey(Paciente, related_name='ordenes', verbose_name=_lazy('paciente'))
     fecha_orden = models.DateField(_lazy('Fecha de la orden'), auto_now_add=True)
-    autorizacion = models.CharField(_lazy('autorización'), max_length=50, blank=True)
-    pendiente_autorizacion = models.BooleanField(_lazy('Pendiente por autorización'), default=False)
     afiliacion = models.CharField(_lazy('afiliación'), max_length=1, choices=AFILIACIONES)
     tipo_usuario = models.CharField(_lazy('tipo de usuario'), max_length=1, choices=TIPOS_USUARIO)
     anulada = models.BooleanField(_lazy('anulada'), default=False)
     razon_anulacion = models.CharField(_lazy('razón de anulación'), max_length=200, blank=True)
-    forma_pago = models.CharField(_lazy('forma de pago'), max_length=2, choices=FORMAS_PAGO)
     plan = models.ForeignKey('servicios.Plan', related_name='ordenes', verbose_name=_lazy('empresa'))
     institucion = models.ForeignKey(
         'organizacional.Institucion', related_name='ordenes', verbose_name=_lazy('entidad que prestará el servicio')
@@ -234,7 +231,6 @@ class Orden(models.Model):
     servicios = models.ManyToManyField(
         'servicios.Servicio', through='ServicioOrden', related_name='ordenes', verbose_name=_lazy('servicios')
     )
-    sucursal = models.ForeignKey('organizacional.Sucursal', related_name='ordenes', verbose_name=_lazy('sucursal'))
 
     class Meta:
         verbose_name = 'orden'
@@ -244,6 +240,42 @@ class Orden(models.Model):
         return '{0} - {1}'.format(str(self.paciente), self.pk)
 
 
+class ServicioRealizar(models.Model):
+    """Modelo que guarda los servicios que maneja una orden."""
+
+    orden = models.ForeignKey(Orden, related_name='servicios_realizar', verbose_name=_lazy('orden'))
+    servicio = models.ForeignKey('servicios.Servicio', related_name='servicios_realizar', verbose_name=_lazy('servicio'))
+    numero_sesiones = models.PositiveIntegerField(_lazy('número de sesiones'), default=1)
+    valor = models.PositiveIntegerField(_lazy('valor'))
+    coopago = models.PositiveIntegerField(_lazy('coopago/moderadora'))
+
+    class Meta:
+        verbose_name = 'servicio a realizar'
+        verbose_name_plural = 'servicios a realizar'
+    
+    def __str__(self):
+        return '{} - {} - {}'.format(self.orden_id, self.pk, self.servicio.nombre)
+
+
+class Sesion(models.Model):
+    """Modelo para guardar las sesiones de un servicio de una orden."""
+
+    fecha = models.DateTimeField(_lazy('fecha'))
+    servicio = models.ForeignKey(ServicioRealizar, related_name='sesiones', verbose_name=_lazy('servicio'))
+    medico = models.ForeignKey('organizacional.Empleado', related_name='sesiones', verbose_name=_lazy('medico'))
+    sucursal = models.ForeignKey('organizacional.Sucursal', related_name='sesiones', verbose_name=_lazy('sucursal'))
+    # autorizacion = models.CharField(_lazy('autorización'), blank=True)
+    # estado = models.CharField(_lazy('estado'), max_length=2, choices=...)
+
+
+    class Meta:
+        verbose_name = 'sesión'
+        verbose_name_plural = 'sesiones'
+    
+    def __str__(self):
+        return '{} {}'.format(self.servicio, self.pk)
+
+# TODO borrar este modelo
 class ServicioOrden(models.Model):
     """Modelo para guardar los servicios que maneja una orden."""
 

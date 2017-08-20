@@ -80,6 +80,7 @@ class Cita(UpdateModelMixin, models.Model):
     servicio = models.ForeignKey('servicios.Servicio', related_name='citas', verbose_name=_lazy('servicio'))
     horario = models.ForeignKey(HorarioAtencion, related_name='citas', verbose_name=_lazy('horario'))
     estado = models.CharField(_lazy('estado'), max_length=2, choices=ESTADOS)
+    sesion = models.OneToOneField('pacientes.Sesion', verbose_name=_lazy('sesión'), null=True, blank=True)
 
     class Meta:
         verbose_name = 'cita'

@@ -47,8 +47,8 @@ class OrdenSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Orden
         fields = [
-            'id', 'fecha_orden', 'sucursal', 'autorizacion', 'pendiente_autorizacion', 'institucion', 'plan', 'empresa',
-            'afiliacion', 'tipo_usuario', 'forma_pago', 'anulada', 'razon_anulacion', 'servicios', 'paciente'
+            'id', 'fecha_orden', 'institucion', 'plan', 'empresa',
+            'afiliacion', 'tipo_usuario', 'anulada', 'razon_anulacion', 'servicios', 'paciente'
         ]
 
     expandable_fields = {
