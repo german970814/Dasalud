@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'^pacientes/', include('pacientes.urls', namespace='pacientes')),
     url(r'^servicios/', include('servicios.urls', namespace='servicios')),
     url(r'^organizacional/', include('organizacional.urls', namespace='organizacional')),
-    url(r'^graphiql', GraphQLView.as_view(graphiql=True)),
+    url(r'^graphql', GraphQLView.as_view(), name='graphql'),
     url(r'^admin/', admin.site.urls),
 ]
 
@@ -40,4 +40,5 @@ if settings.DEBUG:
 
     urlpatterns = [
         url(r'^__debug__/', include(debug_toolbar.urls)),
+        url(r'^graphiql', GraphQLView.as_view(graphiql=True)),
     ] + urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

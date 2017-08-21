@@ -23,11 +23,15 @@ class Cita(DjangoObjectType):
 
     start = graphene.types.datetime.DateTime(source='start')
     end = graphene.types.datetime.DateTime(source='end')
+    title = graphene.String()
     
     class Meta:
         model = models.Cita
         filter_fields = ['estado']
         interfaces = (graphene.Node,)
+    
+    def resolve_title(self, args, context, info):
+        return str(self.paciente)
 
 
 class Query(graphene.AbstractType):
