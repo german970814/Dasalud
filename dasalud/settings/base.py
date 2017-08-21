@@ -44,6 +44,7 @@ SHARED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
+    'graphene_django',
 
     'clientes',
     'globales',
@@ -202,7 +203,14 @@ LOGGING = {
 }
 
 # Restframework configuration
+
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',)
+}
+
+# Graphene configuration
+
+GRAPHENE = {
+    'SCHEMA': 'dasalud.schema.schema'
 }

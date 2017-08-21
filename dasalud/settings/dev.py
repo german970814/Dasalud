@@ -26,3 +26,7 @@ MIDDLEWARE = [
 # Debug toolbar
 
 INTERNAL_IPS = ['127.0.0.1']
+
+# Graphene configuration
+
+GRAPHENE['MIDDLEWARE'] = ['graphene_django.debug.DjangoDebugMiddleware']

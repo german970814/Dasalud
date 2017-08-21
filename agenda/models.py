@@ -90,5 +90,13 @@ class Cita(UpdateModelMixin, models.Model):
         return '{}'.format(self.paciente)
 
     @property
+    def start(self):
+        return self.horario.start
+
+    @property
+    def end(self):
+        return self.horario.end
+
+    @property
     def cumplida(self):
         return self.estado == self.CUMPLIDA
