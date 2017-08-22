@@ -14,6 +14,8 @@ class HorarioAtencion(DjangoObjectType):
 
 class Persona(DjangoObjectType):
 
+    nombre_completo = graphene.String(source='__str__')
+
     class Meta:
         model = models.Persona
         interfaces = (graphene.Node,)

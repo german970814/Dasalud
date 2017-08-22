@@ -1,6 +1,7 @@
 <link rel="import" href="/static/bower_components/polymer/polymer-element.html">
 <link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
 <script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
 <script src="/static/bower_components/moment/min/moment.min.js"></script>
 <script src="/static/bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
@@ -24,7 +25,27 @@
             }
         </style>
 
-        <paper-dialog opened>
+        <graphql-query id="query" variables="[[_queryVariables(documento, fecha)]]" hold>
+            query ($documento: String, $fechaInicial: String){
+                citas(noAsociadaOrden: true, documentoPaciente: $documento, fechaInicial: $fechaInicial) {
+                    edges {
+                        node {
+                            id
+                            start
+                            end
+                            title
+                            paciente { nombreCompleto }
+                            servicio { nombre } 
+                            horario {
+                                medico { nombreCompleto }
+                            }
+                        }
+                    }
+                }
+            }
+        </graphql-query>
+
+        <paper-dialog id="dialog" on-iron-overlay-opened="_renderCalendar">
             <h2>Citas No Asociadas</h2>
             <div id="parent">
                 <div id="calendar"></div>
@@ -43,15 +64,20 @@
 
             static get properties() {
                 return {
-                    citasUrl: String,
-                    paciente: {
+                    citas: {
+                        type: Array,
+                        value() {
+                            return []
+                        }
+                    },
+                    documento: {
                         type: String,
                         value: ''
                     },
                     fecha: {
                         type: Date,
                         value: ''
-                    }                   
+                    }
                 };
             }
 
@@ -87,26 +113,43 @@
                     },
                     eventSources: [
                         {
-                            url: this.citasUrl,
-                            headers: {ACCEPT: 'application/json'},
-                            data: () => {
-                                return {
-                                    paciente: this.paciente,
-                                    since: this.fecha
-                                }
+                            events: (start, end, timezone, callback) => {
+                                let oQuery = this.$.query.execute();
+                                // console.log(oQuery);
+                                oQuery.result().then(result => {
+                                    let citas = this._normalizeCitas(result.data.citas.edges);
+                                    callback(citas);
+                                });
                             }
                         }
                     ],
                     eventClick: (event, jsEvent, view) => {
                         console.log(event);
-                        // this.close();
                         this.dispatchEvent(new CustomEvent('cita-selected', {detail: event}));
-                    },
-                    eventRender: (event, element, view) => {
-                        console.log(element);
-                        // element.children('.fc-list-item-title').html('<a></a>');
+                        this.close();
                     }
                 });
+            }
+
+            _renderCalendar() {
+                this._jCalendar.fullCalendar('render');
+            }
+
+            _queryVariables(documento, fecha) {
+                return {
+                    documento: documento,
+                    fechaInicial: fecha
+                }
+            }
+
+            _normalizeCitas(citas) {
+                let normalizeCitas = []
+                citas.forEach(element => {
+                    element.node.title = `${element.node.servicio.nombre} - ${element.node.horario.medico.nombreCompleto}`;
+                    normalizeCitas.push(element.node);
+                });
+
+                return normalizeCitas;
             }
 
             open() {
@@ -115,10 +158,6 @@
 
             close() {
                 this.$.dialog.close();
-            }
-
-            _refetchCitas(paciente, fecha) {
-                this._jCalendar.fullCalendar('refecthEvents');
             }
 
         }

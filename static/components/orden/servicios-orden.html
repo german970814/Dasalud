@@ -39,7 +39,7 @@
             }
         </style>
 
-        <agenda-citas citas-url="/agenda/citas/"></agenda-citas>
+        <agenda-citas id="citas" documento="[[paciente.numero_documento]]"></agenda-citas>
 
         <ig-iron-ajax url="/organizacional/medicos/?instituciones=[[institucion]]" handle-as="json" last-response="{{_medicos}}"
                             content-type="application/json" auto></ig-iron-ajax>
@@ -77,6 +77,7 @@
             </form>
         </iron-form>
         <paper-button on-tap="_add">Agregar</paper-button>
+        <paper-button on-tap="_showCitas">Citas no asociadas</paper-button>
         <br><br>
         <vaadin-grid id="grid" items="[[servicios]]">
 
@@ -188,8 +189,8 @@
                     empresa: {
                         type: Number,
                         value: 1
-                    }
-                    
+                    },
+                    paciente: Object                    
                 };
             }
 
@@ -231,6 +232,10 @@
                     console.log(item);
                 }
                 console.log(this.servicioActual);
+            }
+
+            _showCitas() {
+                this.$.citas.open();
             }
 
             _delete(e) {

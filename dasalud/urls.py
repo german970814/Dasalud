@@ -16,8 +16,8 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.conf import settings
 from django.contrib import admin
-# from django.views.decorators.csrf import csrf_exempt
-# TODO wrap in csrf_exempt graphiql enpoint
+from django.views.decorators.csrf import csrf_exempt
+# TODO remove csrf_exempt from graphql view, figure out a way to use a middleware to send the csrf token
 
 from django.views.generic import TemplateView
 from graphene_django.views import GraphQLView
@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'^pacientes/', include('pacientes.urls', namespace='pacientes')),
     url(r'^servicios/', include('servicios.urls', namespace='servicios')),
     url(r'^organizacional/', include('organizacional.urls', namespace='organizacional')),
-    url(r'^graphql', GraphQLView.as_view(), name='graphql'),
+    url(r'^graphql', csrf_exempt(GraphQLView.as_view(batch=True)), name='graphql'),
     url(r'^admin/', admin.site.urls),
 ]
 

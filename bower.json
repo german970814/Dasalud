@@ -43,7 +43,8 @@
     "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^2.1.0",
     "fullcalendar": "^3.4.0",
     "paper-time-input": "ryanburns23/paper-time-input#^2.0.3",
-    "paper-checkbox": "PolymerElements/paper-checkbox#^2.0.1"
+    "paper-checkbox": "PolymerElements/paper-checkbox#^2.0.1",
+    "apollo-client": "reach-digital/polymer-apollo-client#^0.8.4"
   },
   "devDependencies": {
     "show-json": "ryanburns23/show-json#^2.0.0"

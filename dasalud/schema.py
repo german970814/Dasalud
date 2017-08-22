@@ -1,10 +1,12 @@
 import graphene
 import agenda.schema
 import servicios.schema
+import organizacional.schema
 from graphene_django.debug import DjangoDebug
 
 
 class Query(
+    organizacional.schema.Query,
     servicios.schema.Query,
     agenda.schema.Query,
     graphene.ObjectType
