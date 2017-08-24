@@ -34,39 +34,8 @@ class Servicio(models.Model):
         return self.nombre
 
 
-class Tarifa(models.Model):
-    """Modelo para guardar las diferentes tarifas que maneja un cliente."""
-
-    nombre = models.CharField(_lazy('nombre'), max_length=100)
-    servicios = models.ManyToManyField(
-        Servicio, through='TarifaServicio', related_name='tarifas', verbose_name=_lazy('servicios')
-    )
-
-    class Meta:
-        verbose_name = 'tarifa'
-        verbose_name_plural = 'tarifas'
-    
-    def __str__(self):
-        return self.nombre
-
-
-class TarifaServicio(models.Model):
-    """Modelo para guardar la información de la tarifa por servicio."""
-
-    tarifa = models.ForeignKey(Tarifa, related_name='tarifas_servicio')
-    servicio = models.ForeignKey(Servicio, related_name='tarifas_servicio')
-    valor = models.PositiveIntegerField(_lazy('valor'))
-
-    class Meta:
-        verbose_name = 'tarifa por servicio'
-        verbose_name_plural = 'tarifas por servicio'
-
-    def __str__(self):
-        return '{}-{}'.format(self.servicio.nombre, self.tarifa.nombre)
-
-
 class Empresa(models.Model):
-    """Modelo para guardar la información de las empresas a las cuales un cliente le presta sus servicios."""
+    """Modelo para guardar la información de los clientes a las cuales un tenant le presta sus servicios."""
 
     nombre = models.CharField(_lazy('nombre'), max_length=200)
     razon_social = models.CharField(_lazy('razón social'), max_length=200)
@@ -94,7 +63,7 @@ class Plan(models.Model):
 
     nombre = models.CharField(_lazy('plan'), max_length=200)
     empresa = models.ForeignKey(Empresa, related_name='planes', verbose_name=_lazy('empresa'))
-    tarifa = models.ForeignKey(Tarifa, related_name='planes', verbose_name=_lazy('tarifa'))
+    servicios = models.ManyToManyField(Servicio, through='tarifa', related_name='planes', verbose_name=_lazy('servicios'))
 
     class Meta:
         verbose_name = 'plan'
@@ -102,3 +71,18 @@ class Plan(models.Model):
     
     def __str__(self):
         return '{} - {}'.format(self.empresa.nombre, self.nombre)
+
+
+class Tarifa(models.Model):
+    """Modelo para guardar las tarifas de los servicio por cada plan de los clientes."""
+
+    plan = models.ForeignKey(Plan, related_name='tarifas', verbose_name=_lazy('plan'))
+    servicio = models.ForeignKey(Servicio, related_name='tarifas', verbose_name=_lazy('servicio'))
+    valor = models.PositiveIntegerField(_lazy('valor'))
+
+    class Meta:
+        verbose_name = 'tarifa'
+        verbose_name_plural = 'tarifas'
+
+    def __str__(self):
+        return '{}-{}: ${}'.format(self.plan.nombre, self.servicio.nombre, self.valor)

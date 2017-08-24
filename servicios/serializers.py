@@ -19,11 +19,11 @@ class PlanSerializer(SelectableSerializerMixin, serializers.ModelSerializer):
         fields = SelectableSerializerMixin.mixin_fields
 
 
-class TarifaServiciosEmpresaSerializer(SelectableSerializerMixin, serializers.ModelSerializer):
-    """Serializer para """
+class TarifaEmpresaSerializer(SelectableSerializerMixin, serializers.ModelSerializer):
+    """Serializer para las tarifas"""
 
     class Meta:
-        model = models.TarifaServicio
+        model = models.Tarifa
         fields = SelectableSerializerMixin.mixin_fields + ['valor']
     
     def get_label(self, obj):

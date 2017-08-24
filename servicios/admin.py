@@ -9,14 +9,14 @@ class EmpresaAdmin(admin.ModelAdmin):
     inlines = [PlanInline]
 
 
-class TarifaServicioInline(admin.TabularInline):
-    model = models.TarifaServicio
+class TarifaInline(admin.TabularInline):
+    model = models.Tarifa
 
-class TarifaAdmin(admin.ModelAdmin):
-    inlines = [TarifaServicioInline]
 
+class PlanAdmin(admin.ModelAdmin):
+    inlines = [TarifaInline]
 
 admin.site.register(models.Empresa, EmpresaAdmin)
 admin.site.register(models.Tipo)
 admin.site.register(models.Servicio)
-admin.site.register(models.Tarifa, TarifaAdmin)
+admin.site.register(models.Plan, PlanAdmin)
