@@ -35,9 +35,9 @@
                             end
                             title
                             paciente { nombreCompleto }
-                            servicio { nombre } 
+                            servicio { id, nombre } 
                             horario {
-                                medico { nombreCompleto }
+                                medico { id, nombreCompleto }
                             }
                         }
                     }
@@ -124,7 +124,6 @@
                         }
                     ],
                     eventClick: (event, jsEvent, view) => {
-                        console.log(event);
                         this.dispatchEvent(new CustomEvent('cita-selected', {detail: event}));
                         this.close();
                     }

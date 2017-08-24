@@ -4,7 +4,7 @@ from organizacional.models import Sucursal, Empleado
 from . import models
 
 class CitaFilter(filters.FilterSet):
-    """Filtro para la citas por medico y sucursal."""
+    """Filtro para la citas."""
 
     medico = django_filters.ModelChoiceFilter(name='horario__medico', queryset=Empleado.objects.medicos())
     sucursal = django_filters.ModelChoiceFilter(name='horario__sucursal', queryset=Sucursal.objects.all())

@@ -39,7 +39,7 @@
             }
         </style>
 
-        <agenda-citas id="citas" documento="[[paciente.numero_documento]]"></agenda-citas>
+        <agenda-citas id="citas" documento="[[paciente.numero_documento]]" on-cita-selected="_citaSelected"></agenda-citas>
 
         <ig-iron-ajax url="/organizacional/medicos/?instituciones=[[institucion]]" handle-as="json" last-response="{{_medicos}}"
                             content-type="application/json" auto></ig-iron-ajax>
@@ -236,6 +236,12 @@
 
             _showCitas() {
                 this.$.citas.open();
+            }
+
+            _citaSelected(e) {
+                console.log(e.detail);
+                const a = this.shadowRoot.querySelector('vaadin-combo-box[name="medico"]');
+                a.value = parseInt(e.detail.horario.medico.id);
             }
 
             _delete(e) {
