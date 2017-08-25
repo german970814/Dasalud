@@ -20,7 +20,7 @@ class Formato(models.Model):
 class Historia(models.Model):
     """Modelo que guarda las historias clinicas de un paciente."""
 
-    servicio_orden = models.OneToOneField('pacientes.ServicioOrden', verbose_name=_lazy('servicio'))
+    sesion = models.OneToOneField('pacientes.Sesion', verbose_name=_lazy('sesion'))
     contenido = fields.JSONField()
     terminada = models.BooleanField(default=False)
 
@@ -29,7 +29,7 @@ class Historia(models.Model):
         verbose_name_plural = 'historias'
     
     def __str__(self):
-        return '{0} - {1}'.format(self.pk, self.servicio_orden)
+        return '{0} - {1}'.format(self.pk, self.sesion)
 
 
 def archivo_adjunto_path(instance, filename):

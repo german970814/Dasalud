@@ -229,7 +229,7 @@ class Orden(models.Model):
         'organizacional.Institucion', related_name='ordenes', verbose_name=_lazy('entidad que prestará el servicio')
     )
     servicios = models.ManyToManyField(
-        'servicios.Servicio', through='ServicioOrden', related_name='ordenes', verbose_name=_lazy('servicios')
+        'servicios.Servicio', through='ServicioRealizar', related_name='ordenes', verbose_name=_lazy('servicios')
     )
 
     class Meta:
