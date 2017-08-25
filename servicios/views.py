@@ -1,15 +1,15 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework import generics
-from .serializers import EmpresaSerializer, PlanSerializer, TarifaEmpresaSerializer
+from .serializers import ClienteSerializer, PlanSerializer, TarifaClienteSerializer
 from .filters import PlanFilter
-from .models import Empresa, Plan, Tarifa
+from .models import Cliente, Plan, Tarifa
 
 
 class ListarEmpresasView(generics.ListAPIView):
     """Permite listar empresas."""
 
-    serializer_class = EmpresaSerializer
-    queryset = Empresa.objects.all()
+    serializer_class = ClienteSerializer
+    queryset = Cliente.objects.all()
 
 class ListarPlanesView(generics.ListAPIView):
     """Permite listar planes."""
@@ -21,7 +21,7 @@ class ListarPlanesView(generics.ListAPIView):
 class ServiciosEmpresaView(generics.ListAPIView):
     """Permite listar los servicios de una empresa."""
 
-    serializer_class = TarifaEmpresaSerializer
+    serializer_class = TarifaClienteSerializer
 
     def get_queryset(self):
         return Tarifa.objects.select_related('servicio').filter(plan=self.plan)

@@ -42,12 +42,12 @@ class AcompananteSerializer(serializers.ModelSerializer):
 class OrdenSerializer(FlexFieldsModelSerializer):
     """Serializer para el modelo Orden."""
 
-    empresa = serializers.SerializerMethodField()
+    cliente = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Orden
         fields = [
-            'id', 'fecha_orden', 'institucion', 'plan', 'empresa',
+            'id', 'fecha_orden', 'institucion', 'plan', 'cliente',
             'afiliacion', 'tipo_usuario', 'anulada', 'razon_anulacion', 'servicios', 'paciente'
         ]
 
@@ -79,13 +79,13 @@ class OrdenSerializer(FlexFieldsModelSerializer):
                 models.ServicioOrden.objects.create(orden=orden, **servicio_data)
             return orden
 
-    def get_empresa(self, obj):
+    def get_cliente(self, obj):
         """
         :returns:
-            Nombre de la empresa cliente con la cual se encuentra asociada la orden.
+            Nombre de la cliente cliente con la cual se encuentra asociada la orden.
         """
 
-        return str(obj.plan.empresa)
+        return str(obj.plan.cliente)
 
 
 class ServicioOrdenSerializer(FlexFieldsModelSerializer):

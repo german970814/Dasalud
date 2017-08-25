@@ -3,11 +3,11 @@ from common.serializers import SelectableSerializerMixin
 from . import models
 
 
-class EmpresaSerializer(SelectableSerializerMixin, serializers.ModelSerializer):
-    """Serializer para el modelo empresa."""
+class ClienteSerializer(SelectableSerializerMixin, serializers.ModelSerializer):
+    """Serializer para el modelo cliente."""
 
     class Meta:
-        model = models.Empresa
+        model = models.Cliente
         fields = SelectableSerializerMixin.mixin_fields
 
 
@@ -19,7 +19,7 @@ class PlanSerializer(SelectableSerializerMixin, serializers.ModelSerializer):
         fields = SelectableSerializerMixin.mixin_fields
 
 
-class TarifaEmpresaSerializer(SelectableSerializerMixin, serializers.ModelSerializer):
+class TarifaClienteSerializer(SelectableSerializerMixin, serializers.ModelSerializer):
     """Serializer para las tarifas"""
 
     class Meta:

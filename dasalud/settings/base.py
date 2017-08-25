@@ -46,7 +46,7 @@ SHARED_APPS = [
     'django_filters',
     'graphene_django',
 
-    'clientes',
+    'tenants',
     'globales',
     'common'
 ]
@@ -69,7 +69,7 @@ TENANT_APPS = [
 
 INSTALLED_APPS = SHARED_APPS + list(set(TENANT_APPS) - set(SHARED_APPS))
 
-TENANT_MODEL = 'clientes.Cliente'
+TENANT_MODEL = 'tenants.Tenant'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

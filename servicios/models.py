@@ -34,7 +34,7 @@ class Servicio(models.Model):
         return self.nombre
 
 
-class Empresa(models.Model):
+class Cliente(models.Model):
     """Modelo para guardar la información de los clientes a las cuales un tenant le presta sus servicios."""
 
     nombre = models.CharField(_lazy('nombre'), max_length=200)
@@ -44,25 +44,25 @@ class Empresa(models.Model):
     telefono = models.PositiveIntegerField(_lazy('telefono'), blank=True, null=True)
     codigo = models.CharField(_lazy('código'), max_length=100, blank=True)
     ciudad = models.ForeignKey(
-        'globales.Poblado', related_name='empresas', verbose_name=_lazy('ciudad'), blank=True, null=True
+        'globales.Poblado', related_name='clientes', verbose_name=_lazy('ciudad'), blank=True, null=True
     )
     instituciones = models.ManyToManyField(
-        'organizacional.Institucion', related_name='empresas', verbose_name=_lazy('instituciones')
+        'organizacional.Institucion', related_name='clientes', verbose_name=_lazy('instituciones')
     )
 
     class Meta:
-        verbose_name = 'empresa'
-        verbose_name_plural = 'empresas'
+        verbose_name = 'cliente'
+        verbose_name_plural = 'clientes'
     
     def __str__(self):
         return self.nombre
 
 
 class Plan(models.Model):
-    """Modelo para guardar información de los planes que manejan las empresas."""
+    """Modelo para guardar información de los planes que manejan los clientes."""
 
     nombre = models.CharField(_lazy('plan'), max_length=200)
-    empresa = models.ForeignKey(Empresa, related_name='planes', verbose_name=_lazy('empresa'))
+    cliente = models.ForeignKey(Cliente, related_name='planes', verbose_name=_lazy('cliente'))
     servicios = models.ManyToManyField(Servicio, through='tarifa', related_name='planes', verbose_name=_lazy('servicios'))
 
     class Meta:
@@ -70,7 +70,7 @@ class Plan(models.Model):
         verbose_name_plural = 'planes'
     
     def __str__(self):
-        return '{} - {}'.format(self.empresa.nombre, self.nombre)
+        return '{} - {}'.format(self.cliente.nombre, self.nombre)
 
 
 class Tarifa(models.Model):

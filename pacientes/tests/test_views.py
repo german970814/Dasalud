@@ -58,7 +58,7 @@ class OrdenesPacienteViewTest(BaseTestCase):
     def get_data(self):
         from organizacional.tests.factories import InstitucionFactory, SucursalFactory, EmpleadoFactory
         from servicios.tests.factories import PlanFactory, TarifaFactory
-        from servicios.models import TarifaServicio, Servicio
+        from servicios.models import Servicio
         from pacientes.models import ServicioOrden
 
         s = SucursalFactory()

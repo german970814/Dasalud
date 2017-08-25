@@ -24,30 +24,10 @@ class ServicioFactory(factory.django.DjangoModelFactory):
     formato = factory.SubFactory('historias.tests.factories.FormatoFactory')
 
 
-class TarifaFactory(factory.django.DjangoModelFactory):
+class ClienteFactory(factory.django.DjangoModelFactory):
 
     class Meta:
-        model = models.Tarifa
-        django_get_or_create = ('nombre', )
-    
-    nombre = 'PARTICULAR'
-    servicios = factory.RelatedFactory('servicios.tests.factories.TarifaServicioFactory', 'tarifa')
-
-
-class TarifaServicioFactory(factory.django.DjangoModelFactory):
-
-    class Meta:
-        model = models.TarifaServicio
-    
-    tarifa = factory.SubFactory(TarifaFactory)
-    servicio = factory.SubFactory(ServicioFactory)
-    valor = 10000
-
-
-class EmpresaFactory(factory.django.DjangoModelFactory):
-
-    class Meta:
-        model = models.Empresa
+        model = models.Cliente
         django_get_or_create = ('nombre', )
     
     nombre = 'PARTICULAR'
@@ -62,5 +42,14 @@ class PlanFactory(factory.django.DjangoModelFactory):
         django_get_or_create = ('nombre', )
     
     nombre = 'PARTICULAR'
-    empresa = factory.SubFactory(EmpresaFactory)
-    tarifa = factory.SubFactory(TarifaFactory)
+    cliente = factory.SubFactory(ClienteFactory)
+
+
+class TarifaFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = models.Tarifa
+    
+    plan = factory.SubFactory(PlanFactory)
+    servicio = factory.SubFactory(ServicioFactory)
+    valor = 10000

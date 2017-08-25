@@ -5,7 +5,7 @@ class PlanInline(admin.TabularInline):
     model = models.Plan
 
 
-class EmpresaAdmin(admin.ModelAdmin):
+class ClienteAdmin(admin.ModelAdmin):
     inlines = [PlanInline]
 
 
@@ -16,7 +16,7 @@ class TarifaInline(admin.TabularInline):
 class PlanAdmin(admin.ModelAdmin):
     inlines = [TarifaInline]
 
-admin.site.register(models.Empresa, EmpresaAdmin)
+admin.site.register(models.Cliente, ClienteAdmin)
 admin.site.register(models.Tipo)
 admin.site.register(models.Servicio)
 admin.site.register(models.Plan, PlanAdmin)

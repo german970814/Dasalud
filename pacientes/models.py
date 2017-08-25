@@ -224,7 +224,7 @@ class Orden(models.Model):
     tipo_usuario = models.CharField(_lazy('tipo de usuario'), max_length=1, choices=TIPOS_USUARIO)
     anulada = models.BooleanField(_lazy('anulada'), default=False)
     razon_anulacion = models.CharField(_lazy('razón de anulación'), max_length=200, blank=True)
-    plan = models.ForeignKey('servicios.Plan', related_name='ordenes', verbose_name=_lazy('empresa'))
+    plan = models.ForeignKey('servicios.Plan', related_name='ordenes', verbose_name=_lazy('cliente'))
     institucion = models.ForeignKey(
         'organizacional.Institucion', related_name='ordenes', verbose_name=_lazy('entidad que prestará el servicio')
     )
