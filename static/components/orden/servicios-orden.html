@@ -7,11 +7,13 @@
 <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
 <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
 <link rel="import" href="/static/bower_components/paper-time-input/paper-time-input.html">
+<link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
 <link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="/static/components/vaadin-grid-material-styles.html">
 <link rel="import" href="/static/components/ig-iron-ajax.html">
 <link rel="import" href="detalle-servicio.html">
 <link rel="import" href="agenda-citas.html">
+<link rel="import" href="servicio-form.html">
 
 
 <dom-module id="servicios-orden">
@@ -41,41 +43,8 @@
 
         <agenda-citas id="citas" documento="[[paciente.numero_documento]]" on-cita-selected="_citaSelected"></agenda-citas>
 
-        <ig-iron-ajax url="/organizacional/medicos/?instituciones=[[institucion]]" handle-as="json" last-response="{{_medicos}}"
-                            content-type="application/json" auto></ig-iron-ajax>
-        <ig-iron-ajax url="/servicios/empresas/[[empresa]]/servicios/" handle-as="json" last-response="{{_servicios}}"
-                            content-type="application/json" auto></ig-iron-ajax>
-        <ig-iron-ajax url="/organizacional/sucursales/" handle-as="json" last-response="{{_sucursales}}"
-                            content-type="application/json" auto></ig-iron-ajax>
+        <servicio-form id="form"></servicio-form>
 
-        <iron-form id="form">
-            <form>
-                 <div class="row">
-                    <vaadin-combo-box name="sucursal" label="Sucursal" items="[[_sucursales]]" required auto-validate 
-                        selected-item="{{sesionActual.sucursal}}"></vaadin-combo-box>
-                    <vaadin-combo-box name="medico" label="Medico*" required items="[[_medicos]]" auto-validate
-                        selected-item="{{servicioActual.medico}}"></vaadin-combo-box>
-                    <vaadin-combo-box name="servicio" label="Servicio*" required items="[[_servicios]]" auto-validate
-                        selected-item="{{servicioActual.servicio}}"></vaadin-combo-box>
-                 </div> 
-                 <div class="row"> 
-                    <paper-input name="numero_sesiones" label="# de sesiones*" type="number" required auto-validate 
-                        min="1" value="{{servicioActual.numero_sesiones}}"></paper-input>
-                    <paper-input name="valor" label="Valor de la sesión*" type="number" required auto-validate 
-                        min="0" value="{{servicioActual.valor}}"></paper-input>
-                    <paper-input name="coopago" label="Coopago/Moderadora" type="number" auto-validate min="0"
-                         value="{{servicioActual.coopago}}"></paper-input>
-                 </div>
-                 <div class="row">
-                    <vaadin-date-picker name="fecha" label="Fecha" required auto-validate 
-                        value="{{sesionActual.fecha}}"></vaadin-date-picker>
-                    <paper-time-input name="hora" label="Hora" value="{{sesionActual.hora}}"></paper-time-input>
-                    <paper-input name="autorización" label="Autorización" value="{{sesionActual.autorizacion}}"></paper-input>
-                    <vaadin-date-picker name="fecha_autorizacion" label="Fecha autorización" 
-                        value="{{sesionActual.fecha_autorizacion}}"></vaadin-date-picker>
-                 </div>
-            </form>
-        </iron-form>
         <paper-button on-tap="_add">Agregar</paper-button>
         <paper-button on-tap="_showCitas">Citas no asociadas</paper-button>
         <br><br>
@@ -157,6 +126,16 @@
 
             static get properties() {
                 return {
+                    paciente: Object,
+                    cita: Object,
+                    institucion: {
+                        type: String,
+                        value: "SW5zdGl0dWNpb246MQ=="
+                    },
+                    plan: {
+                        type: String,
+                        value: "UGxhbjoy"
+                    },
                     servicioActual: {
                         type: Object,
                         value() {
@@ -181,16 +160,7 @@
                         value() {
                             return {};
                         }
-                    },
-                    institucion: {
-                        type: Number,
-                        value: 1
-                    },
-                    empresa: {
-                        type: Number,
-                        value: 1
-                    },
-                    paciente: Object                    
+                    }                  
                 };
             }
 
@@ -207,6 +177,22 @@
                 Polymer.RenderStatus.afterNextRender(this, function() {
                     
                 });
+            }
+
+            _showCitas() {
+                this.$.citas.open();
+            }
+
+            _citaSelected(e) {
+                console.log(e.detail);
+                this.$.form.cita = e.detail;
+            }
+
+            _queryVariables(institucion, plan) {
+                return {
+                    institucion: institucion,
+                    plan: plan
+                }
             }
 
             _showDetail(e) {
@@ -232,16 +218,6 @@
                     console.log(item);
                 }
                 console.log(this.servicioActual);
-            }
-
-            _showCitas() {
-                this.$.citas.open();
-            }
-
-            _citaSelected(e) {
-                console.log(e.detail);
-                const a = this.shadowRoot.querySelector('vaadin-combo-box[name="medico"]');
-                a.value = parseInt(e.detail.horario.medico.id);
             }
 
             _delete(e) {

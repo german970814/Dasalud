@@ -1,14 +1,39 @@
 import graphene
 from graphene_django import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
+from common.schema import BaseNode
 from . import models
 
 
-class ServicioType(DjangoObjectType):
+class Servicio(DjangoObjectType):
 
     class Meta:
         model = models.Servicio
-        interfaces = (graphene.Node,)
+        interfaces = (BaseNode,)
+        filter_fields = ['planes']
+
+
+class Cliente(DjangoObjectType):
+
+    class Meta:
+        model = models.Cliente
+        interfaces = (BaseNode,)
+
+
+class Plan(DjangoObjectType):
+
+    class Meta:
+        model = models.Plan
+        interfaces = (BaseNode,)
+
+
+class Tarifa(DjangoObjectType):
+
+    class Meta:
+        model = models.Tarifa
+        interfaces = (BaseNode,)
+        filter_fields = ['servicio', 'plan']
 
 
 class Query(graphene.AbstractType):
-    pass
+    servicios = DjangoFilterConnectionField(Servicio, description='Todos los servicios')

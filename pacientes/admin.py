@@ -7,13 +7,13 @@ class AcompananteInline(admin.StackedInline):
     model = models.Acompanante
 
 
-class ServiciosOrdenInline(admin.TabularInline):
-    model = models.ServicioOrden
+class ServicioRealizarInline(admin.TabularInline):
+    model = models.ServicioRealizar
 
 
 @admin.register(models.Orden)
 class OrdenAdmin(VersionAdmin):
-    inlines = [AcompananteInline, ServiciosOrdenInline]
+    inlines = [AcompananteInline, ServicioRealizarInline]
 
 
 @admin.register(models.Paciente)
