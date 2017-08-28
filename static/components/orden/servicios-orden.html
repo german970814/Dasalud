@@ -43,7 +43,7 @@
 
         <agenda-citas id="citas" documento="[[paciente.numero_documento]]" on-cita-selected="_citaSelected"></agenda-citas>
 
-        <servicio-form id="form"></servicio-form>
+        <servicio-form id="form" cita="[[cita]]"></servicio-form>
 
         <paper-button on-tap="_add">Agregar</paper-button>
         <paper-button on-tap="_showCitas">Citas no asociadas</paper-button>
@@ -164,14 +164,6 @@
                 };
             }
 
-            static get observers() {
-                return ['_setValorServicio(servicioActual.servicio)'];
-            }
-
-            constructor() {
-                super();
-            }
-
             ready() {
                 super.ready();
                 Polymer.RenderStatus.afterNextRender(this, function() {
@@ -188,22 +180,11 @@
                 this.$.form.cita = e.detail;
             }
 
-            _queryVariables(institucion, plan) {
-                return {
-                    institucion: institucion,
-                    plan: plan
-                }
-            }
-
             _showDetail(e) {
                 e.model.expanded = !e.model.expanded;
             }
 
-            _setValorServicio(servicio) {
-                if (servicio) {
-                    this.set('servicioActual.valor', servicio.valor);
-                }
-            }
+            
 
             _add() {
                 console.log(this.servicioActual);

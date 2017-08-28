@@ -69,12 +69,13 @@ class CitaSerializer(FlexFieldsModelSerializer):
         return instance
     
     def get_redirecciona_link(self, obj):
-        # if not obj.cumplida:
-        #     return None
+        if not obj.cumplida:
+            return None
         
         request = self.context.get('request', None)
         try:
-            Paciente.objects.get(numero_documento=obj.paciente.numero_documento)
-        except:
+            paciente = Paciente.objects.get(numero_documento=obj.paciente.numero_documento)
+            return reverse('pacientes:ordenes-nueva', args=(paciente.id,), request=request)
+        except Exception as e:
             return reverse('pacientes:crear', request=request)
 

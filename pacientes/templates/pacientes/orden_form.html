@@ -46,7 +46,11 @@
     <paciente-info paciente='{{ paciente }}' full-width></paciente-info>
     <br>
      <div class="card">
-        <servicios-orden paciente="{{ paciente }}"></servicios-orden>
+         {% if cita %}
+            <servicios-orden paciente="{{ paciente }}" cita="{{ cita }}"></servicios-orden>
+        {% else %}    
+            <servicios-orden paciente="{{ paciente }}"></servicios-orden>
+        {% endif %}
     </div> 
     <!--<ul class="mdl-stepper mdl-stepper--horizontal mdl-stepper--linear" id="demo-stepper-state-error">-->
     <ul class="mdl-stepper mdl-stepper--horizontal" id="demo-stepper-state-error">
@@ -76,29 +80,11 @@
                 </span>
             </span>
             <div class="mdl-step__content">
-                <template id="servicio-template">
-                    <div class="servicio">
-                        <iron-form>
-                            <form>
-                                <div class="container">
-                                    {% render_form servicios_s template_pack='material-pack' %}
-                                </div>
-                            </form>
-                        </iron-form>
-                        <paper-icon-button onclick="_removeServicio(this)" icon="my-icons:clear"></paper-icon-button>
-                    </div>
-                </template>
-                <!-- <paper-fab mini onclick="_addServicio()" icon="my-icons:add" elevation="1"></paper-fab> -->
-                <br>
-                <iron-form>
-                    <form>
-                        <div id="servicios">
-                            {% csrf_token %}
-                        </div>
-                    </form>
-                </iron-form>
-                <br>
-                <servicios-orden></servicios-orden>
+                 {% if cita %}
+                    <servicios-orden paciente="{{ paciente }}" cita="{{ cita }}"></servicios-orden>
+                {% else %}
+                    <servicios-orden paciente="{{ paciente }}"></servicios-orden>
+                {% endif %}
                 <p>{% trans "TOTAL" %}: <span id="total_servicios"></span></p>
             </div>
             <div class="mdl-step__actions">

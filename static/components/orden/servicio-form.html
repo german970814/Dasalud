@@ -19,10 +19,6 @@
                 align-items: flex-end;
             }
 
-            .row > paper-time-input {
-                flex: 0;
-            }
-
             .row > * {
                 flex: 1;
                 margin-right: 10px;
@@ -77,15 +73,14 @@
                         item-label-path="node.nombreCompleto" item-value-path="node.id">
                     </vaadin-combo-box>
                     <vaadin-combo-box name="servicio" label="Servicio*" required items="[[queryResult.servicios.edges]]" 
-                        auto-validate value="{{value.servicio}}"
+                        auto-validate value="{{value.servicio}}" selected-item="{{value.servicioItem}}"
                         item-label-path="node.nombre" item-value-path="node.id">
                     </vaadin-combo-box>
                 </div>
                 <div class="row">
-                    <vaadin-date-picker name="fecha" label="Fecha" required auto-validate value="{{value.fecha}}">
+                    <vaadin-date-picker name="fecha" label="Fecha*" required auto-validate value="{{value.fecha}}">
                     </vaadin-date-picker>
-                    <paper-time-input name="hora" label="Hora" hour="{{value.hora}}" min="{{value.min}}"
-                        am-pm="{{value.ampm}}" value="{{value.hora}}">
+                    <paper-input type="time" name="hora" label="Hora*" required value="{{value.hora}}"></paper-input>
 
                     </paper-time-input>
                     <paper-input name="autorización" label="Autorización" value="{{value.autorizacion}}"></paper-input>
@@ -142,13 +137,8 @@
                 };
             }
 
-            /**
-             * Instance of the element is created/upgraded. Use: initializing state,
-             * set up event listeners, create shadow dom.
-             * @constructor
-             */
-            constructor() {
-                super();
+            static get observers() {
+                return ['_setValorServicio(value.servicioItem)'];
             }
 
             /**
@@ -175,12 +165,22 @@
                     v.sucursal = newValue.horario.sucursal.id;
                     v.medico = newValue.horario.medico.id;
                     v.servicio = newValue.servicio.id;
-                    v.fecha = newValue.start.format('YYYY-MM-DD');
-                    // v.hora = newValue.start.hour();
-                    // v.min = newValue.start.minutes();
-                    // v.ampm = newValue.start.format('A');
+                    if (!moment.isMoment(newValue.start)) {
+                        v.fecha = moment(newValue.start).format('YYYY-MM-DD');
+                        v.hora = moment(newValue.start).format('HH:mm');
+                    }
+                    else {
+                        v.fecha = newValue.start.format('YYYY-MM-DD');
+                        v.hora = newValue.start.format('HH:mm');
+                    }
 
                     this.value = v;
+                }
+            }
+
+            _setValorServicio(servicio) {
+                if (servicio) {
+                    this.set('value.valor', servicio.node.tarifas.edges[0].node.valor);
                 }
             }
 

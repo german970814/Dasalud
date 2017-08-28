@@ -82,6 +82,7 @@ class CitasView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         super().perform_create(serializer)
         if serializer.data['redirecciona']:
+            self.request.session['paciente-cita'] = serializer.data['paciente']
             self.request.session['cita'] = serializer.data['id']
 
     def get_serializer(self, *args, **kwargs):
@@ -117,7 +118,8 @@ class CitaDetailView(generics.RetrieveUpdateAPIView):
     def perform_update(self, serializer):
         super().perform_update(serializer)
         if serializer.data['redirecciona']:
-            self.request.session['cita'] = serializer.data
+            self.request.session['paciente-cita'] = serializer.data['paciente']
+            self.request.session['cita'] = serializer.data['id']
 
 
 class BuscarPersonaView(APIView):

@@ -76,7 +76,7 @@ class CrearPacienteView(APIView):
         paciente = None
         cita = request.session.get('cita', None)
         if cita:
-            paciente = Paciente(**cita['paciente'])
+            paciente = Paciente(**request.session.pop('paciente-cita'))
         form = PacienteSerializer(paciente, context={'request': None})
         return Response({'form': form, 'VERBO': self.VERBO, 'URL': self.URL, 'MSJ': self.MSJ, 'METHOD': self.METHOD})
 
@@ -105,15 +105,37 @@ class CrearOrdenView(APIView):
     VERBO = _lazy('Crear')
 
     def get(self, request, pk):
+        from dasalud.schema import schema
+        from common.schema import BaseNode
         paciente = get_object_or_404(Paciente, pk=pk)
-        serializer = PacienteSerializer(paciente, context={'request': None})
+        serializer = PacienteSerializer(paciente, context={'request': request})
         paciente_json = JSONRenderer().render(serializer.data)
+
         orden_s = serializers.OrdenSerializer(fields=['sucursal', 'autorizacion', 'pendiente_autorizacion', 'institucion', 'plan', 'afiliacion', 'tipo_usuario', 'forma_pago'])
-        servicios_s = serializers.ServicioOrdenSerializer(fields=['medico', 'servicio', 'tipo_pago', 'valor', 'descuento'])
         acompanante_s = AcompananteSerializer(paciente.ultimo_acompanante)
+        
+        cita = None
+        request.session.pop('paciente-cita', None)
+        cita_id = request.session.pop('cita', None)
+        if cita_id:
+            query = """query a($id: ID!) { cita(id: $id) {
+                id
+                start
+                end
+                title
+                paciente { nombreCompleto }
+                servicio { id, nombre } 
+                horario {
+                    medico { id, nombreCompleto }
+                sucursal { id }
+                }
+            }}"""
+            # TODO una vez se usa graphql para guardar la cita quitar to_global_id. id ej: "Q2l0YTox"
+            result = schema.execute(query, variable_values={'id': BaseNode.to_global_id('Cita', cita_id)})
+            cita = JSONRenderer().render(result.data['cita'])            
 
         return Response({
-            'paciente': paciente_json, 'orden_s': orden_s, 'servicios_s': servicios_s,
+            'paciente': paciente_json, 'orden_s': orden_s, 'cita': cita,
             'acompanante_s': acompanante_s, 'VERBO': self.VERBO, 'paciente_id': pk
         })
 
