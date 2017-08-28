@@ -85,7 +85,7 @@
                     <div class="cell">Sucursal</div>
                 </template>
                 <template>
-                    <div class="cell">[[item.sucursal.label]]</div>
+                    <div class="cell">[[item.sucursal.node.nombre]]</div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column flex-grow="0">
@@ -114,8 +114,7 @@
                     editing: {
                         type: Boolean,
                         value: false
-                    }
-                    
+                    }                    
                 };
             }
 

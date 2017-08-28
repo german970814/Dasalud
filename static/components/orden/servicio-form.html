@@ -65,11 +65,11 @@
             <form>
                 <div class="row">
                     <vaadin-combo-box name="sucursal" label="Sucursal" items="[[queryResult.sucursales.edges]]" required 
-                        auto-validate value="{{value.sucursal}}"
+                        auto-validate value="{{value.sucursal}}" selected-item="{{value.sucursalItem}}"
                         item-label-path="node.nombre" item-value-path="node.id">
                     </vaadin-combo-box>
                     <vaadin-combo-box name="medico" label="Medico*" required items="[[queryResult.medicos.edges]]" 
-                        auto-validate value="{{value.medico}}"
+                        auto-validate value="{{value.medico}}" selected-item="{{value.medicoItem}}"
                         item-label-path="node.nombreCompleto" item-value-path="node.id">
                     </vaadin-combo-box>
                     <vaadin-combo-box name="servicio" label="Servicio*" required items="[[queryResult.servicios.edges]]" 
@@ -98,13 +98,14 @@
                     <paper-input name="coopago" label="Coopago/Moderadora" type="number" auto-validate min="0" 
                         value="{{value.coopago}}">
                     </paper-input>
-                </div>
-                
+                </div>                
             </form>
         </iron-form>
 
-        <show-json json="[[value]]"></show-json>
-        <show-json json="[[cita]]"></show-json>
+        <div class="row">
+            <show-json json="[[value]]"></show-json>
+            <show-json json="[[cita]]"></show-json>
+        </div>
     </template>
 
     <script>
@@ -174,7 +175,7 @@
                         v.hora = newValue.start.format('HH:mm');
                     }
 
-                    this.value = v;
+                    this.set('value', v);
                 }
             }
 
@@ -184,6 +185,9 @@
                 }
             }
 
+            validate() {
+                return this.$.form.validate();
+            }
         }
 
         window.customElements.define(ServicioForm.is, ServicioForm);

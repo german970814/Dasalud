@@ -70,7 +70,7 @@
                     <div class="cell">Medico</div>
                 </template>
                 <template>
-                    <div class="cell">[[item.medico.label]]</div>
+                    <div class="cell">[[item.medicoItem.node.nombreCompleto]]</div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column>
@@ -78,7 +78,7 @@
                     <div class="cell">Servicio</div>
                 </template>
                 <template>
-                    <div class="cell">[[item.servicio.label]]</div>
+                    <div class="cell">[[item.servicioItem.node.nombre]]</div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column>
@@ -136,31 +136,12 @@
                         type: String,
                         value: "UGxhbjoy"
                     },
-                    servicioActual: {
-                        type: Object,
-                        value() {
-                            return {
-                                medico: null,
-                                servicio: null,
-                                numero_sesiones: 1,
-                                valor: 0,
-                                coopago: 0,
-                                sesiones: []
-                            };
-                        }
-                    },
                     servicios: {
                         type: Array,
                         value() {
                             return [];
                         }
-                    },
-                    sesionActual: {
-                        type: Object,
-                        value() {
-                            return {};
-                        }
-                    }                  
+                    }                 
                 };
             }
 
@@ -182,23 +163,17 @@
 
             _showDetail(e) {
                 e.model.expanded = !e.model.expanded;
-            }
-
-            
+            }            
 
             _add() {
-                console.log(this.servicioActual);
                 if (this.$.form.validate()){ 
-                    let item = this.$.form.serializeForm();
-                    let actual = JSON.parse(JSON.stringify(this.servicioActual));
-                    actual.sesiones = this._createSessions(actual.numero_sesiones);
+                    let data = this.$.form.value;
+                    let actual = JSON.parse(JSON.stringify(data));
+                    actual.sesiones = this._createSessions(actual.numero_sesiones, data);
                     this.servicios.unshift(actual);
                     this.$.grid.clearCache();
-                    this.$.form.reset();
                     console.log(actual);
-                    console.log(item);
                 }
-                console.log(this.servicioActual);
             }
 
             _delete(e) {
@@ -207,13 +182,33 @@
                 this.$.grid.clearCache();
             }
 
-            _createSessions(number) {
+            _createSessions(number, info) {
                 let sessions = [];
+                let lastDate = info.fecha;
                 for (var i = 0; i < number; i++) {
-                    sessions.unshift(JSON.parse(JSON.stringify(this.sesionActual)));                    
+                    let sesion = {};
+                    sesion.hora = info.hora;               
+                    sesion.estado = info.estado;               
+                    sesion.autorizacion = info.autorizacion;               
+                    sesion.fecha_autorizacion = info.fecha_autorizacion;               
+                    sesion.sucursal = info.sucursalItem;
+                    if(i > 0) {
+                        lastDate = this._getNextDate(lastDate);
+                    }
+                    sesion.fecha = lastDate;
+                    sessions.push(sesion);
                 }
 
                 return sessions;
+            }
+
+            _getNextDate(date) {
+                let next = moment(date).add(1, 'days');
+                if (next.day() == 6) {
+                    next = next.add(2, 'days');
+                }
+
+                return next.format('YYYY-MM-DD');
             }
 
             _openCalendar(e) {

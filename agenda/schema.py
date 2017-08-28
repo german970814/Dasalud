@@ -38,4 +38,5 @@ class Cita(DjangoObjectType):
 
 
 class Query(graphene.AbstractType):
+    cita = BaseNode.Field(Cita)
     citas = DjangoFilterConnectionField(Cita, filterset_class=CitaFilter, description='Todas las citas')
