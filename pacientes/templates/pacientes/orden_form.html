@@ -44,14 +44,14 @@
 
 {% block content %}
     <paciente-info paciente='{{ paciente }}' full-width></paciente-info>
-    <br>
-     <div class="card">
+    <!-- <br> -->
+     <!-- <div class="card">
          {% if cita %}
             <servicios-orden paciente="{{ paciente }}" cita="{{ cita }}"></servicios-orden>
         {% else %}    
             <servicios-orden paciente="{{ paciente }}"></servicios-orden>
         {% endif %}
-    </div> 
+    </div>  -->
     <!--<ul class="mdl-stepper mdl-stepper--horizontal mdl-stepper--linear" id="demo-stepper-state-error">-->
     <ul class="mdl-stepper mdl-stepper--horizontal" id="demo-stepper-state-error">
         <li class="mdl-step mdl-step--editable" data-step="orden">
@@ -85,7 +85,6 @@
                 {% else %}
                     <servicios-orden paciente="{{ paciente }}"></servicios-orden>
                 {% endif %}
-                <p>{% trans "TOTAL" %}: <span id="total_servicios"></span></p>
             </div>
             <div class="mdl-step__actions">
                 <paper-button data-stepper-next>{% trans "Continuar" %}</paper-button>
@@ -194,16 +193,16 @@
                 console.log("terminado");
             });
 
-            let institucionNode = document.querySelector('*[name="institucion"]');
-            institucionNode.addEventListener('selected-item-changed', function(){
-                _getEmpresas(institucionNode.value);
-                _getMedicos(institucionNode.value);
-            });
+            // let institucionNode = document.querySelector('*[name="institucion"]');
+            // institucionNode.addEventListener('selected-item-changed', function(){
+            //     _getEmpresas(institucionNode.value);
+            //     _getMedicos(institucionNode.value);
+            // });
 
-            let empresaNode = document.querySelector('*[name="plan"]');
-            empresaNode.addEventListener('selected-item-changed', function(){
-                _getServicios(empresaNode.value);
-            });
+            // let empresaNode = document.querySelector('*[name="plan"]');
+            // empresaNode.addEventListener('selected-item-changed', function(){
+            //     _getServicios(empresaNode.value);
+            // });
 
             let asistioNode = document.querySelector('*[name="asistio"]');
             asistioNode.addEventListener('checked-changed', function(e){

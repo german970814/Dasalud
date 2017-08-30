@@ -54,9 +54,9 @@ class OrdenSerializer(FlexFieldsModelSerializer):
     expandable_fields = {
         'paciente': (PacienteSerializer, {'source': 'paciente'}),
         'acompanante': (AcompananteSerializer, {'source': 'acompanante'}),
-        'servicios': ('pacientes.ServicioOrdenSerializer', {
-            'source': 'servicios_orden', 'many': True, 'fields': [
-                'medico', 'servicio', 'tipo_pago', 'valor', 'descuento', 'historias_link'
+        'servicios': ('pacientes.ServicioRealizarSerializer', {
+            'source': 'servicios_realizar', 'many': True, 'fields': [
+               'id' ,'servicio', 'coopago', 'valor', 'numero_sesiones', 'sesiones'
             ]
         })
     }
@@ -86,6 +86,28 @@ class OrdenSerializer(FlexFieldsModelSerializer):
         """
 
         return str(obj.plan.cliente)
+
+
+class ServicioRealizarSerializer(FlexFieldsModelSerializer):
+    """Serializer para el modelo ServicioRealizar."""
+
+    class Meta:
+        model = models.ServicioRealizar
+        fields = ['id', 'orden', 'servicio', 'numero_sesiones', 'valor', 'coopago']
+    
+    expandable_fields = {
+        'sesiones': ('pacientes.SesionSerializer', {'source': 'sesiones', 'many': True, 'fields': [
+            'id', 'fecha', 'medico', 'sucursal', 'cita'
+        ]})
+    }
+
+
+class SesionSerializer(FlexFieldsModelSerializer):
+    """Serializer para el modelo Sesion."""
+
+    class Meta:
+        model = models.Sesion
+        fields = ['id', 'fecha', 'medico', 'servicio', 'sucursal', 'cita']
 
 
 class ServicioOrdenSerializer(FlexFieldsModelSerializer):

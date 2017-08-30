@@ -116,7 +116,7 @@
                 </template>
             </vaadin-grid-column>            
         </vaadin-grid>
-
+        <p>TOTAL: <span id="total"></span></p>
     </template>
 
     <script>
@@ -141,7 +141,8 @@
                         value() {
                             return [];
                         }
-                    }                 
+                    },
+                    total: Number
                 };
             }
 
@@ -172,6 +173,7 @@
                     actual.sesiones = this._createSessions(actual.numero_sesiones, data);
                     this.servicios.unshift(actual);
                     this.$.grid.clearCache();
+                    this.total = this.calcularTotal();
                     console.log(actual);
                 }
             }
@@ -179,6 +181,7 @@
             _delete(e) {
                 let index = this.servicios.indexOf(e.model.item);
                 this.servicios.splice(index, 1);
+                this.total = this.calcularTotal();
                 this.$.grid.clearCache();
             }
 
@@ -220,6 +223,16 @@
                 this.servicios[servicio].sesiones[sesion].fecha = cita.fecha;
                 this.servicios[servicio].sesiones[sesion].hora = cita.hora;
                 this.$.grid.clearCache();
+            }
+
+            calcularTotal() {
+                let total = 0;
+                this.servicios.forEach((servicio) => {
+                    total = total + (servicio.valor * servicio.numero_sesiones);
+                });
+                this.$.total.innerHtml = total;
+                console.log(total);
+                return total;
             }
 
         }

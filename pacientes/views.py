@@ -25,13 +25,7 @@ class OrdenesList(generics.ListCreateAPIView):
     serializer_class = serializers.OrdenSerializer
 
     def get_serializer(self, *args, **kwargs):
-        """
-        Return the serializer instance that should be used for validating and
-        deserializing input, and for serializing output.
-        """
-        serializer_class = self.get_serializer_class()
-        kwargs['context'] = self.get_serializer_context()
-        return serializer_class(*args, **kwargs)
+        return super().get_serializer(expand=['servicios.sesiones'], *args, **kwargs)
 
 
 class ListarPacientesView(generics.ListCreateAPIView):
@@ -111,7 +105,7 @@ class CrearOrdenView(APIView):
         serializer = PacienteSerializer(paciente, context={'request': request})
         paciente_json = JSONRenderer().render(serializer.data)
 
-        orden_s = serializers.OrdenSerializer(fields=['sucursal', 'autorizacion', 'pendiente_autorizacion', 'institucion', 'plan', 'afiliacion', 'tipo_usuario', 'forma_pago'])
+        orden_s = serializers.OrdenSerializer(fields=['sucursal', 'institucion', 'plan', 'afiliacion', 'tipo_usuario'])
         acompanante_s = AcompananteSerializer(paciente.ultimo_acompanante)
         
         cita = None
@@ -152,8 +146,8 @@ class OrdenesPacienteView(generics.CreateAPIView):
 
     def get_serializer(self, *args, **kwargs):
         fields = [
-            'id', 'sucursal', 'autorizacion', 'pendiente_autorizacion', 'institucion', 'plan', 'afiliacion',
-            'tipo_usuario', 'forma_pago', 'acompanante', 'servicios'
+            'id', 'institucion', 'plan', 'afiliacion',
+            'tipo_usuario', 'acompanante', 'servicios'
         ]
         expand = ['acompanante', 'servicios']
         return super().get_serializer(fields=fields, expand=expand, *args, **kwargs)

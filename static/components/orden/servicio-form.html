@@ -102,7 +102,7 @@
             </form>
         </iron-form>
 
-        <div class="row">
+        <div hidden>
             <show-json json="[[value]]"></show-json>
             <show-json json="[[cita]]"></show-json>
         </div>
@@ -123,7 +123,7 @@
                     },
                     plan: {
                         type: String,
-                        value: "UGxhbjoy"
+                        value: "UGxhbjox"
                     },
                     cita: {
                         type: Object,
@@ -162,20 +162,24 @@
 
             _citaProvided(newValue, oldValue) {
                 if (newValue != undefined) {
-                    let v = {};
-                    v.sucursal = newValue.horario.sucursal.id;
-                    v.medico = newValue.horario.medico.id;
-                    v.servicio = newValue.servicio.id;
+                    let fecha, hora;
                     if (!moment.isMoment(newValue.start)) {
-                        v.fecha = moment(newValue.start).format('YYYY-MM-DD');
-                        v.hora = moment(newValue.start).format('HH:mm');
+                        fecha = moment(newValue.start).format('YYYY-MM-DD');
+                        hora = moment(newValue.start).format('HH:mm');
                     }
                     else {
-                        v.fecha = newValue.start.format('YYYY-MM-DD');
-                        v.hora = newValue.start.format('HH:mm');
+                        fecha = newValue.start.format('YYYY-MM-DD');
+                        hora = newValue.start.format('HH:mm');
                     }
 
-                    this.set('value', v);
+                    this.setProperties({
+                        'value.sucursal': newValue.horario.sucursal.id,
+                        'value.medico': newValue.horario.medico.id,
+                        'value.servicio': newValue.servicio.id,
+                        'value.fecha': fecha,
+                        'value.hora': hora,
+                        'value.cita': newValue.id
+                    });
                 }
             }
 
