@@ -1,6 +1,7 @@
 from django.db import transaction
 from rest_framework import serializers
 from rest_flex_fields import FlexFieldsModelSerializer
+from common.serializers import PrimaryKeyGlobalIDMixin
 from . import models
 
 
@@ -47,14 +48,14 @@ class OrdenSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Orden
         fields = [
-            'id', 'fecha_orden', 'institucion', 'plan', 'cliente',
-            'afiliacion', 'tipo_usuario', 'anulada', 'razon_anulacion', 'servicios', 'paciente'
+            'id', 'fecha_orden', 'institucion', 'plan', 'cliente', 'afiliacion', 'tipo_usuario',
+            'anulada', 'razon_anulacion', 'servicios_realizar', 'paciente'
         ]
 
     expandable_fields = {
         'paciente': (PacienteSerializer, {'source': 'paciente'}),
         'acompanante': (AcompananteSerializer, {'source': 'acompanante'}),
-        'servicios': ('pacientes.ServicioRealizarSerializer', {
+        'servicios_realizar': ('pacientes.ServicioRealizarSerializer', {
             'source': 'servicios_realizar', 'many': True, 'fields': [
                'id' ,'servicio', 'coopago', 'valor', 'numero_sesiones', 'sesiones'
             ]
@@ -65,18 +66,31 @@ class OrdenSerializer(FlexFieldsModelSerializer):
         super().__init__(*args, **kwargs)
         self.fields['afiliacion'].initial = models.Orden.PARTICULAR
         self.fields['tipo_usuario'].initial = models.Orden.PARTICULAR
+        self.fields['plan'].label = 'Entidad'
 
     # TODO validar campos
 
     def create(self, validated_data):  #  TODO ver si se crea metodo create en manager de Orden
-        servicios_data = validated_data.pop('servicios_orden')
+        servicios_data = validated_data.pop('servicios_realizar')
         acompanante_data = validated_data.pop('acompanante')
 
         with transaction.atomic():
             orden = super().create(validated_data)
             models.Acompanante.objects.create(orden=orden, **acompanante_data)
             for servicio_data in servicios_data:
-                models.ServicioOrden.objects.create(orden=orden, **servicio_data)
+                sesiones_data = servicio_data.pop('sesiones')
+                servicio = models.ServicioRealizar.objects.create(orden=orden, **servicio_data)
+                for sesion_data in sesiones_data:
+                    sesion = models.Sesion.objects.create(servicio=servicio, **sesion_data)
+                    cita = sesion_data.get('cita', None)
+                    if cita:
+                        cita.sesion = sesion
+                        cita.save()
+                    else:
+                        self.crear_cita(sesion, servicio.servicio, orden.paciente)
+            
+            raise ValueError
+
             return orden
 
     def get_cliente(self, obj):
@@ -87,8 +101,13 @@ class OrdenSerializer(FlexFieldsModelSerializer):
 
         return str(obj.plan.cliente)
 
+    def crear_cita(self, sesion, servicio, paciente):
+        from agenda.models import Cita, Persona, HorarioAtencion
+        persona = Persona.objects.get(numero_documento=paciente.numero_documento)
+        horario = HorarioAtencion.objects.get(medico=sesion.medico_id, sucursal=sesion.sucursal_id, start=sesion.fecha)
+        Cita.objects.create(sesion=sesion, estado=Cita.NO_CONFIRMADA, servicio=servicio, paciente=persona, horario=horario)
 
-class ServicioRealizarSerializer(FlexFieldsModelSerializer):
+class ServicioRealizarSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
     """Serializer para el modelo ServicioRealizar."""
 
     class Meta:
@@ -102,12 +121,19 @@ class ServicioRealizarSerializer(FlexFieldsModelSerializer):
     }
 
 
-class SesionSerializer(FlexFieldsModelSerializer):
+class SesionSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
     """Serializer para el modelo Sesion."""
 
     class Meta:
         model = models.Sesion
-        fields = ['id', 'fecha', 'medico', 'servicio', 'sucursal', 'cita']
+        fields = [
+            'id', 'fecha', 'medico', 'servicio', 'sucursal', 'cita', 'autorizacion', 'fecha_autorizacion', 'estado'
+        ]
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['cita'].required = False
 
 
 class ServicioOrdenSerializer(FlexFieldsModelSerializer):

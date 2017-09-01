@@ -260,12 +260,28 @@ class ServicioRealizar(models.Model):
 class Sesion(models.Model):
     """Modelo para guardar las sesiones de un servicio de una orden."""
 
+    CUMPLIDA = 'CU'
+    EXCUSADA = 'EX'
+    CANCELADA = 'CA'
+    CONFIRMADA = 'CO'
+    NO_ASISTIO = 'NA'
+    NO_CONFIRMADA = 'NC'
+    ESTADOS = (
+        (NO_CONFIRMADA, _lazy('No confirmada')),
+        (CONFIRMADA, _lazy('Confirmada')),
+        (CUMPLIDA, _lazy('Cumplida')),
+        (CANCELADA, _lazy('Cancelada')),
+        (EXCUSADA, _lazy('Excusada')),
+        (NO_ASISTIO, _lazy('No asistio')),
+    )
+
     fecha = models.DateTimeField(_lazy('fecha'))
     servicio = models.ForeignKey(ServicioRealizar, related_name='sesiones', verbose_name=_lazy('servicio'))
     medico = models.ForeignKey('organizacional.Empleado', related_name='sesiones', verbose_name=_lazy('medico'))
     sucursal = models.ForeignKey('organizacional.Sucursal', related_name='sesiones', verbose_name=_lazy('sucursal'))
-    # autorizacion = models.CharField(_lazy('autorización'), blank=True)
-    # estado = models.CharField(_lazy('estado'), max_length=2, choices=...)
+    autorizacion = models.CharField(_lazy('autorización'), max_length=100, blank=True)
+    fecha_autorizacion = models.DateField(_lazy('Fecha de autorización'), blank=True, null=True)
+    estado = models.CharField(_lazy('estado'), max_length=2, choices=ESTADOS, default=NO_CONFIRMADA)
 
 
     class Meta:

@@ -8,7 +8,7 @@ from rest_framework import generics, filters
 
 from agenda.models import Cita
 from .models import Paciente, Orden, ServicioOrden
-from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSerializer, ServicioOrdenSerializer
+from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSerializer
 from . import serializers
 
 
@@ -25,7 +25,7 @@ class OrdenesList(generics.ListCreateAPIView):
     serializer_class = serializers.OrdenSerializer
 
     def get_serializer(self, *args, **kwargs):
-        return super().get_serializer(expand=['servicios.sesiones'], *args, **kwargs)
+        return super().get_serializer(expand=['servicios_realizar.sesiones'], *args, **kwargs)
 
 
 class ListarPacientesView(generics.ListCreateAPIView):
@@ -147,9 +147,9 @@ class OrdenesPacienteView(generics.CreateAPIView):
     def get_serializer(self, *args, **kwargs):
         fields = [
             'id', 'institucion', 'plan', 'afiliacion',
-            'tipo_usuario', 'acompanante', 'servicios'
+            'tipo_usuario', 'acompanante', 'servicios_realizar'
         ]
-        expand = ['acompanante', 'servicios']
+        expand = ['acompanante', 'servicios_realizar.sesiones']
         return super().get_serializer(fields=fields, expand=expand, *args, **kwargs)
 
     def perform_create(self, serializer):

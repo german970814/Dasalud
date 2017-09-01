@@ -158,7 +158,7 @@
             }
 
             _citaSelected(e) {
-                console.log(e.detail);
+                // console.log(e.detail);
                 this.$.form.cita = e.detail;
             }
 
@@ -174,7 +174,7 @@
                     this.servicios.unshift(actual);
                     this.$.grid.clearCache();
                     this.total = this.calcularTotal();
-                    console.log(actual);
+                    // console.log(actual);
                 }
             }
 
@@ -195,7 +195,10 @@
                     sesion.autorizacion = info.autorizacion;               
                     sesion.fecha_autorizacion = info.fecha_autorizacion;               
                     sesion.sucursal = info.sucursalItem;
-                    if(i > 0) {
+                    if(i == 0) {
+                        sesion.cita = info.cita;
+                    }
+                    else {
                         lastDate = this._getNextDate(lastDate);
                     }
                     sesion.fecha = lastDate;
@@ -231,10 +234,40 @@
                     total = total + (servicio.valor * servicio.numero_sesiones);
                 });
                 this.$.total.innerHtml = total;
-                console.log(total);
                 return total;
             }
 
+            serialize() {  // TODO agregar la cita
+                let servicios = [];
+                this.servicios.forEach((element) => {
+                    let sesiones = [];
+                    element.sesiones.forEach((sesionD) => {
+                        let sesion = {
+                            medico: element.medico,
+                            sucursal: element.sucursal,
+                            fecha: sesionD.fecha + ' ' + sesionD.hora,
+                            autorizacion: sesionD.autorizacion,
+                            fecha_autorizacion: sesionD.fecha_autorizacion
+                        };
+
+                        if('cita' in sesionD) sesion.cita = sesionD.cita;
+
+                        sesiones.push(JSON.parse(JSON.stringify(sesion)));
+                    });
+
+                    let servicio = {
+                        servicio: element.servicio,
+                        valor: element.valor,
+                        coopago: element.coopago,
+                        numero_sesiones: element.numero_sesiones,
+                        sesiones: sesiones
+                    };
+
+                    servicios.push(JSON.parse(JSON.stringify(servicio)));          
+                });
+
+                return servicios;
+            }
         }
 
         window.customElements.define(ServiciosOrden.is, ServiciosOrden);

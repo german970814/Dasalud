@@ -1,4 +1,5 @@
-from rest_framework import serializers
+from rest_framework import serializers, relations
+from .fields import GlobalIDField
 
 
 class SelectableSerializerMixin(serializers.Serializer):
@@ -14,3 +15,14 @@ class SelectableSerializerMixin(serializers.Serializer):
     
     def get_value(self, obj):
         return obj.pk
+
+
+class PrimaryKeyGlobalIDMixin(serializers.Serializer):
+    """Mixin para deserializar ForeingKey que usen global ID de graphql."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for key, field in self.fields.items():
+            if isinstance(field, relations.PrimaryKeyRelatedField):
+                field.pk_field = GlobalIDField()

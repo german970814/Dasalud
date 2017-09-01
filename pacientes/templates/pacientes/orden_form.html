@@ -43,15 +43,15 @@
 {% endblock css %}
 
 {% block content %}
-    <paciente-info paciente='{{ paciente }}' full-width></paciente-info>
-    <!-- <br> -->
-     <!-- <div class="card">
+    <!-- <div class="card">
          {% if cita %}
             <servicios-orden paciente="{{ paciente }}" cita="{{ cita }}"></servicios-orden>
-        {% else %}    
+        {% else %}
             <servicios-orden paciente="{{ paciente }}"></servicios-orden>
         {% endif %}
-    </div>  -->
+    </div> -->
+    <br>
+    <paciente-info paciente='{{ paciente }}' full-width></paciente-info>
     <!--<ul class="mdl-stepper mdl-stepper--horizontal mdl-stepper--linear" id="demo-stepper-state-error">-->
     <ul class="mdl-stepper mdl-stepper--horizontal" id="demo-stepper-state-error">
         <li class="mdl-step mdl-step--editable" data-step="orden">
@@ -70,7 +70,6 @@
             </div>
             <div class="mdl-step__actions">
                 <paper-button data-stepper-next>{% trans "Continuar" %}</paper-button>
-                <paper-button data-stepper-back>{% trans "Atras" %}</paper-button>
             </div>
         </li>
         <li class="mdl-step mdl-step--editable" data-step="servicios">
@@ -142,6 +141,7 @@
     <script>
         var stepperNode = document.querySelector('.mdl-stepper');
         var stepper, forms = {};
+        var serviciosForm = document.querySelector('servicios-orden');
 
         function getStepper() {
             if (!stepper) {
@@ -158,15 +158,19 @@
                 let activeStep = stepper.getActive();
                 
                 let form = activeStep.querySelector('.mdl-step__content iron-form');
-                if (form.validate()) {
+                let valid = true;
+                if (activeStep.dataset.step != "servicios") {
+                    valid = form.validate();
+                }
+                if (valid) {
                     if (activeStep.dataset.step == "servicios") {
-                        let servicios = activeStep.querySelectorAll('.mdl-step__content .servicio');
+                        let servicios = serviciosForm.serialize();
                         if (servicios.length == 0) {
                             stepper.error("Hay errores en el formulario.");
                             document.querySelector('paper-dialog').open();
                         }
                         else {
-                            forms[activeStep.dataset.step] = form;
+                            forms[activeStep.dataset.step] = servicios;
                             stepper.next();
                         }
                     }
@@ -176,6 +180,7 @@
                     }
 
                     if (activeStep.dataset.step == "acompanante") {
+                        console.log(forms);
                         _submitOrden();
                     }
                 }
@@ -193,11 +198,11 @@
                 console.log("terminado");
             });
 
-            // let institucionNode = document.querySelector('*[name="institucion"]');
-            // institucionNode.addEventListener('selected-item-changed', function(){
-            //     _getEmpresas(institucionNode.value);
-            //     _getMedicos(institucionNode.value);
-            // });
+            let institucionNode = document.querySelector('*[name="institucion"]');
+            institucionNode.addEventListener('selected-item-changed', function(){
+                _getEmpresas(institucionNode.value);
+                // _getMedicos(institucionNode.value);
+            });
 
             // let empresaNode = document.querySelector('*[name="plan"]');
             // empresaNode.addEventListener('selected-item-changed', function(){
@@ -239,38 +244,6 @@
                 });
         }
 
-        var medicos = [];
-        function _getMedicos(value) {
-            document.querySelector('servicios-orden').institucion = value;
-            fetch("{% url 'organizacional:medicos' %}?instituciones=" + value, {credentials: 'same-origin'})
-                .then(function(response){
-                    return response.json();
-                })
-                .then(function(data){
-                    medicos = data;
-                    let medicosNodes = document.querySelectorAll('*[name="medico"]');
-                    for (let i = 0; i < medicosNodes.length; i++) {
-                        medicosNodes[i].items = data;
-                    }
-                });
-        }
-
-        var servicios_e = [];
-        function _getServicios(value) {
-            document.querySelector('servicios-orden').empresa = value;
-            fetch("{% url 'servicios:empresas_servicios' 0 %}".replace(0, value), {credentials: 'same-origin'})
-                .then(function(response){
-                    return response.json();
-                })
-                .then(function(data){
-                    servicios_e = data;
-                    let serviciosNodes = document.querySelectorAll('*[name="servicio"]');
-                    for (let i = 0; i < serviciosNodes.length; i++) {
-                        serviciosNodes[i].items = data;
-                    }
-                });
-        }
-
         function _setOrdenesUrl(url) {
             let form = stepperNode.querySelector(".mdl-step[data-step='orden'] iron-form form");
             form.setAttribute('action', url);
@@ -280,12 +253,8 @@
             let form = forms['orden'];
             let orden = form.serializeForm();
             orden['acompanante'] = forms['acompanante'].serializeForm();
-            let servicios = [];
-            let servicios_ = forms['servicios'].querySelectorAll('iron-form');
-            for (var i = 0; i < servicios_.length; i++) {
-                servicios.push(servicios_[i].serializeForm());
-            }
-            orden['servicios'] = servicios;
+            orden['servicios_realizar'] = forms['servicios'];
+
             form.headers = {'X-CSRFToken': orden['csrfmiddlewaretoken']};
             form._makeAjaxRequest(orden);
 
@@ -300,7 +269,7 @@
                 }
 
                 if ('servicios' in response) {
-                    _setServiciosErrors(response['servicios']);
+                    // _setServiciosErrors(response['servicios']);
                     delete response['servicios'];
                     stepper.goto(2);
                     stepper.error("Hay errores en el formulario.");
