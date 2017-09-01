@@ -195,10 +195,14 @@
                     sesion.autorizacion = info.autorizacion;               
                     sesion.fecha_autorizacion = info.fecha_autorizacion;               
                     sesion.sucursal = info.sucursalItem;
-                    if(i == 0) {
-                        sesion.cita = info.cita;
+                    if('cita' in info) {
+                        if(i == 0) {
+                            sesion.cita = info.cita;
+                            sesion.estado = info.estado;
+                        }
                     }
-                    else {
+
+                    if(i > 0) {
                         lastDate = this._getNextDate(lastDate);
                     }
                     sesion.fecha = lastDate;
@@ -251,6 +255,7 @@
                         };
 
                         if('cita' in sesionD) sesion.cita = sesionD.cita;
+                        if('estado' in sesionD) sesion.estado = sesionD.estado;
 
                         sesiones.push(JSON.parse(JSON.stringify(sesion)));
                     });
