@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework import generics
-from pacientes.models import ServicioOrden
+from pacientes.models import Sesion
 from .models import Historia, Formato, Adjunto
 from . import serializers
 
@@ -28,20 +28,20 @@ class AdjuntosHistoriaView(generics.ListCreateAPIView):
     serializer_class = serializers.AdjuntoSerializer
     queryset = Adjunto.objects.all()
 
-    def get_servicio(self, servicio):
-        self.servicio = get_object_or_404(ServicioOrden, pk=servicio)
+    def get_sesion(self, sesion):
+        self.sesion = get_object_or_404(Sesion, pk=sesion)
 
-    #  TODO ver si se hace metodo en modelo ServicioOrden para que devuelva la historia
+    #  TODO ver si se hace metodo en modelo sesionOrden para que devuelva la historia
     def get_queryset(self):
-        return self.servicio.historia.adjuntos.all()
+        return self.sesion.historia.adjuntos.all()
 
-    def get(self, request, servicio, *args, **kwargs):        
-        self.get_servicio(servicio)
+    def get(self, request, sesion, *args, **kwargs):        
+        self.get_sesion(sesion)
         return super().get(request, *args, **kwargs)
 
-    def post(self, request, servicio, *args, **kwargs):
-        self.get_servicio(servicio)
+    def post(self, request, sesion, *args, **kwargs):
+        self.get_sesion(sesion)
         return super().post(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        serializer.save(historia=self.servicio.historia)
+        serializer.save(historia=self.sesion.historia)

@@ -20,11 +20,30 @@ class AgendaView(APIView):
     template_name = 'agenda/agenda.html'
 
     def get(self, request):
-        from pacientes.models import ServicioOrden
-        citas = ServicioOrden.objects.select_related('servicio', 'orden', 'orden__paciente', 'orden__plan', 'orden__plan__cliente').all()
-        serializer = ServicioOrdenSerializer(citas, many=True, expand=['orden', 'orden.paciente'], context={'request': None})
-        citas_json = JSONRenderer().render(serializer.data)
-        return Response({'citas': citas_json})
+        from dasalud.schema import schema
+
+        query = """
+        query { sesiones {
+            edges {
+                node {
+                    id
+                    urlHistoria
+                    servicio {
+                        servicio { nombre }
+                        orden {
+                            paciente { nombres, apellidos, numeroDocumento }
+                            plan { nombre }
+                        }
+                    }
+                }
+            }
+        }}
+        """
+
+        result = schema.execute(query)
+        sesiones = JSONRenderer().render(result.data['sesiones']['edges'])
+
+        return Response({'sesiones': sesiones})
 
 
 class HorarioAtencionMedicosView(generics.ListCreateAPIView):

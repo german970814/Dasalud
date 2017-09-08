@@ -291,6 +291,24 @@ class Sesion(models.Model):
     def __str__(self):
         return '{} {}'.format(self.servicio, self.pk)
 
+    def get_historia(self, force_instance=False):
+        """
+        :returns:
+            Retorna la historia de la sesion. Si la sesion no tiene historia guardada, devuelve  ``None`` o una
+            instancia de Historia dependiendo de force_instance.
+        
+        :param bool force_instance:
+            Fuerza que devuelva una instancia de Historia
+        """
+
+        def resolve():
+            if force_instance:
+                from historias.models import Historia
+                return Historia(contenido=self.servicio.servicio.formato.contenido, sesion=self)
+            return None
+
+        return getattr(self, 'historia', resolve())
+
 # TODO borrar este modelo
 class ServicioOrden(models.Model):
     """Modelo para guardar los servicios que maneja una orden."""
