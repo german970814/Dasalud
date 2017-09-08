@@ -2,6 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from common.schema import BaseNode
+from .filters import PlanFilter
 from . import models
 
 
@@ -22,6 +23,8 @@ class Cliente(DjangoObjectType):
 
 class Plan(DjangoObjectType):
 
+    label = graphene.String(source='__str__')
+
     class Meta:
         model = models.Plan
         interfaces = (BaseNode,)
@@ -37,3 +40,4 @@ class Tarifa(DjangoObjectType):
 
 class Query(graphene.AbstractType):
     servicios = DjangoFilterConnectionField(Servicio, description='Todos los servicios')
+    planes = DjangoFilterConnectionField(Plan, filterset_class=PlanFilter, description='Todos los planes')

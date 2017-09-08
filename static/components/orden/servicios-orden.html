@@ -158,7 +158,6 @@
             }
 
             _citaSelected(e) {
-                // console.log(e.detail);
                 this.$.form.cita = e.detail;
             }
 
@@ -173,8 +172,8 @@
                     actual.sesiones = this._createSessions(actual.numero_sesiones, data);
                     this.servicios.unshift(actual);
                     this.$.grid.clearCache();
+                    this.$.form.reset();
                     this.total = this.calcularTotal();
-                    // console.log(actual);
                 }
             }
 
@@ -241,7 +240,7 @@
                 return total;
             }
 
-            serialize() {  // TODO agregar la cita
+            serialize() {
                 let servicios = [];
                 this.servicios.forEach((element) => {
                     let sesiones = [];

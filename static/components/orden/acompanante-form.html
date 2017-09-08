@@ -1,0 +1,81 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/paper-input/paper-input.html">
+<link rel="import" href="/static/bower_components/paper-toggle-button/paper-toggle-button.html">
+
+<dom-module id="acompanante-form">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+
+            .row {
+                display: flex;
+            }
+
+            .row > * {
+                flex: 1;
+                margin-right: 5px;
+            }
+        </style>
+
+        <div class="row">
+            <paper-toggle-button>Asistio con acompañante</paper-toggle-button>
+        </div>
+        <div class="row">
+            <paper-input label="Nombre completo"></paper-input>
+            <paper-input label="Dirección"></paper-input>
+            <paper-input label="Telefono"></paper-input>
+        </div>
+    </template>
+
+    <script>
+        /**
+         * `acompanante-form` Formulario para los datos del acompañante.
+         *
+         * @customElement
+         * @polymer
+         * @extends {Polymer.Element}
+         */
+        class AcompananteForm extends Polymer.Element {
+            /**
+             * String providing the tag name to register the element under.
+             */
+            static get is() {
+                return 'acompanante-form';
+            }
+
+            /**
+             * Object describing property-related metadata used by Polymer features
+             */
+            static get properties() {
+                return {
+                    
+                };
+            }
+
+            /**
+             * Instance of the element is created/upgraded. Use: initializing state,
+             * set up event listeners, create shadow dom.
+             * @constructor
+             */
+            constructor() {
+                super();
+            }
+
+            /**
+             * Use for one-time configuration of your component after local DOM is initialized. 
+             */
+            ready() {
+                super.ready();
+
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    
+                });
+            }
+
+        }
+
+        window.customElements.define(AcompananteForm.is, AcompananteForm);
+    </script>
+</dom-module>

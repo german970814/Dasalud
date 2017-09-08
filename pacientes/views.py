@@ -134,6 +134,31 @@ class CrearOrdenView(APIView):
         })
 
 
+class EditarOrdenView(APIView):
+    """Muestra el formulario de edicion de una orden."""
+
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'paciente/orden_form.html'
+    VERBO = _lazy('Editar')
+
+    def get(self, request, pk):
+        cita = None
+        orden = get_object_or_404(Orden, pk=pk)
+        serializer = PacienteSerializer(orden.paciente, context={'request': request})
+        paciente_json = JSONRenderer().render(serializer.data)
+
+        orden_s = serializers.OrdenSerializer(
+            orden, fields=['sucursal', 'institucion', 'plan', 'afiliacion', 'tipo_usuario']
+        )
+        acompanante_s = AcompananteSerializer(orden.acompanante)
+
+        return Response({
+            'paciente': paciente_json, 'orden_s': orden_s, 'cita': cita,
+            'acompanante_s': acompanante_s, 'VERBO': self.VERBO, 'paciente_id': orden.paciente_id
+        })
+
+
+
 class OrdenesPacienteView(generics.CreateAPIView):
     """Permite crear una orden a un paciente."""
 

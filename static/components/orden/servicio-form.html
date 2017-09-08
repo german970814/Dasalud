@@ -102,10 +102,10 @@
             </form>
         </iron-form>
 
-        <div hidden>
+        <!-- <div class="row">
             <show-json json="[[value]]"></show-json>
             <show-json json="[[cita]]"></show-json>
-        </div>
+        </div> -->
     </template>
 
     <script>
@@ -192,6 +192,14 @@
 
             validate() {
                 return this.$.form.validate();
+            }
+
+            reset() {
+                this.set('value', {
+                    autorizacion: this.value.autorizacion,
+                    fecha_autorizacion: this.value.fecha_autorizacion
+                });
+                this.set('cita', {});
             }
         }
 

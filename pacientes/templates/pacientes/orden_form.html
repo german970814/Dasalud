@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load rest_framework i18n static %}
+{% load rest_framework i18n static common_tags %}
 
 {% block imports %}
     <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
@@ -11,6 +11,9 @@
     <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
     <link rel="import" href="/static/components/paciente-info.html">
     <link rel="import" href="/static/components/orden/servicios-orden.html">
+    <link rel="import" href="/static/components/orden/servicios-orden2.html">
+    <link rel="import" href="/static/components/orden/orden-form.html">
+    <link rel="import" href="/static/components/orden/acompanante-form.html">
 {% endblock imports %}
 
 {% block css %}
@@ -38,18 +41,37 @@
             #servicios .servicio .container > * {
                 margin-right: 20px;
             }
+
+            .row {
+                display: flex;
+            }
+
+            .row > * {
+                flex: 1;
+                margin-right: 10px;
+            }
+
+            .no-flex {
+                flex: 0;
+            }
         </style>
     </custom-style>
 {% endblock css %}
 
 {% block content %}
-    <!-- <div class="card">
-         {% if cita %}
-            <servicios-orden paciente="{{ paciente }}" cita="{{ cita }}"></servicios-orden>
-        {% else %}
-            <servicios-orden paciente="{{ paciente }}"></servicios-orden>
-        {% endif %}
-    </div> -->
+    <div class="card">
+        <div class="row">
+            <paciente-info class="no-flex" flat paciente="{{ paciente }}"></paciente-info>
+            <div>
+                <orden-form instituciones='{{ orden_s.fields.institucion|to_json }}'
+                    afiliaciones='{{ orden_s.fields.afiliacion|to_json }}'
+                    tipos-usuario='{{ orden_s.fields.tipo_usuario|to_json }}'>
+                </orden-form>
+            </div>
+        </div>
+        <!-- <servicios-orden2></servicios-orden2> -->
+        <servicios-orden></servicios-orden>
+    </div>
     <br>
     <paciente-info paciente='{{ paciente }}' full-width></paciente-info>
     <!--<ul class="mdl-stepper mdl-stepper--horizontal mdl-stepper--linear" id="demo-stepper-state-error">-->

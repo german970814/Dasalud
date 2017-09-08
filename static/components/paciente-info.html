@@ -23,6 +23,11 @@
                 --paciente-info-width: 100%;
             }
 
+            :host([flat]) paper-card {
+                box-shadow: none;
+                border: 1px solid #e8e8e8;
+            }
+
             iron-image {
                 width: 150px;
                 height: 150px;
@@ -34,7 +39,7 @@
             }
         </style>
 
-        <paper-card>
+        <paper-card id="card">
             <div class="card-content">
                 <iron-image src="[[paciente.foto]]" sizing="cover" fade preload placeholder="/static/img/profile-none.png"></iron-image>
                 <div class="info">
@@ -63,6 +68,13 @@
                         type: Boolean,
                         value: false,
                         reflectToAttribute: true
+                    },
+
+                    flat: {
+                        type: Boolean,
+                        value: false,
+                        reflectToAttribute: true,
+                        observer: '_flatChanged'
                     }
                 };
             }
@@ -73,6 +85,12 @@
 
             _nombreCompleto(nombres, apellidos) {
                 return nombres + ' ' + apellidos;
+            }
+
+            _flatChanged(newValue, oldValue) {
+                // if (newValue) {
+                //     this.$.card.elevation = 0;
+                // }
             }
 
             // TODO calcular la edad

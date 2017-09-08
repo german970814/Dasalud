@@ -1,0 +1,137 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
+<link rel="import" href="/static/bower_components/paper-input/paper-input.html">
+<link rel="import" href="/static/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/static/bower_components/show-json/show-json.html">
+
+<dom-module id="orden-form">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+
+            .row {
+                display: flex;
+            }
+
+            .row > * {
+                flex: 1;
+                margin-right: 5px;
+            }
+        </style>
+
+        <graphql-query id="planesQuery" variables="[[_queryVariables(value.institucion.value)]]" result="{{planesResult}}">
+            query planesQuery($institucion: ID){
+                planes(institucion: $institucion) {
+                    edges {
+                        node {
+                            id
+                            label
+                        }
+                    }
+                }
+            }
+        </graphql-query>
+
+        <iron-form id="form">
+            <form>
+                <div class="row">
+                    <vaadin-combo-box label="Entidad que prestará el servicio" required items="[[instituciones]]"
+                    selected-item="{{value.institucion}}">
+                    </vaadin-combo-box>
+                    <vaadin-combo-box label="Entidad" required items="[[planesResult.planes.edges]]"
+                        item-value-path="node.id" item-label-path="node.label" selected-item="{{value.plan}}">
+                    </vaadin-combo-box>
+                </div>
+                <div class="row">
+                    <vaadin-combo-box label="Afiliación" required items="[[afiliaciones]]" 
+                        selected-item="{{value.afiliacion}}">
+                    </vaadin-combo-box>
+                    <vaadin-combo-box label="tipo de usuario" required items="[[tiposUsuario]]" 
+                        selected-item="{{value.tipoUsuario}}">
+                    </vaadin-combo-box>
+                </div>
+                <div class="row">
+                    <paper-toggle-button checked="{{value.asistio}}">Asistio con acompañante</paper-toggle-button>
+                </div>
+                <div class="row">
+                    <paper-input label="Nombre completo" value="{{value.nombreCompleto}}"></paper-input>
+                    <paper-input label="Dirección" value="{{value.direccion}}"></paper-input>
+                    <paper-input label="Telefono" value="{{value.telefono}}"></paper-input>
+                </div>
+            </form>
+        </iron-form>
+        <show-json json="[[value]]"></show-json>
+
+    </template>
+
+    <script>
+        /**
+         * `orden-form` Formulario con los datos especificos de una orden y su acompañante.
+         *
+         * @customElement
+         * @polymer
+         * @extends {Polymer.Element}
+         */
+        class OrdenForm extends Polymer.Element {
+            /**
+             * String providing the tag name to register the element under.
+             */
+            static get is() {
+                return 'orden-form';
+            }
+
+            /**
+             * Object describing property-related metadata used by Polymer features
+             */
+            static get properties() {
+                return {
+                    instituciones: Array,
+                    afiliaciones: Array,
+                    tiposUsuario: Array,
+                    value: {
+                        type: Object,
+                        value() {
+                            return {};
+                        }
+                    }               
+                };
+            }
+
+            /**
+             * Instance of the element is created/upgraded. Use: initializing state,
+             * set up event listeners, create shadow dom.
+             * @constructor
+             */
+            constructor() {
+                super();
+            }
+
+            /**
+             * Use for one-time configuration of your component after local DOM is initialized. 
+             */
+            ready() {
+                super.ready();
+
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    
+                });
+            }
+
+            _queryVariables(institucion) {
+                return { institucion };
+            }
+
+            _getPlanesLabel(plan) {
+                console.log(plan);
+                return `${ plan.cliente.nombre } - ${ plan.nombre }`;
+            }
+
+        }
+
+        window.customElements.define(OrdenForm.is, OrdenForm);
+    </script>
+</dom-module>

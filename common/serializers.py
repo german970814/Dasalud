@@ -25,4 +25,4 @@ class PrimaryKeyGlobalIDMixin(serializers.Serializer):
 
         for key, field in self.fields.items():
             if isinstance(field, relations.PrimaryKeyRelatedField):
-                field.pk_field = GlobalIDField()
+                field.pk_field = GlobalIDField(type_=field.source)
