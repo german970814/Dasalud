@@ -11,3 +11,8 @@ class HistoriaAdmin(VersionAdmin):
 @admin.register(models.Formato)
 class FormatoAdmin(VersionAdmin):
     pass
+
+
+@admin.register(models.Adjunto)
+class AdjuntoAdmin(VersionAdmin):
+    pass

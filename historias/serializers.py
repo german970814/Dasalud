@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 from rest_flex_fields import FlexFieldsModelSerializer
 from . import models
 
@@ -15,16 +16,17 @@ class HistoriaSerializer(FlexFieldsModelSerializer):
     """Serializer para el modelo Historia."""
 
     nombre_servicio = serializers.SerializerMethodField()
-    adjuntos_link = serializers.HyperlinkedIdentityField(
-        view_name='historias:adjuntos', lookup_field='sesion_id', lookup_url_kwarg='sesion'
-    )
+    url_adjunto = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Historia
-        fields = ['id', 'nombre_servicio', 'terminada', 'adjuntos_link', 'contenido']
+        fields = ['id', 'nombre_servicio', 'terminada', 'contenido', 'url_adjunto']
     
     def get_nombre_servicio(self, obj):
         return obj.sesion.servicio.servicio.nombre
+
+    def get_url_adjunto(self, obj):
+        return reverse('historias:adjuntos', args=(obj.sesion_id, ))
 
 
 class AdjuntoSerializer(FlexFieldsModelSerializer):

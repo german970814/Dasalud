@@ -28,12 +28,16 @@ class AdjuntosHistoriaView(generics.ListCreateAPIView):
     serializer_class = serializers.AdjuntoSerializer
     queryset = Adjunto.objects.all()
 
-    def get_sesion(self, sesion):
-        self.sesion = get_object_or_404(Sesion, pk=sesion)
+    def get_sesion(self, pk):
+        self.sesion = get_object_or_404(Sesion, pk=pk)
 
-    #  TODO ver si se hace metodo en modelo sesionOrden para que devuelva la historia
+    def get_historia(self):
+        self.historia = self.sesion.get_historia(force_instance=True)
+        return self.historia
+
+    #  TODO ver si se hace metodo en modelo Sesion para que devuelva la historia
     def get_queryset(self):
-        return self.sesion.historia.adjuntos.all()
+        return self.get_historia().adjuntos.all()
 
     def get(self, request, sesion, *args, **kwargs):        
         self.get_sesion(sesion)
@@ -41,7 +45,14 @@ class AdjuntosHistoriaView(generics.ListCreateAPIView):
 
     def post(self, request, sesion, *args, **kwargs):
         self.get_sesion(sesion)
+        self.get_historia()
         return super().post(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        serializer.save(historia=self.sesion.historia)
+        from django.db import transaction
+        with transaction.atomic():
+            self.historia.save()
+            serializer.save(historia=self.sesion.historia)
+
+class AdjuntosHistoriaDestroyView(generics.DestroyAPIView):
+    queryset = Adjunto.objects.all()

@@ -307,7 +307,11 @@ class Sesion(models.Model):
                 return Historia(contenido=self.servicio.servicio.formato.contenido, sesion=self)
             return None
 
-        return getattr(self, 'historia', resolve())
+        try:
+            historia = self.historia
+        except Exception:
+            historia = resolve()
+        return historia
 
 # TODO borrar este modelo
 class ServicioOrden(models.Model):
