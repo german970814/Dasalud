@@ -8,13 +8,13 @@
 {% endblock imports %}
 
 {% block content %}
-    <vaadin-grid items='{{ citas }}'>
+    <vaadin-grid items='{{ sesiones }}'>
         <vaadin-grid-column>
             <template class="header">
                 <div class="cell">{% trans 'Cédula' %}</div>
             </template>
             <template>
-                <div class="cell">[[item.orden.paciente.numero_documento]]</div>
+                <div class="cell">[[item.node.servicio.orden.paciente.numeroDocumento]]</div>
             </template>
         </vaadin-grid-column>
         <vaadin-grid-column>
@@ -22,7 +22,7 @@
                 <div class="cell">{% trans 'Nombre' %}</div>
             </template>
             <template>
-                <div class="cell">[[item.orden.paciente.nombres]] [[item.orden.paciente.apellidos]]</div>
+                <div class="cell">[[item.node.servicio.orden.paciente.nombres]] [[item.node.servicio.orden.paciente.apellidos]]</div>
             </template>
         </vaadin-grid-column>
         <vaadin-grid-column>
@@ -30,7 +30,7 @@
                 <div class="cell">{% trans 'Servicio' %}</div>
             </template>
             <template>
-                <div class="cell">[[item.servicio_nombre]]</div>
+                <div class="cell">[[item.node.servicio.servicio.nombre]]</div>
             </template>
         </vaadin-grid-column>
         <vaadin-grid-column>
@@ -38,7 +38,7 @@
                 <div class="cell">{% trans 'Empresa' %}</div>
             </template>
             <template>
-                <div class="cell">[[item.orden.empresa]]</div>
+                <div class="cell">[[item.node.servicio.orden.plan.nombre]]</div>
             </template>
         </vaadin-grid-column>
         <vaadin-grid-column>
@@ -47,7 +47,7 @@
             </template>
             <template>
                 <div class="cell last">
-                    <a href="[[item.historias_link]]" tabindex="-1">
+                    <a href="[[item.node.urlHistoria]]" tabindex="-1">
                         <paper-icon-button icon="my-icons:menu" title="{% trans 'Historias' %}"></paper-icon-button>
                     </a>
                 </div>

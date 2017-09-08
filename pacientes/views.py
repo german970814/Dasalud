@@ -4,10 +4,10 @@ from django.utils.translation import ugettext_lazy as _lazy
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import generics, filters
+from rest_framework import generics, filters, status
 
 from agenda.models import Cita
-from .models import Paciente, Orden, ServicioOrden
+from .models import Paciente, Orden, ServicioOrden, Sesion
 from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSerializer
 from . import serializers
 
@@ -107,7 +107,7 @@ class CrearOrdenView(APIView):
 
         orden_s = serializers.OrdenSerializer(fields=['sucursal', 'institucion', 'plan', 'afiliacion', 'tipo_usuario'])
         acompanante_s = AcompananteSerializer(paciente.ultimo_acompanante)
-        
+
         cita = None
         request.session.pop('paciente-cita', None)
         cita_id = request.session.pop('cita', None)
@@ -126,7 +126,7 @@ class CrearOrdenView(APIView):
             }}"""
             # TODO una vez se usa graphql para guardar la cita quitar to_global_id. id ej: "Q2l0YTox"
             result = schema.execute(query, variable_values={'id': BaseNode.to_global_id('Cita', cita_id)})
-            cita = JSONRenderer().render(result.data['cita'])            
+            cita = JSONRenderer().render(result.data['cita'])
 
         return Response({
             'paciente': paciente_json, 'orden_s': orden_s, 'cita': cita,
@@ -164,32 +164,33 @@ class HistoriasClinicasView(APIView):
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'pacientes/historias_clinicas.html'
 
-    def get_historia(self, servicio):
-        try:
-            historia = servicio.historia
-        except Exception:
-            historia = None
-        
-        return historia
+    def get_historia(self, sesion):  # TODO: remove if not using
+        """
+        Retorna la historia de una sesion.
+        """
+        return getattr(sesion, 'historia', None)
 
     def get(self, request, pk):
         from historias.serializers import HistoriaSerializer
-        servicio_orden = get_object_or_404(ServicioOrden, pk=pk)
-        paciente = servicio_orden.orden.paciente
-        serializer = PacienteSerializer(paciente, context={'request': None})
-        paciente_json = JSONRenderer().render(serializer.data)
 
-        _historia = servicio_orden.get_historia(force_instance=True)
-        h_serializer = HistoriaSerializer(_historia, context={'request': request})
+        sesion = get_object_or_404(Sesion, pk=pk)
+        paciente = sesion.servicio.orden.paciente
 
-        historia = JSONRenderer().render(h_serializer.data)
-        return Response({'paciente': paciente_json, 'historia': historia, 'pk': pk})
+        serializer_paciente = PacienteSerializer(paciente, context={'request': None})
+        paciente_json = JSONRenderer().render(serializer_paciente.data)
+
+        historia = sesion.get_historia(force_instance=True)
+        serializer_historia = HistoriaSerializer(historia, context={'request': request})
+
+        historia_json = JSONRenderer().render(serializer_historia.data)
+        return Response({'paciente': paciente_json, 'historia': historia_json, 'pk': pk})
 
     def post(self, request, pk):
         from historias.serializers import HistoriaSerializer
-        servicio_orden = get_object_or_404(ServicioOrden, pk=pk)
-        historia = servicio_orden.get_historia()
+
+        sesion = get_object_or_404(Sesion, pk=pk)
+        historia = sesion.get_historia()
         serializer = HistoriaSerializer(historia, data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        serializer.save(servicio_orden=servicio_orden)
-        return Response(serializer.data, status=201)
+        serializer.save(sesion=sesion)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
