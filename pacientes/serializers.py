@@ -40,7 +40,7 @@ class AcompananteSerializer(serializers.ModelSerializer):
     # TODO validar cuando asistio es True
 
 
-class OrdenSerializer(FlexFieldsModelSerializer):
+class OrdenSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
     """Serializer para el modelo Orden."""
 
     cliente = serializers.SerializerMethodField()
@@ -90,7 +90,6 @@ class OrdenSerializer(FlexFieldsModelSerializer):
                         self.crear_cita(sesion, servicio.servicio, orden.paciente)
             
             raise ValueError
-
             return orden
 
     def get_cliente(self, obj):
@@ -132,7 +131,6 @@ class SesionSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.fields['cita'].required = False
 
 

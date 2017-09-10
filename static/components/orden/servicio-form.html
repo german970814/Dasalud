@@ -96,7 +96,7 @@
                         auto-validate min="0" value="{{value.valor}}">
                     </paper-input>
                     <paper-input name="coopago" label="Coopago/Moderadora" type="number" auto-validate min="0" 
-                        value="{{value.coopago}}">
+                        value="{{value.coopago}}" required>
                     </paper-input>
                 </div>                
             </form>
@@ -199,7 +199,7 @@
                     autorizacion: this.value.autorizacion,
                     fecha_autorizacion: this.value.fecha_autorizacion
                 });
-                this.set('cita', {});
+                this.set('cita', undefined);
             }
         }
 

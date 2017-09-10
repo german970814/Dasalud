@@ -14,7 +14,7 @@ class HorarioAtencionAdmin(VersionAdmin):
 
 @admin.register(models.Cita)
 class CitaAdmin(VersionAdmin):
-    pass
+    list_display = ('paciente', 'sesion')
 
 
 @admin.register(models.Persona)

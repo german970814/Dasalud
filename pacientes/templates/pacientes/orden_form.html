@@ -9,11 +9,12 @@
     <link rel="import" href="/static/bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
     <link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
     <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
+    <link rel="import" href="/static/components/ig-iron-ajax.html">
     <link rel="import" href="/static/components/paciente-info.html">
     <link rel="import" href="/static/components/orden/servicios-orden.html">
     <link rel="import" href="/static/components/orden/servicios-orden2.html">
-    <link rel="import" href="/static/components/orden/orden-form.html">
     <link rel="import" href="/static/components/orden/acompanante-form.html">
+    <link rel="import" href="/static/components/orden/orden-form.html">
 {% endblock imports %}
 
 {% block css %}
@@ -59,6 +60,10 @@
 {% endblock css %}
 
 {% block content %}
+    <ig-iron-ajax id="request" method="POST" url="{% url 'pacientes:ordenes' paciente_id %}" 
+        handle-as="json" content-type="application/json">
+    </ig-iron-ajax>
+
     <div class="card">
         <div class="row">
             <paciente-info class="no-flex" flat paciente="{{ paciente }}"></paciente-info>
@@ -71,6 +76,7 @@
         </div>
         <!-- <servicios-orden2></servicios-orden2> -->
         <servicios-orden></servicios-orden>
+        <paper-button id="save">{% trans "Guardar" %}</paper-button>
     </div>
     <br>
     <paciente-info paciente='{{ paciente }}' full-width></paciente-info>
@@ -157,6 +163,41 @@
 {% endblock dialogs %}
 
 {% block js %}
+    <script>
+        const request = document.getElementById('request');
+
+        document.getElementById('save').addEventListener('click', function(e) {
+            console.log(e);
+            const ordenForm = document.querySelector('orden-form');
+            const serviciosOrden = document.querySelector('servicios-orden');
+            ordenForm.validate();
+            // serviciosOrden.validate();
+
+            let orden = serializeOrden(ordenForm.value, serviciosOrden.serialize());
+            request.body = orden;
+            request.generateRequest();
+        });
+
+        function serializeOrden(ordenData, serviciosData) {
+            console.log(ordenData);
+            let orden = {
+                tipo_usuario: ordenData.tipoUsuario.value,
+                institucion: ordenData.institucion.value,
+                afiliacion: ordenData.afiliacion.value,
+                plan: ordenData.plan.node.id,
+                acompanante: {
+                    asistio: ordenData.asistio,
+                    nombre: ordenData.nombreCompleto,
+                    direccion: ordenData.direccion,
+                    telefono: ordenData.telefono
+                },
+                servicios_realizar: serviciosData
+            }
+            console.log(orden);
+            return orden;
+        }
+    </script>
+
     <script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
     <script src="/static/bower_components/mdl-stepper/stepper.min.js"></script>
     <script src="{% static 'js/utils.js' %}"></script>

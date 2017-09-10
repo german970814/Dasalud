@@ -39,32 +39,34 @@
         <iron-form id="form">
             <form>
                 <div class="row">
-                    <vaadin-combo-box label="Entidad que prestará el servicio" required items="[[instituciones]]"
-                    selected-item="{{value.institucion}}">
+                    <vaadin-combo-box label="Entidad que prestará el servicio*" required items="[[instituciones]]"
+                    selected-item="{{value.institucion}}" value="[[value.institucionValue]]" readonly="[[readonly]]">
                     </vaadin-combo-box>
-                    <vaadin-combo-box label="Entidad" required items="[[planesResult.planes.edges]]"
-                        item-value-path="node.id" item-label-path="node.label" selected-item="{{value.plan}}">
-                    </vaadin-combo-box>
-                </div>
-                <div class="row">
-                    <vaadin-combo-box label="Afiliación" required items="[[afiliaciones]]" 
-                        selected-item="{{value.afiliacion}}">
-                    </vaadin-combo-box>
-                    <vaadin-combo-box label="tipo de usuario" required items="[[tiposUsuario]]" 
-                        selected-item="{{value.tipoUsuario}}">
+                    <vaadin-combo-box label="Entidad*" required items="[[planesResult.planes.edges]]" value="[[value.planValue]]"
+                        item-value-path="node.id" item-label-path="node.label" selected-item="{{value.plan}}" readonly="[[readonly]]">
                     </vaadin-combo-box>
                 </div>
                 <div class="row">
-                    <paper-toggle-button checked="{{value.asistio}}">Asistio con acompañante</paper-toggle-button>
+                    <vaadin-combo-box label="Afiliación*" required items="[[afiliaciones]]" readonly="[[readonly]]"
+                        selected-item="{{value.afiliacion}}" value="[[value.afiliacionValue]]">
+                    </vaadin-combo-box>
+                    <vaadin-combo-box label="tipo de usuario*" required items="[[tiposUsuario]]" readonly="[[readonly]]"
+                        selected-item="{{value.tipoUsuario}}" value="[[value.tipoUsuarioValue]]">
+                    </vaadin-combo-box>
                 </div>
                 <div class="row">
-                    <paper-input label="Nombre completo" value="{{value.nombreCompleto}}"></paper-input>
-                    <paper-input label="Dirección" value="{{value.direccion}}"></paper-input>
-                    <paper-input label="Telefono" value="{{value.telefono}}"></paper-input>
+                    <paper-toggle-button checked="{{value.asistio}}" disabled="[[readonly]]">
+                        Asistio con acompañante
+                    </paper-toggle-button>
+                </div>
+                <div class="row" id="acompananteInputs">
+                    <paper-input label="Nombre completo" value="{{value.nombreCompleto}}" readonly="[[readonly]]"></paper-input>
+                    <paper-input label="Dirección" value="{{value.direccion}}" readonly="[[readonly]]"></paper-input>
+                    <paper-input label="Telefono" value="{{value.telefono}}" readonly="[[readonly]]"></paper-input>
                 </div>
             </form>
         </iron-form>
-        <show-json json="[[value]]"></show-json>
+        <!-- <show-json json="[[value]]"></show-json> -->
 
     </template>
 
@@ -97,8 +99,19 @@
                         value() {
                             return {};
                         }
-                    }               
+                    },
+                    readonly: {
+                        type: Boolean,
+                        value: false,
+                        reflectToAttribute: true
+                    }     
                 };
+            }
+
+            static get observers() {
+                return [
+                    '_acompananteObligatorio(value.asistio)', '_cleanTelefonoValue(value.telefono)'
+                ];
             }
 
             /**
@@ -128,6 +141,35 @@
             _getPlanesLabel(plan) {
                 console.log(plan);
                 return `${ plan.cliente.nombre } - ${ plan.nombre }`;
+            }
+
+            _acompananteObligatorio(obligatorio) {
+                if(obligatorio != undefined) {
+                    let inputs = this.$.acompananteInputs.querySelectorAll('paper-input');
+                    [...inputs].forEach(input => {
+                        input.required = obligatorio;
+                        let label = input.label;
+                        if(obligatorio) {
+                            input.label = `${label}*`;
+                        }
+                        else {
+                            input.value = '';
+                            if(label.substr(label.length - 1) == '*') {
+                                input.label = label.substring(0, label.length - 1);
+                            }
+                        }
+                    });
+                }
+            }
+
+            _cleanTelefonoValue(value) {
+                if(value == '') {
+                    this.set('value.telefono', null);
+                }
+            }
+
+            validate() {
+                return this.$.form.validate();
             }
 
         }
