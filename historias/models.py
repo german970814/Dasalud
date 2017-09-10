@@ -51,3 +51,5 @@ class Adjunto(models.Model):
 
     def __str__(self):
         return '{0} - {1}'.format(self.historia, self.pk)
+
+    # def delete(self, *args, **kwargs):

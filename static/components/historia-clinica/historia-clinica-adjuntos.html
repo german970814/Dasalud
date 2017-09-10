@@ -33,7 +33,8 @@
             <iron-ajax url="[[url]]" handle-as="json" on-response="handleResponse" auto></iron-ajax>
 
             <vaadin-upload id="upload" files="{{files}}" target="[[url]]" on-file-show="showFile" 
-                            on-upload-success="handleSuccess" form-data-name="archivo" accept=".pdf,image/*">
+                            on-upload-success="handleSuccess" form-data-name="archivo" accept=".pdf,image/*"
+                            on-file-abort="handleAbort">
                 <div slot="file-list">
                     <div id="fileList">
                         <template is="dom-repeat" items="[[files]]" as="file">
@@ -77,6 +78,7 @@
                 let response = e.detail.response;
                 let files = [];
                 response.forEach(function(element) {
+                    console.log(element)
                     files.push({name: element.nombre, url: element.archivo, complete: true, progress: 100});
                 }, this);
 
@@ -93,6 +95,10 @@
                 this.$.dialog.querySelector('object').data = e.detail.file.url;
                 document.body.appendChild(this.$.dialog);
                 this.$.dialog.open();
+            }
+
+            handleAbort(e) {
+                console.log(e)
             }
 
         }
