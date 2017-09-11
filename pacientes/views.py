@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, filters, status
 
+from dasalud.schema import schema
+from common.schema import BaseNode
 from agenda.models import Cita
 from .models import Paciente, Orden, ServicioOrden, Sesion
 from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSerializer
@@ -98,9 +100,7 @@ class CrearOrdenView(APIView):
     template_name = 'pacientes/orden_form.html'
     VERBO = _lazy('Crear')
 
-    def get(self, request, pk):
-        from dasalud.schema import schema
-        from common.schema import BaseNode
+    def get(self, request, pk):        
         paciente = get_object_or_404(Paciente, pk=pk)
         serializer = PacienteSerializer(paciente, context={'request': request})
         paciente_json = JSONRenderer().render(serializer.data)
@@ -138,23 +138,65 @@ class EditarOrdenView(APIView):
     """Muestra el formulario de edicion de una orden."""
 
     renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'paciente/orden_form.html'
+    template_name = 'pacientes/orden_form.html'
     VERBO = _lazy('Editar')
 
-    def get(self, request, pk):
+    def get(self, request, paciente, pk):
         cita = None
-        orden = get_object_or_404(Orden, pk=pk)
-        serializer = PacienteSerializer(orden.paciente, context={'request': request})
+        paciente = get_object_or_404(Paciente, pk=paciente)
+        orden = get_object_or_404(paciente.ordenes.all(), pk=pk)
+        serializer = PacienteSerializer(paciente, context={'request': request})
         paciente_json = JSONRenderer().render(serializer.data)
 
         orden_s = serializers.OrdenSerializer(
-            orden, fields=['sucursal', 'institucion', 'plan', 'afiliacion', 'tipo_usuario']
+            orden, fields=['institucion', 'plan', 'afiliacion', 'tipo_usuario']
         )
-        acompanante_s = AcompananteSerializer(orden.acompanante)
+
+        # "T3JkZW46MTU="
+        query = """query a($id: ID!) { 
+            orden(id: $id) {
+                id
+                afiliacion
+                tipoUsuario
+                institucion { id }
+                plan { id }
+                acompanante {
+                    asistio
+                    nombre
+                    direccion
+                    telefono
+                }
+                serviciosRealizar {
+                    edges {
+                        node {
+                            numeroSesiones
+                            valor
+                            coopago
+                            servicio { id, nombre }
+                            sesiones {
+                                edges {
+                                    node {
+                                        id
+                                        fecha
+                                        estado
+                                        autorizacion
+                                        fechaAutorizacion
+                                        medico { nombreCompleto }
+                                        sucursal { nombre }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }    
+            }}"""
+        result = schema.execute(query, variable_values={'id': BaseNode.to_global_id('Orden', pk)})
+        servicios_json = JSONRenderer().render(result.data['orden'].pop('serviciosRealizar')['edges'])
+        orden_json = JSONRenderer().render(result.data['orden'])
 
         return Response({
-            'paciente': paciente_json, 'orden_s': orden_s, 'cita': cita,
-            'acompanante_s': acompanante_s, 'VERBO': self.VERBO, 'paciente_id': orden.paciente_id
+            'paciente': paciente_json, 'orden_s': orden_s, 'cita': cita, 'orden': orden_json,
+            'VERBO': self.VERBO, 'paciente_id': paciente.id, 'servicios': servicios_json
         })
 
 

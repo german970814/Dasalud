@@ -41,6 +41,13 @@ class Sesion(DjangoObjectType):
         return reverse('pacientes:historias', args=(self.id, ))
 
 
+class Acompanante(DjangoObjectType):
+
+    class Meta:
+        model = models.Acompanante
+        interfaces = (BaseNode,)
+
+
 class Query(graphene.AbstractType):
     sesion = BaseNode.Field(Sesion)
     sesiones = DjangoFilterConnectionField(Sesion, description='Todas las sesiones')
