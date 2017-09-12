@@ -110,7 +110,8 @@
 
             static get observers() {
                 return [
-                    '_acompananteObligatorio(value.asistio)', '_cleanTelefonoValue(value.telefono)'
+                    '_acompananteObligatorio(value.asistio)', '_cleanTelefonoValue(value.telefono)',
+                    '_notifyServicio(value.institucion, value.plan)'
                 ];
             }
 
@@ -165,6 +166,14 @@
             _cleanTelefonoValue(value) {
                 if(value == '') {
                     this.set('value.telefono', null);
+                }
+            }
+
+            _notifyServicio(institucion, plan) {
+                if(institucion != null || plan != null) {
+                    this.dispatchEvent(new CustomEvent(
+                        'institucion-plan-changed', {detail: {institucion, plan}}
+                    ));
                 }
             }
 

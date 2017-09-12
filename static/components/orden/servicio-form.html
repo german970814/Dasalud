@@ -117,14 +117,8 @@
 
             static get properties() {
                 return {
-                    institucion: {
-                        type: String,
-                        value: "SW5zdGl0dWNpb246MQ=="
-                    },
-                    plan: {
-                        type: String,
-                        value: "UGxhbjox"
-                    },
+                    institucion: String,
+                    plan: String,
                     cita: {
                         type: Object,
                         observer: '_citaProvided'
@@ -164,8 +158,8 @@
                 if (newValue != undefined) {
                     let fecha, hora;
                     if (!moment.isMoment(newValue.start)) {
-                        fecha = moment(newValue.start).format('YYYY-MM-DD');
-                        hora = moment(newValue.start).format('HH:mm');
+                        fecha = moment.utc(newValue.start).format('YYYY-MM-DD');
+                        hora = moment.utc(newValue.start).format('HH:mm');
                     }
                     else {
                         fecha = newValue.start.format('YYYY-MM-DD');

@@ -3,7 +3,7 @@ from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from pacientes.models import Paciente
+from pacientes.models import Paciente, Orden
 from . import models
 
 
@@ -36,7 +36,7 @@ class CitaSerializer(FlexFieldsModelSerializer):
         model = models.Cita
         fields = [
             'id', 'paciente', 'servicio', 'estado', 'horario', 'start', 'end', 'title', 'redirecciona',
-            'redirecciona_link', 'edit_link'
+            'redirecciona_link', 'edit_link', 'sesion'
         ]
     
     expandable_fields = {
@@ -73,9 +73,13 @@ class CitaSerializer(FlexFieldsModelSerializer):
             return None
         
         request = self.context.get('request', None)
-        try:
-            paciente = Paciente.objects.get(numero_documento=obj.paciente.numero_documento)
-            return reverse('pacientes:ordenes-nueva', args=(paciente.id,), request=request)
-        except Exception as e:
-            return reverse('pacientes:crear', request=request)
+        if not obj.sesion:
+            try:
+                paciente = Paciente.objects.get(numero_documento=obj.paciente.numero_documento)
+                return reverse('pacientes:ordenes-nueva', args=(paciente.id,), request=request)
+            except Exception as e:
+                return reverse('pacientes:crear', request=request)
+        else:
+            orden = Orden.objects.get(servicios_realizar__sesiones=obj.sesion_id)
+            return reverse('pacientes:ordenes-detalle', kwargs={'paciente': orden.paciente_id, 'pk': orden.pk}, request=request)
 

@@ -1,6 +1,7 @@
 from contextlib import suppress
 from django.db import models
 from django.utils.translation import ugettext_lazy as _lazy
+from rest_framework.reverse import reverse
 
 
 class ParentescoMixin(object):
@@ -238,6 +239,9 @@ class Orden(models.Model):
 
     def __str__(self):
         return '{0} - {1}'.format(str(self.paciente), self.pk)
+
+    def get_absolute_url(self):
+        return reverse('pacientes:ordenes-detalle', kwargs={'paciente': self.paciente_id, 'pk': self.id})
 
 
 class ServicioRealizar(models.Model):

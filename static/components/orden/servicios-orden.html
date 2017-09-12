@@ -31,15 +31,36 @@
             .detail {
                 padding: 10px;
             }
+
+            #gridError {
+                display: none;
+            }
+
+            #gridError.invalid {
+                color: var(--error-color);
+                text-transform: uppercase;
+                text-align: center;
+                display: block;
+            }
+
+            .invalid {
+                --vaadin-grid-header-cell: {
+                    color: var(--error-color);
+                    height: 64px;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                };
+            }
         </style>
 
         <agenda-citas id="citas" documento="[[paciente.numero_documento]]" on-cita-selected="_citaSelected"></agenda-citas>
 
-        <servicio-form id="form" cita="[[cita]]"></servicio-form>
+        <servicio-form id="form" cita="[[cita]]" institucion="[[institucion]]" plan="[[plan]]"></servicio-form>
 
         <paper-button on-tap="_add">Agregar</paper-button>
         <paper-button on-tap="_showCitas">Citas no asociadas</paper-button>
         <br><br>
+        <div id="gridError">Debes agregar al menos un servicio.</div>
         <vaadin-grid id="grid" items="[[servicios]]">
 
             <template class="row-details">
@@ -230,6 +251,17 @@
                 });
                 this.$.total.innerHtml = total;
                 return total;
+            }
+
+            validate() {
+                if(this.servicios.length == 0) {
+                    this.$.grid.classList.add('invalid');
+                    this.$.gridError.classList.add('invalid');
+                    return false;
+                }
+
+                this.$.gridError.classList.remove('invalid');
+                return true;
             }
 
             serialize() {

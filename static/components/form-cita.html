@@ -76,7 +76,7 @@
                             <vaadin-combo-box name="estado" label="Estado*" items="[[estados]]" auto-validate required
                                 value="{{cita.estado}}"></vaadin-combo-box>
                         </div>
-                        <show-json json="[[cita]]"></show-json>
+                        <!-- <show-json json="[[cita]]"></show-json> -->
                     </form>
                 </iron-form>
             </paper-dialog-scrollable>
@@ -120,6 +120,12 @@
                 };
             }
 
+            static get observers() {
+                return [
+                    '_cleanNumberValues(cita.paciente.telefono, cita.paciente.celular)'
+                ];
+            }
+
             constructor() {
                 super();
             }
@@ -137,6 +143,18 @@
 
             close() {
                 this.$.dialog.close();
+            }
+
+            _cleanNumberValues(telefono, celular) {
+                console.log(telefono);
+                console.log(celular);
+                if(telefono == '') {
+                    this.set('cita.paciente.telefono', null);
+                }
+
+                if(celular == '') {
+                    this.set('cita.paciente.celular', null);
+                }
             }
 
             _formatFecha(fecha) {

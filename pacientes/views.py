@@ -213,7 +213,7 @@ class OrdenesPacienteView(generics.CreateAPIView):
 
     def get_serializer(self, *args, **kwargs):
         fields = [
-            'id', 'institucion', 'plan', 'afiliacion',
+            'id', 'institucion', 'plan', 'afiliacion', 'orden_link',
             'tipo_usuario', 'acompanante', 'servicios_realizar'
         ]
         expand = ['acompanante', 'servicios_realizar.sesiones']

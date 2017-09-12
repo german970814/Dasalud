@@ -1,4 +1,5 @@
 from django.db import transaction
+from rest_framework.reverse import reverse
 from rest_framework import serializers
 from rest_flex_fields import FlexFieldsModelSerializer
 from common.serializers import PrimaryKeyGlobalIDMixin
@@ -44,12 +45,13 @@ class OrdenSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
     """Serializer para el modelo Orden."""
 
     cliente = serializers.SerializerMethodField()
+    orden_link = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Orden
         fields = [
             'id', 'fecha_orden', 'institucion', 'plan', 'cliente', 'afiliacion', 'tipo_usuario',
-            'anulada', 'razon_anulacion', 'servicios_realizar', 'paciente'
+            'anulada', 'razon_anulacion', 'servicios_realizar', 'paciente', 'orden_link'
         ]
 
     expandable_fields = {
@@ -89,7 +91,7 @@ class OrdenSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
                     else:
                         self.crear_cita(sesion, servicio.servicio, orden.paciente)
             
-            raise ValueError
+            # raise ValueError
             return orden
 
     def get_cliente(self, obj):
@@ -99,6 +101,9 @@ class OrdenSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
         """
 
         return str(obj.plan.cliente)
+
+    def get_orden_link(self, obj):
+        return reverse('pacientes:ordenes-detalle', kwargs={'paciente': obj.paciente_id, 'pk': obj.id})
 
     def crear_cita(self, sesion, servicio, paciente):
         from agenda.models import Cita, Persona, HorarioAtencion
