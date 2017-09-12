@@ -81,6 +81,10 @@
 {% endblock dialogs %}
 
 {% block js %}
+    <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'bower_components/moment/min/moment.min.js' %}"></script>
+    <script src="{% static 'bower_components/fullcalendar/dist/fullcalendar.min.js' %}"></script>
+    <script src="{% static 'bower_components/fullcalendar/dist/locale/es.js' %}"></script>
     <script>
         const request = document.getElementById('request');
         const ordenForm = document.querySelector('orden-form');
@@ -172,7 +176,11 @@
 
                     let sesiones = [];
                     data.node.sesiones.edges.forEach(sesionData => {
+                        console.log(sesionData);
+                        let moment_ = moment.utc(sesionData.node.fecha);
                         let sesion = {
+                            fecha: moment_.format('DD/MM/YYYY'),
+                            hora: moment_.format('HH:mm'),
                             estado: sesionData.node.estado,
                             autorizacion: sesionData.node.autorizacion,
                             fecha_autorizacion: sesionData.node.fechaAutorizacion,
@@ -192,11 +200,6 @@
             }
         {% endif %}
     </script>
-
-    <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
-    <script src="{% static 'bower_components/moment/min/moment.min.js' %}"></script>
-    <script src="{% static 'bower_components/fullcalendar/dist/fullcalendar.min.js' %}"></script>
-    <script src="{% static 'bower_components/fullcalendar/dist/locale/es.js' %}"></script>
 
     <script>
         const calendar = $('#calendar');
