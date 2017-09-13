@@ -33,11 +33,15 @@ class AdjuntoSerializer(FlexFieldsModelSerializer):
     """"Serializer para el modelo Adjunto."""
 
     nombre = serializers.SerializerMethodField()
+    url_delete = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Adjunto
-        fields = ['id', 'archivo', 'nombre']
+        fields = ['id', 'archivo', 'nombre', 'url_delete']
     
     def get_nombre(self, obj):
         split_name = obj.archivo.name.split('/')
         return split_name[-1]
+
+    def get_url_delete(self, obj):
+        return reverse('historias:adjuntos-eliminar', args=(obj.id, ))

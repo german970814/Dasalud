@@ -54,5 +54,6 @@ class AdjuntosHistoriaView(generics.ListCreateAPIView):
             self.historia.save()
             serializer.save(historia=self.sesion.historia)
 
+
 class AdjuntosHistoriaDestroyView(generics.DestroyAPIView):
     queryset = Adjunto.objects.all()

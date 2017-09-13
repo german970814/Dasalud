@@ -52,4 +52,10 @@ class Adjunto(models.Model):
     def __str__(self):
         return '{0} - {1}'.format(self.historia, self.pk)
 
-    # def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs):
+        import os
+
+        path = self.archivo.path
+        super().delete(*args, **kwargs)
+        if os.path.exists(path) and os.path.isfile(path):
+            os.remove(path)
