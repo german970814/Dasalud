@@ -35,8 +35,10 @@
             </template>
         </div>
         <div class="actions">
-            <paper-button on-tap="save">Guardar</paper-button>
-            <paper-button on-tap="close">Cerrar</paper-button>
+            <template is="dom-if" if="[[historia.is_editable]]">
+                <paper-button on-tap="save">Guardar</paper-button>
+                <paper-button on-tap="close">Cerrar</paper-button>
+            </template>
         </div>
 
         <paper-dialog on-iron-overlay-closed="confirmClose" id="dialog">
@@ -58,6 +60,9 @@
                 return {
                     fields: {
                         type: Array
+                    },
+                    historia: {
+                        type: Object
                     },
                     invalid: {
                         type: Boolean,
