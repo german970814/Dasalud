@@ -165,12 +165,16 @@
                 let servicios = [];
 
                 serviciosData.forEach(data => {
+                    let medico = data.node.sesiones.edges[0].node.medico.nombreCompleto;
                     let servicio = {
                         numero_sesiones: data.node.numeroSesiones,
                         coopago: data.node.coopago,
                         valor: data.node.valor,
                         servicioItem: {
                             node: { nombre: data.node.servicio.nombre }
+                        },
+                        medicoItem: {
+                            node: { nombreCompleto: medico }
                         }
                     };
 

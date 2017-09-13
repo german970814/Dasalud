@@ -2,7 +2,6 @@ import graphene
 from graphene_django import DjangoConnectionField, DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField, filterset
 from common.schema import BaseNode
-# from .filters import EmpleadoFilter
 from . import models
 
 
