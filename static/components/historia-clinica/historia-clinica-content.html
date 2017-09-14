@@ -34,12 +34,12 @@
                 </template>
             </template>
         </div>
-        <div class="actions">
-            <template is="dom-if" if="[[historia.is_editable]]">
+        <template is="dom-if" if="[[isEditable]]">
+            <div class="actions">
                 <paper-button on-tap="save">Guardar</paper-button>
                 <paper-button on-tap="close">Cerrar</paper-button>
-            </template>
-        </div>
+            </div>
+        </template>
 
         <paper-dialog on-iron-overlay-closed="confirmClose" id="dialog">
             <h2>¿Estás seguro que deseas cerrar la historia?</h2>
@@ -61,8 +61,8 @@
                     fields: {
                         type: Array
                     },
-                    historia: {
-                        type: Object
+                    isEditable: {
+                        type: Boolean
                     },
                     invalid: {
                         type: Boolean,

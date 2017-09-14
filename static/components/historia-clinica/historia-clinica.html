@@ -46,7 +46,7 @@
 
         <iron-pages id="pages" selected="{{selected}}">
             <template is="dom-repeat" items="[[historia.contenido]]">
-                <historia-clinica-content on-close-historia="_close" on-validate-historia="_checkValidity" fields=[[item.fields]] historia=[[historia]]></historia-clinica-content>
+                <historia-clinica-content on-close-historia="_close" on-validate-historia="_checkValidity" fields=[[item.fields]] is-editable=[[historia.is_editable]]></historia-clinica-content>
             </template>
             <historia-clinica-adjuntos url="[[historia.url_adjunto]]"></historia-clinica-adjuntos>
         </iron-pages>
