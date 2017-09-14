@@ -196,7 +196,7 @@
       <div id="commands">
         <paper-icon-button icon="my-icons:remove-red-eye" file-event="file-show" on-tap="_fireFileEvent" hidden$="[[file.error]]"></paper-icon-button>
         <paper-icon-button icon="my-icons:refresh" file-event="file-retry" on-tap="_fireFileEvent" hidden$="[[!file.error]]"></paper-icon-button>
-        <paper-icon-button icon="my-icons:clear" file-event="file-abort" on-tap="_fireFileEvent"></paper-icon-button>
+        <paper-icon-button icon="my-icons:clear" file-event="file-abort" on-tap="_fireFileEvent" hidden$="[[!isEditable]]"></paper-icon-button>
       </div>
 
     </div>
@@ -224,7 +224,8 @@
       /**
        * File metadata, upload status and progress information.
        */
-      file: Object
+      file: Object,
+      isEditable: Boolean,
     },
 
     observers: [
