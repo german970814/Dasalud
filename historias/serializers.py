@@ -17,10 +17,11 @@ class HistoriaSerializer(FlexFieldsModelSerializer):
 
     nombre_servicio = serializers.SerializerMethodField()
     url_adjunto = serializers.SerializerMethodField()
+    is_editable = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Historia
-        fields = ['id', 'nombre_servicio', 'terminada', 'contenido', 'url_adjunto']
+        fields = ['id', 'nombre_servicio', 'terminada', 'contenido', 'url_adjunto', 'is_editable']
     
     def get_nombre_servicio(self, obj):
         return obj.sesion.servicio.servicio.nombre
@@ -28,16 +29,23 @@ class HistoriaSerializer(FlexFieldsModelSerializer):
     def get_url_adjunto(self, obj):
         return reverse('historias:adjuntos', args=(obj.sesion_id, ))
 
+    def get_is_editable(self, obj):
+        return not obj.terminada
+
 
 class AdjuntoSerializer(FlexFieldsModelSerializer):
     """"Serializer para el modelo Adjunto."""
 
     nombre = serializers.SerializerMethodField()
+    url_delete = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Adjunto
-        fields = ['id', 'archivo', 'nombre']
+        fields = ['id', 'archivo', 'nombre', 'url_delete']
     
     def get_nombre(self, obj):
         split_name = obj.archivo.name.split('/')
         return split_name[-1]
+
+    def get_url_delete(self, obj):
+        return reverse('historias:adjuntos-eliminar', args=(obj.id, ))
