@@ -63,7 +63,6 @@
     <script src="{% static 'bower_components/moment/min/moment.min.js' %}"></script>
     <script src="{% static 'bower_components/fullcalendar/dist/fullcalendar.min.js' %}"></script>
     <script src="{% static 'bower_components/fullcalendar/dist/locale/es.js' %}"></script>
-    <script src="{% static 'components/ds-scheduler/ResourceView.js' %}"></script>
     <script src="{% static 'js/utils.js' %}"></script>
 
     <script>
@@ -76,9 +75,8 @@
             header: {
                 'left': 'prev,next, today',
                 'center': 'title',
-                'right': 'month,agendaWeek,agendaDay,resource'
+                'right': 'month,agendaWeek,agendaDay'
             },
-            defaultView: 'resource',
             allDaySlot: false,
             slotLabelFormat: 'h(:mm)a',
             navLinks: true,

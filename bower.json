@@ -43,7 +43,8 @@
     "vaadin-date-picker": "vaadin/vaadin-date-picker#2.0.0-alpha1",
     "scheduler-component": "HaithemMosbahi/scheduler-component#^1.6.0",
     "apollo-client": "reach-digital/polymer-apollo-client#^0.8.4",
-    "fullcalendar": "^3.5.1"
+    "fullcalendar": "^3.5.1",
+    "fullcalendar-scheduler": "^1.7.1"
   },
   "devDependencies": {
     "show-json": "ryanburns23/show-json#^2.0.0"
