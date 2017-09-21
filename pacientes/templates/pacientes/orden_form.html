@@ -49,10 +49,12 @@
                 </orden-form>
             </div>
         </div>
+        <br>
+        <servicios-orden2></servicios-orden2>
         {% if cita %}
-            <servicios-orden cita='{{ cita }}'></servicios-orden>          
+            <!-- <servicios-orden cita='{{ cita }}'></servicios-orden>           -->
         {% else %}
-            <servicios-orden></servicios-orden>
+            <!-- <servicios-orden></servicios-orden> -->
         {% endif %}
         
         <paper-button id="save">{% trans "Guardar" %}</paper-button>
@@ -60,6 +62,7 @@
 {% endblock content %}
 
 {% block dialogs %}
+    <servicio-form2></servicio-form2>
     <paper-dialog>
         <div>
             {% trans "Debe agregar por lo menos un servicio." %}                
@@ -88,121 +91,121 @@
     <script>
         const request = document.getElementById('request');
         const ordenForm = document.querySelector('orden-form');
-        const serviciosOrden = document.querySelector('servicios-orden');
+        const serviciosOrden = document.querySelector('servicios-orden2');
 
-        ordenForm.addEventListener('institucion-plan-changed', function(e) {
-            let institucion = e.detail.institucion
-            let plan = e.detail.plan;
+        // ordenForm.addEventListener('institucion-plan-changed', function(e) {
+        //     let institucion = e.detail.institucion
+        //     let plan = e.detail.plan;
 
-            if(institucion) serviciosOrden.institucion = institucion.value;
-            if(plan) serviciosOrden.plan = plan.node.id;
-        });
+        //     if(institucion) serviciosOrden.institucion = institucion.value;
+        //     if(plan) serviciosOrden.plan = plan.node.id;
+        // });
 
-        document.getElementById('save').addEventListener('click', function(e) {
-            console.log(e);
-            let ordenValid = ordenForm.validate();
-            let serviciosValid = serviciosOrden.validate();
-            if( ordenValid && serviciosValid) {
-                let orden = serializeOrden(ordenForm.value, serviciosOrden.serialize());
-                request.body = orden;
-                request.generateRequest();
-            }            
-        });
+        // document.getElementById('save').addEventListener('click', function(e) {
+        //     console.log(e);
+        //     let ordenValid = ordenForm.validate();
+        //     let serviciosValid = serviciosOrden.validate();
+        //     if( ordenValid && serviciosValid) {
+        //         let orden = serializeOrden(ordenForm.value, serviciosOrden.serialize());
+        //         request.body = orden;
+        //         request.generateRequest();
+        //     }            
+        // });
 
-        request.addEventListener('response', function(e) {
-            console.log(e);
-            let response = e.detail.response;
-            window.location = response.orden_link;
-        });
+        // request.addEventListener('response', function(e) {
+        //     console.log(e);
+        //     let response = e.detail.response;
+        //     window.location = response.orden_link;
+        // });
 
-        request.addEventListener('error', function(e) {
-            console.log(e);
-        });
+        // request.addEventListener('error', function(e) {
+        //     console.log(e);
+        // });
 
-        function serializeOrden(ordenData, serviciosData) {
-            console.log(ordenData);
-            let orden = {
-                tipo_usuario: ordenData.tipoUsuario.value,
-                institucion: ordenData.institucion.value,
-                afiliacion: ordenData.afiliacion.value,
-                plan: ordenData.plan.node.id,
-                acompanante: {
-                    asistio: ordenData.asistio,
-                    nombre: ordenData.nombreCompleto,
-                    direccion: ordenData.direccion,
-                    telefono: ordenData.telefono
-                },
-                servicios_realizar: serviciosData
-            }
-            console.log(orden);
-            return orden;
-        }
+        // function serializeOrden(ordenData, serviciosData) {
+        //     console.log(ordenData);
+        //     let orden = {
+        //         tipo_usuario: ordenData.tipoUsuario.value,
+        //         institucion: ordenData.institucion.value,
+        //         afiliacion: ordenData.afiliacion.value,
+        //         plan: ordenData.plan.node.id,
+        //         acompanante: {
+        //             asistio: ordenData.asistio,
+        //             nombre: ordenData.nombreCompleto,
+        //             direccion: ordenData.direccion,
+        //             telefono: ordenData.telefono
+        //         },
+        //         servicios_realizar: serviciosData
+        //     }
+        //     console.log(orden);
+        //     return orden;
+        // }
 
-        {% if orden %}
-            const ordenData = document.getElementById('ordenHidden');
-            ordenForm.value = deserializeOrden(JSON.parse(ordenData.innerHTML));
-            ordenForm.readonly = true;
+        // {% if orden %}
+        //     const ordenData = document.getElementById('ordenHidden');
+        //     ordenForm.value = deserializeOrden(JSON.parse(ordenData.innerHTML));
+        //     ordenForm.readonly = true;
             
-            function deserializeOrden(ordenData) {
-                let value = {
-                    institucionValue: ordenData.institucion.id,
-                    planValue: ordenData.plan.id,
-                    afiliacionValue: ordenData.afiliacion,
-                    tipoUsuarioValue: ordenData.tipoUsuario,
-                    asistio: ordenData.acompanante.asistio,
-                    nombreCompleto: ordenData.acompanante.nombre,
-                    direccion: ordenData.acompanante.direccion,
-                    telefono: ordenData.acompanante.telefono
-                }
-                return value;
-            }
+        //     function deserializeOrden(ordenData) {
+        //         let value = {
+        //             institucionValue: ordenData.institucion.id,
+        //             planValue: ordenData.plan.id,
+        //             afiliacionValue: ordenData.afiliacion,
+        //             tipoUsuarioValue: ordenData.tipoUsuario,
+        //             asistio: ordenData.acompanante.asistio,
+        //             nombreCompleto: ordenData.acompanante.nombre,
+        //             direccion: ordenData.acompanante.direccion,
+        //             telefono: ordenData.acompanante.telefono
+        //         }
+        //         return value;
+        //     }
 
-            const serviciosData = document.getElementById('serviciosHidden');
-            console.log(JSON.parse(serviciosData.innerHTML));
-            serviciosOrden.servicios = deserializeServicios(JSON.parse(serviciosData.innerHTML));
+        //     const serviciosData = document.getElementById('serviciosHidden');
+        //     console.log(JSON.parse(serviciosData.innerHTML));
+        //     serviciosOrden.servicios = deserializeServicios(JSON.parse(serviciosData.innerHTML));
 
-            function deserializeServicios(serviciosData) {
-                let servicios = [];
+        //     function deserializeServicios(serviciosData) {
+        //         let servicios = [];
 
-                serviciosData.forEach(data => {
-                    let medico = data.node.sesiones.edges[0].node.medico.nombreCompleto;
-                    let servicio = {
-                        numero_sesiones: data.node.numeroSesiones,
-                        coopago: data.node.coopago,
-                        valor: data.node.valor,
-                        servicioItem: {
-                            node: { nombre: data.node.servicio.nombre }
-                        },
-                        medicoItem: {
-                            node: { nombreCompleto: medico }
-                        }
-                    };
+        //         serviciosData.forEach(data => {
+        //             let medico = data.node.sesiones.edges[0].node.medico.nombreCompleto;
+        //             let servicio = {
+        //                 numero_sesiones: data.node.numeroSesiones,
+        //                 coopago: data.node.coopago,
+        //                 valor: data.node.valor,
+        //                 servicioItem: {
+        //                     node: { nombre: data.node.servicio.nombre }
+        //                 },
+        //                 medicoItem: {
+        //                     node: { nombreCompleto: medico }
+        //                 }
+        //             };
 
-                    let sesiones = [];
-                    data.node.sesiones.edges.forEach(sesionData => {
-                        console.log(sesionData);
-                        let moment_ = moment.utc(sesionData.node.fecha);
-                        let sesion = {
-                            fecha: moment_.format('DD/MM/YYYY'),
-                            hora: moment_.format('HH:mm'),
-                            estado: sesionData.node.estado,
-                            autorizacion: sesionData.node.autorizacion,
-                            fecha_autorizacion: sesionData.node.fechaAutorizacion,
-                            sucursal: {
-                                node: { nombre: sesionData.node.sucursal.nombre }
-                            }
-                        };
+        //             let sesiones = [];
+        //             data.node.sesiones.edges.forEach(sesionData => {
+        //                 console.log(sesionData);
+        //                 let moment_ = moment.utc(sesionData.node.fecha);
+        //                 let sesion = {
+        //                     fecha: moment_.format('DD/MM/YYYY'),
+        //                     hora: moment_.format('HH:mm'),
+        //                     estado: sesionData.node.estado,
+        //                     autorizacion: sesionData.node.autorizacion,
+        //                     fecha_autorizacion: sesionData.node.fechaAutorizacion,
+        //                     sucursal: {
+        //                         node: { nombre: sesionData.node.sucursal.nombre }
+        //                     }
+        //                 };
 
-                        sesiones.push(sesion);
-                    });
-                    servicio.sesiones = sesiones;
+        //                 sesiones.push(sesion);
+        //             });
+        //             servicio.sesiones = sesiones;
                     
-                    servicios.push(servicio);
-                });
-                console.log(servicios);
-                return servicios;
-            }
-        {% endif %}
+        //             servicios.push(servicio);
+        //         });
+        //         console.log(servicios);
+        //         return servicios;
+        //     }
+        // {% endif %}
     </script>
 
     <script>

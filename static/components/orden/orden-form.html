@@ -39,19 +39,20 @@
         <iron-form id="form">
             <form>
                 <div class="row">
-                    <vaadin-combo-box label="Entidad que prestará el servicio*" required items="[[instituciones]]"
-                    selected-item="{{value.institucion}}" value="[[value.institucionValue]]" readonly="[[readonly]]">
+                    <vaadin-combo-box label="Entidad que prestará el servicio*" required items="[[instituciones]]" auto-validate
+                        selected-item="{{value.institucion}}" value="[[value.institucionValue]]" readonly="[[readonly]]">
                     </vaadin-combo-box>
                     <vaadin-combo-box label="Entidad*" required items="[[planesResult.planes.edges]]" value="[[value.planValue]]"
-                        item-value-path="node.id" item-label-path="node.label" selected-item="{{value.plan}}" readonly="[[readonly]]">
+                        item-value-path="node.id" item-label-path="node.label" selected-item="{{value.plan}}" 
+                        readonly="[[readonly]]" auto-validate>
                     </vaadin-combo-box>
                 </div>
                 <div class="row">
                     <vaadin-combo-box label="Afiliación*" required items="[[afiliaciones]]" readonly="[[readonly]]"
-                        selected-item="{{value.afiliacion}}" value="[[value.afiliacionValue]]">
+                        selected-item="{{value.afiliacion}}" value="[[value.afiliacionValue]]" auto-validate>
                     </vaadin-combo-box>
                     <vaadin-combo-box label="tipo de usuario*" required items="[[tiposUsuario]]" readonly="[[readonly]]"
-                        selected-item="{{value.tipoUsuario}}" value="[[value.tipoUsuarioValue]]">
+                        selected-item="{{value.tipoUsuario}}" value="[[value.tipoUsuarioValue]]" auto-validate>
                     </vaadin-combo-box>
                 </div>
                 <div class="row">
@@ -60,9 +61,10 @@
                     </paper-toggle-button>
                 </div>
                 <div class="row" id="acompananteInputs">
-                    <paper-input label="Nombre completo" value="{{value.nombreCompleto}}" readonly="[[readonly]]"></paper-input>
-                    <paper-input label="Dirección" value="{{value.direccion}}" readonly="[[readonly]]"></paper-input>
-                    <paper-input label="Telefono" value="{{value.telefono}}" readonly="[[readonly]]"></paper-input>
+                    <paper-input label="Nombre completo" value="{{value.nombreCompleto}}" readonly="[[readonly]]" auto-validate>
+                    </paper-input>
+                    <paper-input label="Dirección" value="{{value.direccion}}" readonly="[[readonly]]" auto-validate></paper-input>
+                    <paper-input label="Telefono" value="{{value.telefono}}" readonly="[[readonly]]" auto-validate></paper-input>
                 </div>
             </form>
         </iron-form>

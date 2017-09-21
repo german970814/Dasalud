@@ -1,19 +1,393 @@
 <link rel="import" href="/static/bower_components/polymer/polymer-element.html">
 
-<dom-module id="servicios-orden2">
+<link rel="import" href="/static/bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/static/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/static/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/static/bower_components/paper-input/paper-input.html">
+<link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
+<link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<link rel="import" href="/static/bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="/static/bower_components/show-json/show-json.html">
+
+<link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="/static/components/vaadin-grid-material-styles.html">
+<link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/static/bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="/static/bower_components/iron-list/iron-list.html">
+<link rel="import" href="/static/bower_components/paper-item/paper-item.html">
+<link rel="import" href="/static/my-icons.html">
+
+
+<dom-module id="servicio-form2">
     <template>
         <style>
             :host {
+                display: block
+            }
+
+            paper-dialog {
+                width: 60%;
+            }
+
+            .row {
+                display: flex;
+                align-items: flex-end;
+            }
+            
+            .row > * {
+                flex: 1;
+                margin-right: 10px;
+            }
+
+            .row:last-child paper-input:first-child {
+                flex: 0 1 auto;
+            }
+        </style>
+
+        <graphql-query id="query" variables="[[_queryVariables(institucion, plan)]]" result="{{queryResult}}">
+            query servicioFormData($plan: ID, $institucion: ID){
+                servicios(planes: [$plan]) {
+                    edges {
+                        node {
+                            id
+                            nombre
+                            tarifas(plan: $plan) {
+                                edges {
+                                    node {
+                                        valor
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                medicos(instituciones: [$institucion]) {
+                    edges {
+                        node {
+                            id
+                            nombreCompleto
+                        }
+                    }
+                }
+                sucursales {
+                    edges {
+                        node {
+                            id
+                            nombre
+                        }
+                    }
+                }
+            }
+        </graphql-query>
+
+        <paper-dialog modal id="dialog" opened>
+            <h2>Nuevo Servicio</h2>
+
+            <paper-dialog-scrollable>
+                <iron-form id="form">
+                    <form>
+                        <div class="row">
+                            <vaadin-combo-box label="Sucursal*" required items="[[queryResult.sucursales.edges]]"  
+                                auto-validate value="{{value.sucursal}}" selected-item="{{value.sucursalItem}}"
+                                item-label-path="node.nombre" item-value-path="node.id">
+                            </vaadin-combo-box>
+                            <vaadin-combo-box label="Medico*" required items="[[queryResult.medicos.edges]]" 
+                                auto-validate value="{{value.medico}}" selected-item="{{value.medicoItem}}"
+                                item-label-path="node.nombreCompleto" item-value-path="node.id">
+                            </vaadin-combo-box>
+                        </div>
+                        <div class="row">
+                            <vaadin-combo-box label="Servicio*" required items="[[queryResult.servicios.edges]]" 
+                                auto-validate value="{{value.servicio}}" selected-item="{{value.servicioItem}}"
+                                item-label-path="node.nombre" item-value-path="node.id">
+                            </vaadin-combo-box>
+                        </div>
+                        <div class="row">
+                            <vaadin-date-picker label="Fecha*" required auto-validate value="{{value.fecha}}">
+                            </vaadin-date-picker>
+                            <paper-input type="time" label="Hora*" required value="{{value.hora}}"></paper-input>
+                        </div>
+                        <div class="row">
+                            <paper-input label="Autorización" value="{{value.autorizacion}}"></paper-input>
+                            <vaadin-date-picker name="fecha_autorizacion" label="Fecha autorización" 
+                                value="{{value.fechaAutorizacion}}">
+                            </vaadin-date-picker>
+                        </div>
+                        <div class="row">
+                            <paper-input label="# de sesiones*" type="number" required 
+                                auto-validate min="1" value="{{value.numeroSesiones}}">
+                            </paper-input>
+                            <paper-input label="Valor de la sesión*" type="number" required 
+                                auto-validate min="0" value="{{value.valor}}">
+                            </paper-input>
+                            <paper-input label="Coopago/Moderadora" type="number" auto-validate min="0" 
+                                value="{{value.coopago}}" required>
+                            </paper-input>
+                        </div>                
+                    </form>
+                </iron-form>
+                <show-json json="[[value]]"></show-json>
+            </paper-dialog-scrollable>
+
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancelar</paper-button>
+                <paper-button>Aceptar</paper-button>
+            </div>
+        </paper-dialog>
+
+    </template>
+</dom-module>
+
+<dom-module id="servicios-orden2">
+    <template>
+        <style include="vaadin-grid-material-styles">
+            :host {
                 display: block;
+                border: 1px solid #e8e8e8;
+            }
+
+            .grid {
+                display: grid;
+                grid-template-columns: 20% 1fr;
+                grid-template-rows: 20% 1fr;
+                grid-template-areas: 
+                "servicios servicio-info"
+                "servicios sesiones";
+                box-sizing: border-box;
+                height: 540px;
+            }
+
+            .servicios {
+                grid-area: servicios;
+                display: flex;
+                flex-direction: column;
+                border-right: 1px solid #e8e8e8;
+                /* padding: 5px; */
+            }
+
+            .servicios app-toolbar {
+                border-bottom: 1px solid #e8e8e8;
+            }
+
+            .servicios iron-list {
+                flex: 1;
+            }
+
+            .servicio-info {
+                grid-area: servicio-info;
+                display: grid;
+                grid-template: 1fr 1fr / 1fr 1fr 1fr;
+                border-bottom: 1px solid #e8e8e8;
+                padding: 5px;
+            }
+            .sesiones {
+                grid-area: sesiones;
+                padding: 5px;
             }
         </style>
         
-        <div></div>
-        <div></div>
+        <div class="grid">
+            <div class="servicios">
+                <app-toolbar>
+                    <paper-icon-button icon="my-icons:add" on-tap="_addServicio"></paper-icon-button>
+                </app-toolbar>
+                <iron-list items='[{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}]'>
+                    <template>
+                        <div>
+                            <paper-item>CONSULTA POR PRIMERA VEZ</paper-item>
+                        </div>
+                    </template>
+                </iron-list>
+            </div>
+            <div class="servicio-info">
+                <p><b>Numero de sesiones:</b> 10</p>
+                <p><b>Cumplidas:</b> 5</p>
+                <p><b>Pendientes:</b> 5</p>
+                <p><b>Valor de la sesión:</b> $10.000</p>
+                <p><b>Coopago/Cuota Moderadora:</b> $10.000</p>
+                <p><b>Fecha Inicio:</b> 10/10/2017</p>
+            </div>
+            <div class="sesiones">
+                <vaadin-grid>
+                    <vaadin-grid-column>
+                        <template class="header">
+                            <div class="cell">Fecha y Hora</div>
+                        </template>
+                        <template>
+                            <div class="cell"></div>
+                        </template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column>
+                        <template class="header">
+                            <div class="cell">Estado</div>
+                        </template>
+                        <template>
+                            <div class="cell"></div>
+                        </template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column>
+                        <template class="header">
+                            <div class="cell">Medico</div>
+                        </template>
+                        <template>
+                            <div class="cell"></div>
+                        </template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column>
+                        <template class="header">
+                            <div class="cell">Autorización</div>
+                        </template>
+                        <template>
+                            <div class="cell"></div>
+                        </template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column>
+                        <template class="header">
+                            <div class="cell">Fecha Autorización</div>
+                        </template>
+                        <template>
+                            <div class="cell"></div>
+                        </template>
+                    </vaadin-grid-column>
+                </vaadin-grid>
+            </div>
+        </div>
 
     </template>
 
     <script>
+        
+    </script>
+</dom-module>
+
+<script>
+    (function() {
+
+        let servicioFormInstance = null;
+
+        /**
+         * `servicio-form2` Formulario para agregar un servicio a una orden.
+         *
+         * @customElement
+         * @polymer
+         * @extends {Polymer.Element}
+         */
+         class ServicioForm2 extends Polymer.Element {
+            /**
+             * String providing the tag name to register the element under.
+             */
+            static get is() {
+                return 'servicio-form2';
+            }
+
+            /**
+             * Object describing property-related metadata used by Polymer features
+             */
+            static get properties() {
+                return {
+                    /**
+                     * Filtra los medicos permitidos a escoger.
+                     */
+                    institucion: {
+                        type: String,
+                        value: 'SW5zdGl0dWNpb246Mg=='
+                    },
+
+                    /**
+                     * Filtra los servicios permitidos a escoger.
+                     */
+                    plan: {
+                        type: String,
+                        value: 'UGxhbjox=='
+                    },
+
+                    /**
+                     * Datos del formulario.
+                     *
+                     * @type {{sucursal: string, sucursalItem: Object, medico: string, medicoItem: Object, servicio: string, servicioItem: Object, fecha: string, hora: string, autorizacion: string, fechaAutorizacion: string, numeroSesiones: number, valor: number, coopago: number}}
+                     */
+                    value: {
+                        type: Object,
+                        value() {
+                            return {};
+                        }
+                    }
+                };
+            }
+
+            /**
+              * Array of strings describing multi-property observer methods and their
+              * dependant properties
+              */
+            static get observers() {
+                return [
+                    '_cleanNumberValues(value.numeroSesiones, value.valor, value.coopago)',
+                    '_setFieldValorServicio(value.servicioItem)'
+                ];
+            }
+
+            /**
+             * Instance of the element is created/upgraded. Use: initializing state,
+             * set up event listeners, create shadow dom.
+             * @constructor
+             */
+            constructor() {
+                super();
+                if (!servicioFormInstance) servicioFormInstance = this;
+            }
+
+            open() {
+                this.$.dialog.open();
+            }
+
+            /**
+            * Normaliza las variables en un objecto para ser usadas en graphql query
+            * 
+            * @param {string} institucion institucion escogida
+            * @param {string} plan plan escogido
+            * @return {{institucion: String, plan: string}} Objeto para ser usado en query
+            */
+            _queryVariables(institucion, plan) {
+                return { institucion, plan };
+            }
+
+            /**
+            * Normaliza a null los valores numericos cuando estan vacios.
+            * 
+            * @param {number} numeroSesiones Valor del input numeroSesiones
+            * @param {number} valor Valor del input valor 
+            * @param {number} coopago Valor del input coopago 
+            */
+            _cleanNumberValues(numeroSesiones, valor, coopago) {
+                if (numeroSesiones == '') {
+                    this.set('value.numeroSesiones', null);
+                }
+
+                if (valor == '') {
+                    this.set('value.valor', null);
+                }
+
+                if (coopago == '') {
+                    this.set('value.coopago', null);
+                }
+            }
+
+            /**
+            * Setea el valor por sesion de acuerdo al servicio escogido.
+            * 
+            * @param {object} servicio Servicio escogido
+            */
+            _setFieldValorServicio(servicio) {
+                if (servicio) {
+                    this.set('value.valor', servicio.node.tarifas.edges[0].node.valor);
+                }
+            }
+
+        }
+
+        window.customElements.define(ServicioForm2.is, ServicioForm2);
+
         /**
          * `servicios-orden2` Muestra los servicios de una orden.
          *
@@ -21,7 +395,7 @@
          * @polymer
          * @extends {Polymer.Element}
          */
-        class ServicioOrden2 extends Polymer.Element {
+         class ServicioOrden2 extends Polymer.Element {
             /**
              * String providing the tag name to register the element under.
              */
@@ -58,8 +432,11 @@
                 });
             }
 
+            _addServicio() {
+                servicioFormInstance.open();
+            }
         }
 
         window.customElements.define(ServicioOrden2.is, ServicioOrden2);
-    </script>
-</dom-module>
+    }());
+</script>
