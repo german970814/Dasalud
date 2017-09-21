@@ -9,6 +9,7 @@ from rest_framework import generics, filters, status
 from dasalud.schema import schema
 from common.schema import BaseNode
 from agenda.models import Cita
+from historias.serializers import HistoriaSerializer
 from .models import Paciente, Orden, ServicioOrden, Sesion
 from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSerializer
 from . import serializers
@@ -238,8 +239,6 @@ class HistoriasClinicasView(APIView):
         return getattr(sesion, 'historia', None)
 
     def get(self, request, pk):
-        from historias.serializers import HistoriaSerializer
-
         sesion = get_object_or_404(Sesion, pk=pk)
         paciente = sesion.servicio.orden.paciente
 
@@ -253,8 +252,6 @@ class HistoriasClinicasView(APIView):
         return Response({'paciente': paciente_json, 'historia': historia_json, 'pk': pk})
 
     def post(self, request, pk):
-        from historias.serializers import HistoriaSerializer
-
         sesion = get_object_or_404(Sesion, pk=pk)
         historia = sesion.get_historia()
         serializer = HistoriaSerializer(historia, data=request.data, context={'request': request})

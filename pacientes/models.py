@@ -182,6 +182,14 @@ class Paciente(ParentescoMixin, models.Model):
 
         return None
 
+    def get_historias(self):
+        """
+        :returns:
+            Retorna un ``Queryset`` de las historias hechas por el paciente.
+        """
+        from historias.models import Historia
+        return Historia.objects.filter(sesion__servicio__orden__paciente=self)
+
 
 class Orden(models.Model):
     """Modelo que maneja la información de una orden de un paciente."""

@@ -3,6 +3,7 @@ from rest_framework.reverse import reverse
 from rest_framework import serializers
 from rest_flex_fields import FlexFieldsModelSerializer
 from common.serializers import PrimaryKeyGlobalIDMixin
+from common.schema import BaseNode
 from . import models
 
 
@@ -11,6 +12,7 @@ class PacienteSerializer(serializers.ModelSerializer):
 
     edit_link = serializers.HyperlinkedIdentityField(view_name='pacientes:editar')
     ordenes_link = serializers.HyperlinkedIdentityField(view_name='pacientes:ordenes-nueva')
+    graph_id = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Paciente
@@ -19,7 +21,8 @@ class PacienteSerializer(serializers.ModelSerializer):
             'fecha_nacimiento', 'zona', 'direccion', 'telefono', 'celular', 'email', 'grupo_sanguineo',
             'grupo_etnico', 'profesion', 'lugar_nacimiento', 'lugar_residencia', 'activo', 'fecha_ingreso',
             'nombre_responsable', 'direccion_responsable', 'telefono_responsable', 'edit_link', 'ordenes_link',
-            'identificacion_padre', 'nombre_padre', 'identificacion_madre', 'nombre_madre', 'foto', 'firma'
+            'identificacion_padre', 'nombre_padre', 'identificacion_madre', 'nombre_madre', 'foto', 'firma',
+            'graph_id'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -29,6 +32,9 @@ class PacienteSerializer(serializers.ModelSerializer):
         self.fields['grupo_etnico'].initial = models.Paciente.OTRO
         self.fields['foto'].style.update({'attrs': 'no-auto max-files=1 accept=image/*'})
         self.fields['firma'].style.update({'attrs': 'no-auto max-files=1 accept=image/*'})
+
+    def get_graph_id(self, obj):
+        return BaseNode.to_global_id('Paciente', obj.id)
 
 
 class AcompananteSerializer(serializers.ModelSerializer):

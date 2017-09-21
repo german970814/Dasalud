@@ -1,0 +1,124 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
+
+<dom-module id="historia-clinica-historias">
+    <template>
+        <style>
+            :host {
+                display: block;
+                background-color: white;
+            }
+        </style>
+
+        <graphql-query id="query" variables="[[_handleVariables(paciente)]]" hold>
+            query ($paciente: ID!){
+                paciente (id: $paciente) {
+                    historias {
+                        edges {
+                            node {
+                                id
+                                contenido
+                                sesion {
+                                    fecha
+                                    servicio {
+                                        servicio {
+                                            nombre
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        </graphql-query>
+
+        <div class="content">
+            <vaadin-grid items={{historias}}>
+                <vaadin-grid-column>
+                    <template class="header">
+                        <div class="cell">Nombre</div>
+                    </template>
+                    <template>
+                        <div class="cell">[[item.sesion.servicio.servicio.nombre]]</div>
+                    </template>
+                </vaadin-grid-column>
+                <vaadin-grid-column>
+                    <template class="header">
+                        <div class="cell">Fecha</div>
+                    </template>
+                    <template>
+                        <div class="cell">[[item.sesion.fecha]]</div>
+                    </template>
+                </vaadin-grid-column>
+                <vaadin-grid-column>
+                    <template class="header">
+                        <div class="cell">Ver</div>
+                    </template>
+                    <template>
+                        <div class="cell"></div>
+                    </template>
+                </vaadin-grid-column>
+            </vaadin-grid>
+        </div>
+
+        <paper-dialog id="dialog" with-backdrop style="width: 75%; height: 90%;">
+            <!-- <div style="width: 90%; height: 90%;">  
+                <object width="100%" height="100%" data="/static/a.pdf"></object>
+            </div> -->
+        </paper-dialog>
+    </template>
+
+    <script>
+        class HistoriaClinicaHistorias extends Polymer.Element {
+
+            static get is() { return 'historia-clinica-historias'; }
+
+            static get properties() {
+                return {
+                    url: String,
+                    paciente: {
+                        type: String,
+                        value: 'UGFjaWVudGU6MQ=='
+                    },
+                    result: {
+                        type: Object,
+                        readOnly: true
+                    },
+                    historias: Array
+                };
+            }
+
+            constructor() {
+                super();
+            }
+
+            ready() {
+                super.ready();
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    let response = this.$.query.execute();
+                    response.result().then(result => {
+                        if (result.data.paciente) {
+                            this.historias = this._normalizeHistorias(result.data.paciente.historias.edges);
+                        }
+                    });
+                });
+            }
+
+            _handleVariables(paciente) {
+                return { paciente };
+            }
+
+            _normalizeHistorias(historias) {
+                return historias.map(function(element) {
+                    return element.node;
+                }, this);
+            }
+
+        }
+
+        window.customElements.define(HistoriaClinicaHistorias.is, HistoriaClinicaHistorias);
+    </script>
+</dom-module>

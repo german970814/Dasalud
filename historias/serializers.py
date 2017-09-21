@@ -1,3 +1,4 @@
+from common.schema import BaseNode
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 from rest_flex_fields import FlexFieldsModelSerializer
@@ -18,10 +19,11 @@ class HistoriaSerializer(FlexFieldsModelSerializer):
     nombre_servicio = serializers.SerializerMethodField()
     url_adjunto = serializers.SerializerMethodField()
     is_editable = serializers.SerializerMethodField()
+    paciente_graph_id = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Historia
-        fields = ['id', 'nombre_servicio', 'terminada', 'contenido', 'url_adjunto', 'is_editable']
+        fields = ['id', 'nombre_servicio', 'terminada', 'contenido', 'url_adjunto', 'is_editable', 'paciente_graph_id']
     
     def get_nombre_servicio(self, obj):
         return obj.sesion.servicio.servicio.nombre
@@ -31,6 +33,9 @@ class HistoriaSerializer(FlexFieldsModelSerializer):
 
     def get_is_editable(self, obj):
         return not obj.terminada
+
+    def get_paciente_graph_id(self, obj):
+        return BaseNode.to_global_id('Paciente', obj.sesion.servicio.orden.paciente.id)
 
 
 class AdjuntoSerializer(FlexFieldsModelSerializer):

@@ -39,7 +39,7 @@
                 <div slot="file-list">
                     <div id="fileList">
                         <template is="dom-repeat" items="[[files]]" as="file">
-                            <historia-clinica-file file="[[file]]"></historia-clinica-file>
+                            <historia-clinica-file file="[[file]]" is-editable="[[isEditable]]"></historia-clinica-file>
                         </template>
                     </div>
                 </div>
@@ -60,7 +60,11 @@
 
             static get properties() {
                 return {
-                    url: String                                        
+                    url: String,
+                    isEditable: {
+                        type: Boolean,
+                        observer: 'getMaxFiles'
+                    }                                     
                 };
             }
 
@@ -114,6 +118,12 @@
                     }
                 });
                 this.$.ajax.generateRequest();
+            }
+
+            getMaxFiles(_new, old) {
+                if (!_new) {
+                    this.$.upload.maxFiles = this.$.upload.files.length;
+                }
             }
 
         }

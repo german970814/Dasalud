@@ -3,14 +3,20 @@ from graphene_django import DjangoObjectType, DjangoConnectionField
 from graphene_django.filter import DjangoFilterConnectionField
 from common.schema import BaseNode
 
+from historias.schema import Historia
 from . import models
 
 
 class Paciente(DjangoObjectType):
+    
+    historias = DjangoConnectionField(Historia)
 
     class Meta:
         model = models.Paciente
         interfaces = (BaseNode,)
+
+    def resolve_historias(self, args, context, info):
+        return self.get_historias()
 
 
 class Orden(DjangoObjectType):
