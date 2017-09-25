@@ -10,6 +10,7 @@
 <link rel="import" href="/static/bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="/static/bower_components/show-json/show-json.html">
 
+<link rel="import" href="/static/components/vaadin-grid-material-styles.html">
 <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="/static/components/vaadin-grid-material-styles.html">
 <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
@@ -81,7 +82,7 @@
             }
         </graphql-query>
 
-        <paper-dialog modal id="dialog" opened>
+        <paper-dialog modal id="dialog">
             <h2>Nuevo Servicio</h2>
 
             <paper-dialog-scrollable>
@@ -89,17 +90,17 @@
                     <form>
                         <div class="row">
                             <vaadin-combo-box label="Sucursal*" required items="[[queryResult.sucursales.edges]]"  
-                                auto-validate value="{{value.sucursal}}" selected-item="{{value.sucursalItem}}"
+                                auto-validate value="[[value.sucursal]]" selected-item="{{value.sucursalItem}}"
                                 item-label-path="node.nombre" item-value-path="node.id">
                             </vaadin-combo-box>
                             <vaadin-combo-box label="Medico*" required items="[[queryResult.medicos.edges]]" 
-                                auto-validate value="{{value.medico}}" selected-item="{{value.medicoItem}}"
+                                auto-validate value="[[value.medico]]" selected-item="{{value.medicoItem}}"
                                 item-label-path="node.nombreCompleto" item-value-path="node.id">
                             </vaadin-combo-box>
                         </div>
                         <div class="row">
                             <vaadin-combo-box label="Servicio*" required items="[[queryResult.servicios.edges]]" 
-                                auto-validate value="{{value.servicio}}" selected-item="{{value.servicioItem}}"
+                                auto-validate value="[[value.servicio]]" selected-item="{{value.servicioItem}}"
                                 item-label-path="node.nombre" item-value-path="node.id">
                             </vaadin-combo-box>
                         </div>
@@ -132,7 +133,7 @@
 
             <div class="buttons">
                 <paper-button dialog-dismiss>Cancelar</paper-button>
-                <paper-button>Aceptar</paper-button>
+                <paper-button on-tap="add">Agregar</paper-button>
             </div>
         </paper-dialog>
 
@@ -174,6 +175,16 @@
                 flex: 1;
             }
 
+            .servicios iron-list paper-item {
+                border-bottom: 1px solid #e8e8e8;
+            }
+
+            .servicios iron-list paper-item[selected] {
+                background-color: #e4e2e2;
+                font-weight: bold;
+                color: #3e3c3c;
+            }
+
             .servicio-info {
                 grid-area: servicio-info;
                 display: grid;
@@ -185,6 +196,7 @@
                 grid-area: sesiones;
                 padding: 5px;
             }
+            }
         </style>
         
         <div class="grid">
@@ -192,30 +204,36 @@
                 <app-toolbar>
                     <paper-icon-button icon="my-icons:add" on-tap="_addServicio"></paper-icon-button>
                 </app-toolbar>
-                <iron-list items='[{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}]'>
+                <iron-list id="serviciosList" items="[[servicios]]" selection-enabled selected-item="{{selectedServicio}}">
                     <template>
-                        <div>
-                            <paper-item>CONSULTA POR PRIMERA VEZ</paper-item>
-                        </div>
+                        <paper-item selected$="[[selected]]">[[item.node.servicio.nombre]]</paper-item>
                     </template>
                 </iron-list>
             </div>
             <div class="servicio-info">
-                <p><b>Numero de sesiones:</b> 10</p>
+                <p><b>Numero de sesiones:</b> [[selectedServicio.node.numeroSesiones]]</p>
                 <p><b>Cumplidas:</b> 5</p>
                 <p><b>Pendientes:</b> 5</p>
-                <p><b>Valor de la sesión:</b> $10.000</p>
-                <p><b>Coopago/Cuota Moderadora:</b> $10.000</p>
+                <p><b>Valor de la sesión:</b> $[[selectedServicio.node.valor]]</p>
+                <p><b>Coopago/Cuota Moderadora:</b> $[[selectedServicio.node.coopago]]</p>
                 <p><b>Fecha Inicio:</b> 10/10/2017</p>
             </div>
             <div class="sesiones">
-                <vaadin-grid>
+                <vaadin-grid id="grid" items="[[selectedServicio.node.sesiones.edges]]">
                     <vaadin-grid-column>
                         <template class="header">
-                            <div class="cell">Fecha y Hora</div>
+                            <div class="cell">Fecha</div>
                         </template>
                         <template>
-                            <div class="cell"></div>
+                            <div class="cell">[[_formatFecha(item.node.fecha)]]</div>
+                        </template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column>
+                        <template class="header">
+                            <div class="cell">Hora</div>
+                        </template>
+                        <template>
+                            <div class="cell">[[_formatHora(item.node.fecha)]]</div>
                         </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
@@ -223,7 +241,7 @@
                             <div class="cell">Estado</div>
                         </template>
                         <template>
-                            <div class="cell"></div>
+                            <div class="cell">[[item.node.estado]]</div>
                         </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
@@ -231,7 +249,7 @@
                             <div class="cell">Medico</div>
                         </template>
                         <template>
-                            <div class="cell"></div>
+                            <div class="cell">[[item.node.medico.nombreCompleto]]</div>
                         </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
@@ -239,7 +257,7 @@
                             <div class="cell">Autorización</div>
                         </template>
                         <template>
-                            <div class="cell"></div>
+                            <div class="cell">[[item.node.autorizacion]]</div>
                         </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
@@ -247,7 +265,15 @@
                             <div class="cell">Fecha Autorización</div>
                         </template>
                         <template>
-                            <div class="cell"></div>
+                            <div class="cell">[[item.node.fechaAutorizacion]]</div>
+                        </template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column>
+                        <template class="header">
+                            <div class="cell">Sucursal</div>
+                        </template>
+                        <template>
+                            <div class="cell">[[item.node.sucursal.node.nombre]]</div>
                         </template>
                     </vaadin-grid-column>
                 </vaadin-grid>
@@ -282,6 +308,13 @@
             }
 
             /**
+            * Emitido cuando el formulario es valido y se presiona el boton Agregar.
+            *
+            * @param {Param} data Datos del servicio a agregar.
+            * @event add-servicio
+            */
+
+            /**
              * Object describing property-related metadata used by Polymer features
              */
             static get properties() {
@@ -291,7 +324,7 @@
                      */
                     institucion: {
                         type: String,
-                        value: 'SW5zdGl0dWNpb246Mg=='
+                        value: ''
                     },
 
                     /**
@@ -299,7 +332,7 @@
                      */
                     plan: {
                         type: String,
-                        value: 'UGxhbjox=='
+                        value: ''
                     },
 
                     /**
@@ -309,9 +342,7 @@
                      */
                     value: {
                         type: Object,
-                        value() {
-                            return {};
-                        }
+                        value: () => { return {}; }
                     }
                 };
             }
@@ -335,10 +366,6 @@
             constructor() {
                 super();
                 if (!servicioFormInstance) servicioFormInstance = this;
-            }
-
-            open() {
-                this.$.dialog.open();
             }
 
             /**
@@ -384,6 +411,43 @@
                 }
             }
 
+            /** Muestra el formulario. */
+            open() {
+                this.$.dialog.open();
+            }
+
+            /** Oculta el formulario. */
+            close() {
+                this.$.dialog.close();
+            }
+
+            /** Limpia el formulario. */
+            clean() {
+                this.value = {};
+            }
+
+            /**
+            * Valida el formulario
+            * 
+            * @returns {boolean} True si el formulario es valido, false si es invalido.
+            */
+            validate() {
+                return this.$.form.validate();
+            }
+
+            /**
+            * Verifica que el formulario sea valido y notifica si se debe agregar un nuevo servicio.
+            */
+            add() {
+                if (this.validate()) {
+                    this.close();
+                    this.dispatchEvent(new CustomEvent('add-servicio', {
+                        detail: { data: this.value }
+                    }));
+                    this.clean();
+                }
+            }            
+
         }
 
         window.customElements.define(ServicioForm2.is, ServicioForm2);
@@ -408,7 +472,21 @@
              */
             static get properties() {
                 return {
-                    
+                    /**
+                     * Servicios a realizar en la orden.
+                     */
+                    servicios: {
+                        type: Array,
+                        value: () => { return []; }
+                    },
+
+                    /**
+                     * Servicio seleccionado de la lista de servicios.
+                     */
+                    selectedServicio: {
+                        type: Object,
+                        value: () => { return {}; }
+                    }
                 };
             }
 
@@ -419,6 +497,26 @@
              */
             constructor() {
                 super();
+                this._boundAddServicioListener = this._addServicioListener.bind(this);
+            }
+
+            /**
+              * Called every time the element is inserted into the DOM. Useful for 
+              * running setup code, such as fetching resources or rendering.
+              * Generally, you should try to delay work until this time.
+              */
+            connectedCallback() {
+                super.connectedCallback();
+                servicioFormInstance.addEventListener('add-servicio', this._boundAddServicioListener);
+            }
+
+            /**
+              * Called every time the element is removed from the DOM. Useful for 
+              * running clean up code (removing event listeners, etc.).
+              */
+            disconnectedCallback() {
+                super.disconnectedCallback();
+                servicioFormInstance.removeEventListener('add-servicio', this._boundAddServicioListener);
             }
 
             /**
@@ -432,8 +530,106 @@
                 });
             }
 
+            /**
+             * Muestra el formulario para agregar un servicio. 
+             */
             _addServicio() {
                 servicioFormInstance.open();
+            }
+
+            /**
+             * Listener que indica que se debe crear un servicio.
+             */
+            _addServicioListener(e) {
+                console.log('add servicio listener');
+                let data = e.detail.data;
+                let servicioRealizar = {
+                    node: {
+                        numeroSesiones: data.numeroSesiones,
+                        valor: data.valor,
+                        coopago: data.coopago,
+                        servicio: {
+                            id: data.servicioItem.node.id,
+                            nombre: data.servicioItem.node.nombre
+                        },
+                        sesiones: {
+                            edges: this._createSesiones(data)
+                        }
+                    }
+                }
+
+                console.log(servicioRealizar);
+                this.push('servicios', servicioRealizar);
+                this.$.serviciosList.selectItem(servicioRealizar);
+            }
+
+            /**
+             * Crea las sesiones a partir número de sesiones ingresadas.
+             * 
+             * @param {Param} data Datos del formulario con los cuales se crean las sesiones.
+             */
+            _createSesiones(data) {
+                let sesiones = [];
+                let fechaActual = `${data.fecha} ${data.hora}`;
+
+                for (let i = 0; i < data.numeroSesiones; i++) {
+                    let sesion = {
+                        node: {
+                            fecha: fechaActual,
+                            estado: 'No cumplida',
+                            autorizacion: data.autorizacion,
+                            fechaAutorizacion: data.fechaAutorizacion,
+                            medico: {
+                                id: data.medicoItem.node.id,
+                                nombreCompleto: data.medicoItem.node.nombreCompleto
+                            },
+                            sucursal: {
+                                id: data.sucursalItem.node.id,
+                                nombre: data.sucursalItem.node.nombre
+                            }
+                        }
+                    };
+                    /** @todo Modificar el estado, autorizaciones segun empresa  */
+                    sesiones.push(sesion);
+                    fechaActual = this._getNextDate(fechaActual);
+                }
+
+                return sesiones;
+            }
+
+            /**
+             * Retorna la fecha de la siguiente sesión de acuerdo a la fecha ingresada.
+             * 
+             * @param {String} date Fecha a partir de la cual se calcula la siguiente fecha.
+             * @return {String} Posible fecha de la siguiente sesión.
+             */
+            _getNextDate(date) {
+                let next = moment(date).add(1, 'days');
+                if (next.day() == 6) {
+                    next = next.add(2, 'days');
+                }
+
+                return next.format('YYYY-MM-DD hh:mm a');
+            }
+
+            /**
+             * Formatea la fecha de la sesion 
+             * 
+             * @param {String} date Fecha en que se realiza la sesión
+             * @return {String} La fecha en formato Martes, 12/02/2017
+             */
+             _formatFecha(date) {
+                return moment(date).format("dddd, DD/MM/YYYY");
+            }
+
+            /**
+             * Formatea la hora de la sesion
+             * 
+             * @param {String} date Fecha en que se realiza la sesión
+             * @return {String} La hora en formato 02:30 PM
+             */
+             _formatHora(date) {
+                return moment(date).format("hh:mm a");
             }
         }
 
