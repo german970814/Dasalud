@@ -107,45 +107,79 @@
             if(plan) servicioForm.plan = plan.node.id;
         });
 
-        // document.getElementById('save').addEventListener('click', function(e) {
-        //     console.log(e);
-        //     let ordenValid = ordenForm.validate();
-        //     let serviciosValid = serviciosOrden.validate();
-        //     if( ordenValid && serviciosValid) {
-        //         let orden = serializeOrden(ordenForm.value, serviciosOrden.serialize());
-        //         request.body = orden;
-        //         request.generateRequest();
-        //     }            
-        // });
+        document.getElementById('save').addEventListener('click', function(e) {
+            console.log(e);
+            let ordenValid = ordenForm.validate();
+            let serviciosValid = serviciosOrden.validate();
+            if( ordenValid && serviciosValid) {
+                let orden = serializeOrden(ordenForm.value, serviciosOrden.servicios);
+                request.body = orden;
+                request.generateRequest();
+            }            
+        });
 
-        // request.addEventListener('response', function(e) {
-        //     console.log(e);
-        //     let response = e.detail.response;
-        //     window.location = response.orden_link;
-        // });
+        request.addEventListener('response', function(e) {
+            console.log(e);
+            let response = e.detail.response;
+            window.location = response.orden_link;
+        });
 
         // request.addEventListener('error', function(e) {
         //     console.log(e);
         // });
 
-        // function serializeOrden(ordenData, serviciosData) {
-        //     console.log(ordenData);
-        //     let orden = {
-        //         tipo_usuario: ordenData.tipoUsuario.value,
-        //         institucion: ordenData.institucion.value,
-        //         afiliacion: ordenData.afiliacion.value,
-        //         plan: ordenData.plan.node.id,
-        //         acompanante: {
-        //             asistio: ordenData.asistio,
-        //             nombre: ordenData.nombreCompleto,
-        //             direccion: ordenData.direccion,
-        //             telefono: ordenData.telefono
-        //         },
-        //         servicios_realizar: serviciosData
-        //     }
-        //     console.log(orden);
-        //     return orden;
-        // }
+        function serializeOrden(ordenData, serviciosData) {
+            console.log(ordenData);
+            let orden = {
+                tipo_usuario: ordenData.tipoUsuario.value,
+                institucion: ordenData.institucion.value,
+                afiliacion: ordenData.afiliacion.value,
+                plan: ordenData.plan.node.id,
+                acompanante: {
+                    asistio: ordenData.asistio,
+                    nombre: ordenData.nombreCompleto,
+                    direccion: ordenData.direccion,
+                    telefono: ordenData.telefono
+                },
+                servicios_realizar: serializeServicios(serviciosData)
+            }
+            console.log('datos a enviar');
+            console.log(orden);
+            return orden;
+        }
+
+        function serializeServicios(serviciosData) {
+            console.log('serialize servicios');
+            console.log(serviciosData);
+
+            let servicios = [];
+            serviciosData.forEach(function(servicioD) {
+                let sesiones = [];
+                let servicioNode = servicioD.node;
+                servicioNode.sesiones.edges.forEach(function(sesionD) {
+                    let sesionNode = sesionD.node;
+                    let sesion = {
+                        medico: sesionNode.medico.id,
+                        sucursal: sesionNode.sucursal.id,
+                        fecha: sesionNode.fecha,
+                        autorizacion: sesionNode.autorizacion,
+                        fecha_autorizacion: sesionNode.fechaAutorizacion
+                    };
+
+                    sesiones.push(JSON.parse(JSON.stringify(sesion)));
+                }, this);
+
+                let servicio = {
+                    servicio: servicioNode.servicio.id,
+                    valor: servicioNode.valor,
+                    coopago: servicioNode.coopago,
+                    numero_sesiones: servicioNode.numeroSesiones,
+                    sesiones: sesiones
+                };
+            }, this);
+
+            return servicios;
+        }
 
         // {% if orden %}
         //     const ordenData = document.getElementById('ordenHidden');

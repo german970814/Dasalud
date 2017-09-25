@@ -373,7 +373,7 @@
             * 
             * @param {string} institucion institucion escogida
             * @param {string} plan plan escogido
-            * @return {{institucion: String, plan: string}} Objeto para ser usado en query
+            * @return {{institucion: string, plan: string}} Objeto para ser usado en query
             */
             _queryVariables(institucion, plan) {
                 return { institucion, plan };
@@ -541,7 +541,6 @@
              * Listener que indica que se debe crear un servicio.
              */
             _addServicioListener(e) {
-                console.log('add servicio listener');
                 let data = e.detail.data;
                 let servicioRealizar = {
                     node: {
@@ -558,7 +557,6 @@
                     }
                 }
 
-                console.log(servicioRealizar);
                 this.push('servicios', servicioRealizar);
                 this.$.serviciosList.selectItem(servicioRealizar);
             }
@@ -600,8 +598,8 @@
             /**
              * Retorna la fecha de la siguiente sesión de acuerdo a la fecha ingresada.
              * 
-             * @param {String} date Fecha a partir de la cual se calcula la siguiente fecha.
-             * @return {String} Posible fecha de la siguiente sesión.
+             * @param {string} date Fecha a partir de la cual se calcula la siguiente fecha.
+             * @return {string} Posible fecha de la siguiente sesión.
              */
             _getNextDate(date) {
                 let next = moment(date).add(1, 'days');
@@ -609,14 +607,14 @@
                     next = next.add(2, 'days');
                 }
 
-                return next.format('YYYY-MM-DD hh:mm a');
+                return next.format('YYYY-MM-DD HH:mm');
             }
 
             /**
              * Formatea la fecha de la sesion 
              * 
-             * @param {String} date Fecha en que se realiza la sesión
-             * @return {String} La fecha en formato Martes, 12/02/2017
+             * @param {string} date Fecha en que se realiza la sesión
+             * @return {string} La fecha en formato Martes, 12/02/2017
              */
              _formatFecha(date) {
                 return moment(date).format("dddd, DD/MM/YYYY");
@@ -625,12 +623,21 @@
             /**
              * Formatea la hora de la sesion
              * 
-             * @param {String} date Fecha en que se realiza la sesión
-             * @return {String} La hora en formato 02:30 PM
+             * @param {string} date Fecha en que se realiza la sesión
+             * @return {string} La hora en formato 02:30 PM
              */
              _formatHora(date) {
                 return moment(date).format("hh:mm a");
             }
+
+            /**
+             * Valida que por lo menos haya un servicio.
+             * 
+             * @return {boolean} True si el los servicios estan validos, false si no.
+             */
+             validate() {
+                return this.servicios.length > 0;
+            }            
         }
 
         window.customElements.define(ServicioOrden2.is, ServicioOrden2);
