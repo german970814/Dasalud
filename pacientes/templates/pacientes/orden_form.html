@@ -10,6 +10,7 @@
     <link rel="import" href="/static/components/orden/servicios-orden.html">
     <link rel="import" href="/static/components/orden/servicios-orden2.html">
     <link rel="import" href="/static/components/orden/orden-form.html">
+    <link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
 {% endblock imports %}
 
 {% block css %}
@@ -37,8 +38,6 @@
         <h1>{% trans "Orden" %}</h1>
     </header>
 
-    <div id="ordenHidden" hidden>{{ orden }}</div>
-    <div id="serviciosHidden" hidden>{{ servicios }}</div>
     <ig-iron-ajax id="request" method="POST" url="{% url 'pacientes:ordenes' paciente_id %}" 
         handle-as="json" content-type="application/json">
     </ig-iron-ajax>
@@ -62,6 +61,49 @@
         {% endif %}
         <br>
         <paper-button id="save">{% trans "Guardar" %}</paper-button>
+
+        {% if edit %}
+        <graphql-query id="ordenQuery" variables='{"id": "{{ orden }}"}' hold>
+            query ordenQuery($id: ID!){
+                orden(id: $id) {
+                    id
+                    afiliacion
+                    tipoUsuario
+                    institucion { id }
+                    plan { id }
+                    acompanante {
+                        asistio
+                        nombre
+                        direccion
+                        telefono
+                    }
+                    serviciosRealizar {
+                        edges {
+                            node {
+                                numeroSesiones
+                                valor
+                                coopago
+                                servicio { id, nombre }
+                                sesiones {
+                                    edges {
+                                        node {
+                                            id
+                                            fecha
+                                            estado
+                                            autorizacion
+                                            fechaAutorizacion
+                                            medico { nombreCompleto }
+                                            sucursal { nombre }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }    
+                }
+            }
+        </graphql-query>          
+        {% endif %}
     </div>
 {% endblock content %}
 
@@ -90,7 +132,6 @@
 {% block js %}
     <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
     <script src="{% static 'bower_components/moment/min/moment.min.js' %}"></script>
-    <!-- <script src="{% static 'bower_components/moment/locale/es.js' %}"></script> -->
     <script src="{% static 'bower_components/fullcalendar/dist/fullcalendar.min.js' %}"></script>
     <script src="{% static 'bower_components/fullcalendar/dist/locale/es.js' %}"></script>
     <script>
@@ -124,9 +165,9 @@
             window.location = response.orden_link;
         });
 
-        // request.addEventListener('error', function(e) {
-        //     console.log(e);
-        // });
+        request.addEventListener('error', function(e) {
+            console.log(e);
+        });
 
         function serializeOrden(ordenData, serviciosData) {
             console.log(ordenData);
@@ -176,76 +217,37 @@
                     numero_sesiones: servicioNode.numeroSesiones,
                     sesiones: sesiones
                 };
+
+                servicios.push(JSON.parse(JSON.stringify(servicio)));
             }, this);
 
             return servicios;
         }
 
-        // {% if orden %}
-        //     const ordenData = document.getElementById('ordenHidden');
-        //     ordenForm.value = deserializeOrden(JSON.parse(ordenData.innerHTML));
-        //     ordenForm.readonly = true;
-            
-        //     function deserializeOrden(ordenData) {
-        //         let value = {
-        //             institucionValue: ordenData.institucion.id,
-        //             planValue: ordenData.plan.id,
-        //             afiliacionValue: ordenData.afiliacion,
-        //             tipoUsuarioValue: ordenData.tipoUsuario,
-        //             asistio: ordenData.acompanante.asistio,
-        //             nombreCompleto: ordenData.acompanante.nombre,
-        //             direccion: ordenData.acompanante.direccion,
-        //             telefono: ordenData.acompanante.telefono
-        //         }
-        //         return value;
-        //     }
+        {% if edit %}
+        const ordenQuery = document.getElementById('ordenQuery');
+        
+        ordenQuery.execute().result().then(result => {
+            serviciosOrden.servicios = result.data.orden.serviciosRealizar.edges;
+            ordenForm.value = deserializeOrden(result.data.orden);
+            ordenForm.readonly= true;
+            console.log(result);
+        });
 
-        //     const serviciosData = document.getElementById('serviciosHidden');
-        //     console.log(JSON.parse(serviciosData.innerHTML));
-        //     serviciosOrden.servicios = deserializeServicios(JSON.parse(serviciosData.innerHTML));
-
-        //     function deserializeServicios(serviciosData) {
-        //         let servicios = [];
-
-        //         serviciosData.forEach(data => {
-        //             let medico = data.node.sesiones.edges[0].node.medico.nombreCompleto;
-        //             let servicio = {
-        //                 numero_sesiones: data.node.numeroSesiones,
-        //                 coopago: data.node.coopago,
-        //                 valor: data.node.valor,
-        //                 servicioItem: {
-        //                     node: { nombre: data.node.servicio.nombre }
-        //                 },
-        //                 medicoItem: {
-        //                     node: { nombreCompleto: medico }
-        //                 }
-        //             };
-
-        //             let sesiones = [];
-        //             data.node.sesiones.edges.forEach(sesionData => {
-        //                 console.log(sesionData);
-        //                 let moment_ = moment.utc(sesionData.node.fecha);
-        //                 let sesion = {
-        //                     fecha: moment_.format('DD/MM/YYYY'),
-        //                     hora: moment_.format('HH:mm'),
-        //                     estado: sesionData.node.estado,
-        //                     autorizacion: sesionData.node.autorizacion,
-        //                     fecha_autorizacion: sesionData.node.fechaAutorizacion,
-        //                     sucursal: {
-        //                         node: { nombre: sesionData.node.sucursal.nombre }
-        //                     }
-        //                 };
-
-        //                 sesiones.push(sesion);
-        //             });
-        //             servicio.sesiones = sesiones;
-                    
-        //             servicios.push(servicio);
-        //         });
-        //         console.log(servicios);
-        //         return servicios;
-        //     }
-        // {% endif %}
+        function deserializeOrden(ordenData) {
+                let value = {
+                    institucionValue: ordenData.institucion.id,
+                    planValue: ordenData.plan.id,
+                    afiliacionValue: ordenData.afiliacion,
+                    tipoUsuarioValue: ordenData.tipoUsuario,
+                    asistio: ordenData.acompanante.asistio,
+                    nombreCompleto: ordenData.acompanante.nombre,
+                    direccion: ordenData.acompanante.direccion,
+                    telefono: ordenData.acompanante.telefono
+                }
+                return value;
+            }
+        {% endif %}
     </script>
 
     <script>

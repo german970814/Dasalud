@@ -273,7 +273,7 @@
                             <div class="cell">Sucursal</div>
                         </template>
                         <template>
-                            <div class="cell">[[item.node.sucursal.node.nombre]]</div>
+                            <div class="cell">[[item.node.sucursal.nombre]]</div>
                         </template>
                     </vaadin-grid-column>
                 </vaadin-grid>
@@ -569,7 +569,7 @@
             _createSesiones(data) {
                 let sesiones = [];
                 let fechaActual = `${data.fecha} ${data.hora}`;
-
+                console.log(data);
                 for (let i = 0; i < data.numeroSesiones; i++) {
                     let sesion = {
                         node: {

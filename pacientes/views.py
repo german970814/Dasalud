@@ -153,51 +153,9 @@ class EditarOrdenView(APIView):
             orden, fields=['institucion', 'plan', 'afiliacion', 'tipo_usuario']
         )
 
-        # "T3JkZW46MTU="
-        query = """query a($id: ID!) { 
-            orden(id: $id) {
-                id
-                afiliacion
-                tipoUsuario
-                institucion { id }
-                plan { id }
-                acompanante {
-                    asistio
-                    nombre
-                    direccion
-                    telefono
-                }
-                serviciosRealizar {
-                    edges {
-                        node {
-                            numeroSesiones
-                            valor
-                            coopago
-                            servicio { id, nombre }
-                            sesiones {
-                                edges {
-                                    node {
-                                        id
-                                        fecha
-                                        estado
-                                        autorizacion
-                                        fechaAutorizacion
-                                        medico { nombreCompleto }
-                                        sucursal { nombre }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }    
-            }}"""
-        result = schema.execute(query, variable_values={'id': BaseNode.to_global_id('Orden', pk)})
-        servicios_json = JSONRenderer().render(result.data['orden'].pop('serviciosRealizar')['edges'])
-        orden_json = JSONRenderer().render(result.data['orden'])
-
         return Response({
-            'paciente': paciente_json, 'orden_s': orden_s, 'cita': cita, 'orden': orden_json,
-            'VERBO': self.VERBO, 'paciente_id': paciente.id, 'servicios': servicios_json
+            'paciente': paciente_json, 'orden_s': orden_s, 'cita': cita, 'orden': BaseNode.to_global_id('Orden', pk),
+            'VERBO': self.VERBO, 'paciente_id': paciente.id, 'edit': True
         })
 
 
