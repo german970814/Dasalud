@@ -1,0 +1,114 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/scheduler-component/scheduler-component.html">
+
+<dom-module id="resource-scheduler">
+    <link rel="import" type="css" href="/static/bower_components/fullcalendar/dist/fullcalendar.min.css">
+    <link rel="import" type="css" href="/static/bower_components/fullcalendar-scheduler/dist/scheduler.min.css">
+    <script src="/static/bower_components/fullcalendar/dist/locale/es.js"></script>
+    <script src="/static/bower_components/fullcalendar-scheduler/dist/scheduler.min.js"></script>
+    <script>
+        /**
+         * `resource-scheduler` Resource scheduler.
+         *
+         * @customElement
+         * @polymer
+         * @extends {Polymer.Element}
+         */
+        class ResourceScheduler extends SchedulerComponent {
+            /**
+             * String providing the tag name to register the element under.
+             */
+            static get is() {
+                return 'resource-scheduler';
+            }
+
+            /**
+             * Object describing property-related metadata used by Polymer features
+             */
+            static get properties() {
+                return {
+                    /**
+                     * Recursos a los cuales se les asigna los eventos.
+                     */
+                    resources: {
+                        type: Array,
+                        value: () => { return []; },
+                        observer: '_resourcesChanged'
+                    }
+                };
+            }
+
+            /**
+              * Array of strings describing multi-property observer methods and their
+              * dependant properties
+              */
+            static get observers() {
+                return [
+                    // '_resourcesChanged(resources.*, _scheduler)'
+                ];
+            }
+
+            /**
+             * Vistas disponibles para el calendario.
+             */
+            static get availabeViews() {
+                return [...super.availabeViews, ...['timelineDay', 'timelineWeek', 'timelineMonth', 'timelineYear']];
+            }
+
+            /**
+             * Instance of the element is created/upgraded. Use: initializing state,
+             * set up event listeners, create shadow dom.
+             * @constructor
+             */
+            constructor() {
+                super();
+            }
+
+            /**
+             * Use for one-time configuration of your component after local DOM is initialized. 
+             */
+            ready() {
+                super.ready();
+
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    
+                });
+            }
+
+            /**
+             * This will initialize the calendar component. Se sobrescribe para agregar los recursos.
+            */
+            _initialize() {
+                this._config.schedulerLicenseKey = 'CC-Attribution-NonCommercial-NoDerivatives';
+                this._config.resources = (callback) => { 
+                    callback(this.resources); 
+                }
+
+                super._initialize();
+            }
+
+            /*
+            * Observer method for the defaultView attribute. Soobrescribe para que use availabeVies de 
+            *
+            */
+            _viewChanged(newValue, oldValue) {
+                if (ResourceScheduler.availabeViews.indexOf(newValue) < 0) {
+                    throw new Error("Inavlid value for the attribute defaultView - Available views are " + SchedulerComponent.availabeViews.join());
+                }
+            }
+
+            /**
+             * Observer method for resources property.
+            * re-render resources on the scheduler when the resources property changes.
+            */
+            _resourcesChanged(newValue, oldValue) {
+                if (oldValue) {
+                    this._scheduler.fullCalendar('refetchResources');
+                }
+            }
+
+        }
+
+        window.customElements.define(ResourceScheduler.is, ResourceScheduler);
+    </script>
+</dom-module>
