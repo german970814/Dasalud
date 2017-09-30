@@ -70,6 +70,8 @@ class Empleado(models.Model):
     duracion_cita = models.DurationField(
         _lazy('duración de las citas'), null=True, blank=True, help_text=_lazy('Ingresar duración de la forma HH:MM:SS')
     )
+    agenda = models.ForeignKey('agenda.Agenda', related_name='empleados', verbose_name=_lazy('agenda'), blank=True, null=True)
+    sucursal = models.ForeignKey(Sucursal, related_name='empleados', verbose_name=_lazy('sucursal'), blank=True, null=True)
 
     # Managers
     objects = managers.EmpleadoManager()

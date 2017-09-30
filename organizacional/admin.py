@@ -10,7 +10,7 @@ class InstitucionAdmin(VersionAdmin):
 
 @admin.register(models.Empleado)
 class EmpleadoAdmin(VersionAdmin):
-    pass
+    list_display = ['nombres', 'apellidos', 'agenda', 'sucursal']
 
 
 @admin.register(models.Sucursal)

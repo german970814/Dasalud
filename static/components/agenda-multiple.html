@@ -1,0 +1,131 @@
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
+<link rel="import" href="/static/components/resource-scheduler.html">
+<link rel="import" href="/static/bower_components/show-json/show-json.html">
+
+<dom-module id="agenda-multiple">
+    <template>
+        <style>
+            :host {
+                display: block
+            }
+
+            * {
+                box-sizing: border-box;
+            }            
+
+            @media (min-width: 40em) {
+                .row {
+                display: flex;
+                }
+
+                .row > * {
+                    flex: 1;
+                    margin: auto 10px; 
+                }
+            }
+        </style>
+
+        <graphql-query result="{{filtrosResult}}">
+            query agendaMultipleFiltrosQuery{
+                sucursales {
+                    edges {
+                        node { id, nombre }
+                    }
+                }
+                agendas {
+                    edges {
+                        node { id, nombre, duracion }
+                    }
+                }
+            }
+        </graphql-query>
+
+        <!-- <graphql-query result="{{citasResult}}" variables="[[_citasQueryVariables()]]">
+            query agendaMultipleCitasQuery{
+                medicos(agenda: "QWdlbmRhOjE=", sucursal: "U3VjdXJzYWw6MQ==") {
+                    edges {
+                        node { id, nombreCompleto }
+                    }
+                }
+            }
+        </graphql-query> -->
+
+        <div class="row">
+            <vaadin-combo-box label="Agenda*" auto-validate required items="[[filtrosResult.agendas.edges]]"
+                item-value-path="node.id" item-label-path="node.nombre" selected-item="{{filtros.agendaItem}}">
+            </vaadin-combo-box>
+            <vaadin-combo-box label="Sucursal*" auto-validate required items="[[filtrosResult.sucursales.edges]]"
+                item-value-path="node.id" item-label-path="node.nombre" selected-item="{{filtros.sucursalItem}}">
+            </vaadin-combo-box>
+        </div>
+        <show-json json="[[filtros]]"></show-json>
+        <br>
+        <resource-scheduler header='{"left": "prev,next, today", "center": "title", "right": "timelineDay,timelineWeek"}'
+            default-view="timelineDay" slot-duration="[[filtros.agendaItem.node.duracion]]"
+            resources='[{"id": "1", "title": "MARIO MENDOZA"}, {"id": "2", "title": "MELISSA CARDONA"}]'
+            events='[{"id": 1, "title": "Tania Hernandez", "resourceId": "1", "start": "2017-09-28T09:00:00Z", "end": "2017-09-28T09:45:00Z"}
+            ,{"id": 2, "title": "Tania Hernandez", "resourceId": "1", "start": "2017-09-28T09:00:00Z", "end": "2017-09-28T09:45:00Z"}]'>
+        </resource-scheduler>
+
+    </template>
+
+    <script>
+        /**
+         * `agenda-multiple` Muestra el calendario en una vista con multiples doctores.
+         *
+         * @customElement
+         * @polymer
+         * @extends {Polymer.Element}
+         */
+        class AgendaMultiple extends Polymer.Element {
+            /**
+             * String providing the tag name to register the element under.
+             */
+            static get is() {
+                return 'agenda-multiple';
+            }
+
+            /**
+             * Object describing property-related metadata used by Polymer features
+             */
+            static get properties() {
+                return {
+                    /**
+                     * Filtros escogidos por el usuario. Se usan para definir los datos mostrados en el calendario.
+                     * 
+                     * @type {{agendaItem: object, sucursalItem: object}}
+                     */
+                    filtros: {
+                        type: Object,
+                        value: () => { return {}; }
+                    }
+                };
+            }
+
+            /**
+             * Instance of the element is created/upgraded. Use: initializing state,
+             * set up event listeners, create shadow dom.
+             * @constructor
+             */
+            constructor() {
+                super();
+            }
+
+            /**
+             * Use for one-time configuration of your component after local DOM is initialized. 
+             */
+            ready() {
+                super.ready();
+
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    
+                });
+            }
+
+        }
+
+        window.customElements.define(AgendaMultiple.is, AgendaMultiple);
+    </script>
+</dom-module>

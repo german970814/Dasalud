@@ -8,7 +8,9 @@
     <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
     <link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
     <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
+    <link rel="import" href="/static/bower_components/scheduler-component/scheduler-component.html">
     <link rel="import" href="/static/components/form-cita.html">
+    <link rel="import" href="/static/components/agenda-multiple.html">
 {% endblock imports %}
 
 {% block css %}
@@ -46,7 +48,10 @@
         <br><br>
         <iron-ajax id="save-event-request" url="{% url "agenda:citas" %}" method="POST" handle-as="json"
                 content-type="application/json"></iron-ajax>
-        <div id="calendar"></div>
+        <!-- <div id="calendar"></div> -->
+
+        <agenda-multiple></agenda-multiple>
+        <!-- <scheduler-component></scheduler-component> -->
     </div>
 {% endblock content %}
 

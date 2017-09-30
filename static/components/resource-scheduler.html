@@ -28,31 +28,29 @@
             static get properties() {
                 return {
                     /**
-                     * Recursos a los cuales se les asigna los eventos.
+                     * Recursos a los cuales se les asignan eventos.
                      */
                     resources: {
                         type: Array,
                         value: () => { return []; },
                         observer: '_resourcesChanged'
+                    },
+
+                    /**
+                     * Vistas disponibles para el calendario.
+                     */
+                    views: {
+                        type: Object,
+                        value: () => { return {}; }
+                    },
+
+                    /** Duracion de los slots en el calendario */
+                    slotDuration: {
+                        type: String,
+                        value: '00:30:00',
+                        observer: '_slotDurationChanged'
                     }
                 };
-            }
-
-            /**
-              * Array of strings describing multi-property observer methods and their
-              * dependant properties
-              */
-            static get observers() {
-                return [
-                    // '_resourcesChanged(resources.*, _scheduler)'
-                ];
-            }
-
-            /**
-             * Vistas disponibles para el calendario.
-             */
-            static get availabeViews() {
-                return [...super.availabeViews, ...['timelineDay', 'timelineWeek', 'timelineMonth', 'timelineYear']];
             }
 
             /**
@@ -80,6 +78,8 @@
             */
             _initialize() {
                 this._config.schedulerLicenseKey = 'CC-Attribution-NonCommercial-NoDerivatives';
+                this._config.resourceLabelText = 'Medicos'
+                this._config.views = this.views;
                 this._config.resources = (callback) => { 
                     callback(this.resources); 
                 }
@@ -88,23 +88,40 @@
             }
 
             /*
-            * Observer method for the defaultView attribute. Soobrescribe para que use availabeVies de 
+            * Observer method for the defaultView attribute. Se soobrescribe para que no haga la verificación.
             *
             */
             _viewChanged(newValue, oldValue) {
-                if (ResourceScheduler.availabeViews.indexOf(newValue) < 0) {
-                    throw new Error("Inavlid value for the attribute defaultView - Available views are " + SchedulerComponent.availabeViews.join());
-                }
+                
             }
 
             /**
-             * Observer method for resources property.
+            * Observer method for resources property.
             * re-render resources on the scheduler when the resources property changes.
             */
             _resourcesChanged(newValue, oldValue) {
                 if (oldValue) {
                     this._scheduler.fullCalendar('refetchResources');
                 }
+            }
+
+            /**
+            * Observer method for slotDuration property.
+            * re-renders the scheduler when the slotDuration property changes.
+            */
+            _slotDurationChanged(newValue, oldValue) {
+                if (newValue) {
+                    this.changeOptions({slotDuration: newValue});
+                }
+            }
+
+            /**
+            * Modifica dinamicamente opciones en el calendario.
+            * 
+            * @param {{opcion: value}} options Opciones a modificar. Ex: {locale: 'es', slotDuration: '00:30:00'}
+            */
+            changeOptions(options) {
+                this._scheduler.fullCalendar('option', options);
             }
 
         }

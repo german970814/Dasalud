@@ -27,7 +27,7 @@ class Empleado(DjangoObjectType):
     class Meta:
         model = models.Empleado
         interfaces = (BaseNode,)
-        filter_fields = ['instituciones']
+        filter_fields = ['instituciones', 'agenda', 'sucursal']
 
 
 class Query(graphene.AbstractType):

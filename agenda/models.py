@@ -3,6 +3,23 @@ from django.utils.translation import ugettext_lazy as _lazy
 from common.models import UpdateModelMixin
 
 
+# TODO asociar los doctores a esta agenda o una agenda individual
+
+class Agenda(models.Model):
+    """Modelo para guardar las distintas agendas que maneja un cliente."""
+
+    nombre = models.CharField(_lazy('nombre'), max_length=100)
+    duracion = models.DurationField(
+        _lazy('duración'), help_text=_lazy('Duración de la atención para cada cita. Ingresar duración de la forma HH:MM:SS')
+    )
+
+    class Meta:
+        verbose_name = 'agenda'
+        verbose_name_plural = 'agendas'
+    
+    def __str__(self):
+        return self.nombre
+
 class HorarioAtencion(models.Model):
     """Modelo que guarda el horario de atención que un medico maneja en una sucursal."""
 
@@ -100,3 +117,4 @@ class Cita(UpdateModelMixin, models.Model):
     @property
     def cumplida(self):
         return self.estado == self.CUMPLIDA
+

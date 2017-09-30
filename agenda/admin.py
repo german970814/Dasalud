@@ -20,3 +20,7 @@ class CitaAdmin(VersionAdmin):
 @admin.register(models.Persona)
 class PersonaAdmin(VersionAdmin):
     pass
+
+@admin.register(models.Agenda)
+class AgendaAdmin(VersionAdmin):
+    pass

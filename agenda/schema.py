@@ -6,6 +6,19 @@ from . import models
 from .filters import CitaFilter
 
 
+class Agenda(DjangoObjectType):
+
+    duracion = graphene.String()
+
+    class Meta:
+        model = models.Agenda
+        description = 'Agendas que maneja el cliente'
+        interfaces = (BaseNode,)
+    
+    def resolve_duracion(self, args, context, info):
+        return str(self.duracion)
+
+
 class HorarioAtencion(DjangoObjectType):
 
     class Meta:
@@ -40,3 +53,4 @@ class Cita(DjangoObjectType):
 class Query(graphene.AbstractType):
     cita = BaseNode.Field(Cita)
     citas = DjangoFilterConnectionField(Cita, filterset_class=CitaFilter, description='Todas las citas')
+    agendas = DjangoConnectionField(Agenda, description='Todas las agendas')
