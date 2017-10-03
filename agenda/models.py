@@ -26,8 +26,8 @@ class HorarioAtencion(models.Model):
     title = models.CharField(_lazy('titulo'), max_length=100, default='')
     start = models.DateTimeField(_lazy('inicio'))
     end = models.DateTimeField(_lazy('final'))
-    medico = models.ForeignKey('organizacional.Empleado', related_name='horario_atencion')
-    sucursal = models.ForeignKey('organizacional.Sucursal', related_name='horario_atencion')
+    medico = models.ForeignKey('organizacional.Empleado', related_name='horarios_atencion')
+    sucursal = models.ForeignKey('organizacional.Sucursal', related_name='horarios_atencion')
 
     class Meta:
         verbose_name = 'horario de atención'

@@ -50,8 +50,8 @@
                 content-type="application/json"></iron-ajax>
         <!-- <div id="calendar"></div> -->
 
-        <agenda-multiple></agenda-multiple>
-        <!-- <scheduler-component></scheduler-component> -->
+        <agenda-multiple id="agenda"></agenda-multiple>
+        <!-- <scheduler-component default-view="agendaWeek" selectable></scheduler-component> -->
     </div>
 {% endblock content %}
 
@@ -119,6 +119,14 @@
                     }
                 }
             }
+        });
+
+        const agenda = document.getElementById('agenda');
+
+        agenda.addEventListener('event-click', function(e) {
+            console.log('event click');
+            console.log(e.detail);
+            showCita(e.detail.calEvent);
         });
 
         medicosNode.addEventListener('selected-item-changed', function(e) {

@@ -42,15 +42,27 @@
             }
         </graphql-query>
 
-        <!-- <graphql-query result="{{citasResult}}" variables="[[_citasQueryVariables()]]">
-            query agendaMultipleCitasQuery{
-                medicos(agenda: "QWdlbmRhOjE=", sucursal: "U3VjdXJzYWw6MQ==") {
+        <graphql-query id="citasQuery" hold>
+            query agendaMultipleCitasQuery($agenda: ID!, $sucursal: ID!){
+                medicos(agenda: $agenda, sucursal: $sucursal) {
                     edges {
-                        node { id, nombreCompleto }
+                        node { id, title }
+                    }
+                }
+                horariosAtencion(agenda: $agenda, sucursal: $sucursal) {
+                    edges {
+                        node { id, start, end, resourceId }
+                    }
+                }
+                citas(agenda: $agenda, sucursal: $sucursal) {
+                    edges {
+                        node { 
+                            id, start, end, title, resourceId
+                        }
                     }
                 }
             }
-        </graphql-query> -->
+        </graphql-query>
 
         <div class="row">
             <vaadin-combo-box label="Agenda*" auto-validate required items="[[filtrosResult.agendas.edges]]"
@@ -60,13 +72,11 @@
                 item-value-path="node.id" item-label-path="node.nombre" selected-item="{{filtros.sucursalItem}}">
             </vaadin-combo-box>
         </div>
-        <show-json json="[[filtros]]"></show-json>
+        <!-- <show-json json="[[filtros]]"></show-json> -->
         <br>
         <resource-scheduler header='{"left": "prev,next, today", "center": "title", "right": "timelineDay,timelineWeek"}'
-            default-view="timelineDay" slot-duration="[[filtros.agendaItem.node.duracion]]"
-            resources='[{"id": "1", "title": "MARIO MENDOZA"}, {"id": "2", "title": "MELISSA CARDONA"}]'
-            events='[{"id": 1, "title": "Tania Hernandez", "resourceId": "1", "start": "2017-09-28T09:00:00Z", "end": "2017-09-28T09:45:00Z"}
-            ,{"id": 2, "title": "Tania Hernandez", "resourceId": "1", "start": "2017-09-28T09:00:00Z", "end": "2017-09-28T09:45:00Z"}]'>
+            default-view="timelineDay" slot-duration="[[filtros.agendaItem.node.duracion]]" id="calendar"
+            on-event-click="_citaClicked" selectable on-select-overlap="_espacioDisponibleClicked">
         </resource-scheduler>
 
     </template>
@@ -105,6 +115,16 @@
             }
 
             /**
+              * Array of strings describing multi-property observer methods and their
+              * dependant properties
+              */
+            static get observers() {
+                return [
+                    'getCalendarInfo(filtros.agendaItem.node.id, filtros.sucursalItem.node.id)'
+                ];
+            }
+
+            /**
              * Instance of the element is created/upgraded. Use: initializing state,
              * set up event listeners, create shadow dom.
              * @constructor
@@ -112,6 +132,20 @@
             constructor() {
                 super();
             }
+
+            /**
+             * Fired cuando una `cita` en el calendario es presionada.
+             *
+             * @event cita-click
+             * @param {object} cita Cita presionada.
+             */
+
+            /**
+             * Fired cuando un espacio disponible para cita es presionada en el calendario.
+             *
+             * @event disponible-click
+             * @param {object} event Espacio disponible presionado.
+             */
 
             /**
              * Use for one-time configuration of your component after local DOM is initialized. 
@@ -122,6 +156,57 @@
                 Polymer.RenderStatus.afterNextRender(this, function() {
                     
                 });
+            }
+
+            /** 
+             * Convierte la respuesta del query de citas para poder ser usado por fullCalendar
+             * 
+             * @param {Array<object>} array
+             * @return {Array<object>} 
+             */
+            _normalizeConnections(array) {
+                let newArray = [];
+                array.forEach(element => {
+                    newArray.push(element.node);
+                });
+
+                return newArray;
+            }
+
+            /** Bubbles event click on calendar */
+             _citaClicked(e) {
+                let cita = e.detail.calEvent;
+                this.dispatchEvent(new CustomEvent('cita-click', { detail: { cita } }));
+            }
+
+            /** Fires un evento que indica que se presiono un espacio disponible para crear un cita */
+            _espacioDisponibleClicked(e) {
+                let event = e.detail.event;
+                if (event.source.rendering == 'background') {
+                    this.dispatchEvent(new CustomEvent('disponible-click', { detail: { event } }));
+                }
+            }
+
+            /** 
+             * Obtiene las citas y los medicos para el calendario.
+             * 
+             * @param {string} agenda Valor escogido de la agenda.
+             * @param {string} sucursal Valor escogido de la sucursal.
+             */
+            getCalendarInfo(agenda, sucursal) {
+                if (agenda && sucursal) {
+                    this.$.citasQuery.variables = {agenda, sucursal};
+                    this.$.citasQuery.execute().result().then(result => {
+                        this.$.calendar.resources = this._normalizeConnections(result.data.medicos.edges);
+                        this.$.calendar.backgroundEvents = this._normalizeConnections(result.data.horariosAtencion.edges);
+                        this.$.calendar.events = this._normalizeConnections(result.data.citas.edges);
+                    });
+                }
+                else {
+                    this.$.calendar.resources = [];
+                    this.$.calendar.backgroundEvents = [];
+                    this.$.calendar.events = [];
+                }
             }
 
         }

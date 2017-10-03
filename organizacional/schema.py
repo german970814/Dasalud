@@ -21,6 +21,7 @@ class Institucion(DjangoObjectType):
 
 class Empleado(DjangoObjectType):
 
+    title = graphene.String(source='__str__')
     nombre_completo = graphene.String(source='__str__')
     instituciones = DjangoFilterConnectionField(Institucion)
 

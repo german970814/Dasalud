@@ -36,6 +36,12 @@
                         observer: '_resourcesChanged'
                     },
 
+                    backgroundEvents: {
+                        type: Array,
+                        value: () => { return []; },
+                        observer: '_backgroundEventsChanged'
+                    },
+
                     /**
                      * Vistas disponibles para el calendario.
                      */
@@ -80,8 +86,24 @@
                 this._config.schedulerLicenseKey = 'CC-Attribution-NonCommercial-NoDerivatives';
                 this._config.resourceLabelText = 'Medicos'
                 this._config.views = this.views;
+                this._config.eventSources = [{
+                    id: 'background',
+                    rendering: 'background',
+                    events: (start, end, timezone, callback) => {
+                        callback(this.backgroundEvents);
+                    }
+                }];
                 this._config.resources = (callback) => { 
                     callback(this.resources); 
+                };
+                this._config.dayClick = (date, jsEvent, view, resourceObj) => {
+                    this.dispatchEvent(new CustomEvent('day-click', { detail: { date, jsEvent, view, resourceObj } }));
+                }
+                this._config.selectOverlap = (event) => {
+                    this.dispatchEvent(new CustomEvent('select-overlap', { 
+                        detail: { event, view: this.getView() } 
+                    }));
+                    return true;
                 }
 
                 super._initialize();
@@ -92,7 +114,7 @@
             *
             */
             _viewChanged(newValue, oldValue) {
-                
+
             }
 
             /**
@@ -102,6 +124,16 @@
             _resourcesChanged(newValue, oldValue) {
                 if (oldValue) {
                     this._scheduler.fullCalendar('refetchResources');
+                }
+            }
+
+            /**
+            * Observer method for resources property.
+            * re-render resources on the scheduler when the resources property changes.
+            */
+            _backgroundEventsChanged(newValue, oldValue) {
+                if (oldValue) {
+                    this._scheduler.fullCalendar('refetchEventSources', 'background');
                 }
             }
 
