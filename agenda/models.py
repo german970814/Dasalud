@@ -59,8 +59,10 @@ class Persona(UpdateModelMixin, models.Model):
         (NUMERO_UNICO_ID, 'Número único de identificación')
     )
 
-    nombres = models.CharField(_lazy('nombres'), max_length=150)
-    apellidos = models.CharField(_lazy('apellidos'), max_length=150)
+    primer_nombre = models.CharField(_lazy('primer nombre'), max_length=150)
+    segundo_nombre = models.CharField(_lazy('segundo nombre'), max_length=150, blank=True)
+    primer_apellido = models.CharField(_lazy('primer apellido'), max_length=150)
+    segundo_apellido = models.CharField(_lazy('segundo apellido'), max_length=150, blank=True)
     tipo_documento = models.CharField(_lazy('tipo de documento'), max_length=2, choices=TIPO_DOCUMENTOS)
     numero_documento = models.CharField(_lazy('número de documento'), max_length=20, unique=True)
     telefono = models.PositiveIntegerField(_lazy('telefono'), null=True, blank=True)
@@ -72,7 +74,7 @@ class Persona(UpdateModelMixin, models.Model):
         verbose_name_plural = 'personas'
     
     def __str__(self):
-        return '{} {}'.format(self.nombres, self.apellidos)
+        return '{} {}'.format(self.primer_nombre, self.primer_apellido)
 
 
 class Cita(UpdateModelMixin, models.Model):

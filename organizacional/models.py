@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _lazy
 from . import managers
 
@@ -72,6 +73,7 @@ class Empleado(models.Model):
     )
     agenda = models.ForeignKey('agenda.Agenda', related_name='empleados', verbose_name=_lazy('agenda'), blank=True, null=True)
     sucursal = models.ForeignKey(Sucursal, related_name='empleados', verbose_name=_lazy('sucursal'), blank=True, null=True)
+    usuario = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_lazy('usuario'))
 
     # Managers
     objects = managers.EmpleadoManager()

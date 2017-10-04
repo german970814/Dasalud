@@ -127,8 +127,10 @@ class Paciente(ParentescoMixin, models.Model):
         (OTRO, _lazy('Otro'))
     )
 
-    nombres = models.CharField(_lazy('nombres'), max_length=150)
-    apellidos = models.CharField(_lazy('apellidos'), max_length=150)
+    primer_nombre = models.CharField(_lazy('primer nombre'), max_length=150)
+    segundo_nombre = models.CharField(_lazy('segundo nombre'), max_length=150, blank=True)
+    primer_apellido = models.CharField(_lazy('primer apellido'), max_length=150)
+    segundo_apellido = models.CharField(_lazy('segundo apellido'), max_length=150, blank=True)
     genero = models.CharField(_lazy('género'), max_length=1, choices=GENEROS)
     fecha_nacimiento = models.DateField(_lazy('fecha de nacimiento'))
     fecha_ingreso = models.DateField(_lazy('fecha de ingreso'))
@@ -163,10 +165,10 @@ class Paciente(ParentescoMixin, models.Model):
     class Meta:
         verbose_name = _lazy('paciente')
         verbose_name_plural = _lazy('pacientes')
-        ordering = ['nombres', 'apellidos']
+        ordering = ['primer_nombre', 'primer_apellido']
 
     def __str__(self):
-        return '{} {}'.format(self.nombres, self.apellidos)
+        return '{} {}'.format(self.primer_nombre, self.primer_apellido)
 
     @property
     def ultimo_acompanante(self):
