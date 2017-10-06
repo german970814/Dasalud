@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.views.decorators.csrf import csrf_exempt
 # TODO remove csrf_exempt from graphql view, figure out a way to use a middleware to send the csrf token
 
@@ -23,6 +24,8 @@ from django.views.generic import TemplateView
 from graphene_django.views import GraphQLView
 
 urlpatterns = [
+    url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
+    url(r'^logout/$', auth_views.logout_then_login, name='logout'),
     url(r'^$', TemplateView.as_view(template_name='base.html')),
     url(r'^agenda/', include('agenda.urls', namespace='agenda')),
     url(r'^globales/', include('globales.urls', namespace='globales')),

@@ -202,6 +202,11 @@ LOGGING = {
     },
 }
 
+# Login settings
+
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/login'
+
 # Restframework configuration
 
 REST_FRAMEWORK = {

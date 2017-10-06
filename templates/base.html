@@ -117,7 +117,9 @@
                         <div main-title>DASALUD</div>
                         <search-box></search-box>
                         <span></span>
-                        <paper-icon-button icon="my-icons:exit-to-app"></paper-icon-button>
+                        <a href="{% url 'logout' %}" tabindex="-1">
+                            <paper-icon-button icon="my-icons:exit-to-app"></paper-icon-button>
+                        </a>
                     </app-toolbar>
                 </app-header>
 
