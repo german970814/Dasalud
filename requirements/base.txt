@@ -3,7 +3,7 @@ django-environ==0.4.4
 django-tenant-schemas==1.9.0
 psycopg2==2.7.3.1
 djangorestframework==3.6.4
-Pillow==4.2.1
+Pillow==4.3
 django-filter==1.0.4
 django-reversion==2.0.10
 drf-flex-fields==0.2.2

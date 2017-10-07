@@ -43,7 +43,7 @@
             <div class="card-content">
                 <iron-image src="[[paciente.foto]]" sizing="cover" fade preload placeholder="/static/img/profile-none.png"></iron-image>
                 <div class="info">
-                    <h4><strong>[[_nombreCompleto(paciente.nombres, paciente.apellidos)]]</strong></h4>
+                    <h4><strong>[[nombreCompleto]]</strong></h4>
                     <p><small>[[paciente.tipo_documento]]: [[paciente.numero_documento]]</small></p>
                     <p><small>Edad: 23 años</small></p>
                 </div>
@@ -56,41 +56,90 @@
     </template>
 
     <script>
+        /**
+         * `paciente-info` Muestra la información de un paciente.
+         * 
+         * @customElement
+         * @polymer
+         * @extends {Polymer.Element}
+         */
         class PacienteInfo extends Polymer.Element {
-
-            static get is() { return 'paciente-info'; }
-
+            /**
+             * String providing the tag name to register the element under.
+             */
+            static get is() {
+                return 'paciente-info';
+            }
+        
+            /**
+             * Object describing property-related metadata used by Polymer features
+             */
             static get properties() {
                 return {
+                    /**
+                     * Datos del paciente
+                     */
                     paciente: Object,
 
+                    /**
+                     * Description for prop
+                     */
+                    nombreCompleto: {
+                        type: String,
+                        computed: '_nombreCompleto(paciente.primer_nombre, paciente.segundo_nombre, paciente.primer_apellido, paciente.segundo_apellido)'
+                    },
+
+                    /**
+                     * Permite que el ocupe todo el ancho del contenedor en donde se encuentre.
+                     */
                     fullWidth: {
                         type: Boolean,
                         value: false,
                         reflectToAttribute: true
                     },
 
+                    /**
+                     * Muestra el componente sin elevación.
+                     */
                     flat: {
                         type: Boolean,
                         value: false,
-                        reflectToAttribute: true,
-                        observer: '_flatChanged'
+                        reflectToAttribute: true
                     }
                 };
             }
-
+        
+            /**
+             * Instance of the element is created/upgraded. Use: initializing state,
+             * set up event listeners, create shadow dom.
+             * @constructor
+             */
             constructor() {
                 super();
             }
-
-            _nombreCompleto(nombres, apellidos) {
-                return nombres + ' ' + apellidos;
+        
+            /**
+             * Use for one-time configuration of your component after local DOM is initialized. 
+             */
+            ready() {
+                super.ready();
+        
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    
+                });
             }
 
-            _flatChanged(newValue, oldValue) {
-                // if (newValue) {
-                //     this.$.card.elevation = 0;
-                // }
+            /** 
+             * Computed method for the property nombreCompleto.
+             * 
+             * @param {string} primerNombre
+             * @param {string} segundoNombre
+             * @param {string} primerApellido
+             * @param {string} segundoApellido
+             * @return {string}
+             */
+            _nombreCompleto(primerNombre, segundoNombre, primerApellido, segundoApellido) {
+                return `${primerNombre} ${segundoNombre} ${primerApellido} ${segundoApellido}`;
             }
 
             // TODO calcular la edad
@@ -103,10 +152,9 @@
             //         age--;
             //     }
             //     return age;
-            // }
-
+            // }        
         }
-
+        
         window.customElements.define(PacienteInfo.is, PacienteInfo);
     </script>
 </dom-module>

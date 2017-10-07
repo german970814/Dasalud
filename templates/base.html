@@ -90,23 +90,30 @@
 
         {% block css %}{% endblock css %}
     </head>
-    <body> 
+    <body>
+        <paper-toast id="baseToast"></paper-toast>
         <graphql-client config='{"uri": "{% url 'graphql' %}"}'></graphql-client>
         <app-drawer-layout force-narrow fullbleed id="drawerLayout">
             <app-drawer slot="drawer">
                 <app-menu selected="0">
+                    {% if perms.pacientes.add_paciente %}
                     <a class="app-menu-item" href="{% url 'pacientes:crear' %}">
                         <app-menu-icon-item icon="my-icons:people">{% trans "Crear paciente" %}</app-menu-icon-item>
-                    </a>
+                    </a>                      
+                    {% endif %}
                     <a class="app-menu-item" href="{% url 'agenda:listar' %}">
                         <app-menu-icon-item icon="my-icons:people">{% trans "Agenda" %}</app-menu-icon-item>
                     </a>
+                    {% if perms.agenda.add_horario_atencion %}
                     <a class="app-menu-item" href="{% url 'agenda:horario-atencion' %}">
                         <app-menu-icon-item icon="my-icons:people">{% trans "Horario de atención" %}</app-menu-icon-item>
-                    </a>
+                    </a>                    
+                    {% endif %}
+                    {% if perms.agenda.add_cita %}
                     <a class="app-menu-item" href="{% url 'agenda:citas' %}">
                         <app-menu-icon-item icon="my-icons:people">{% trans "Agendar citas" %}</app-menu-icon-item>
-                    </a>
+                    </a>                    
+                    {% endif %}
                 </app-menu>
             </app-drawer>
 
@@ -132,9 +139,19 @@
         {% block dialogs %}{% endblock dialogs %}
 
         <script>
-            document.querySelector('search-box').addEventListener('enter', function(e) {
-                window.location = '{% url "pacientes:listar" %}?search=' + e.detail;
-            });
+            (function() {
+                document.querySelector('search-box').addEventListener('enter', function(e) {
+                    window.location = '{% url "pacientes:listar" %}?search=' + e.detail;
+                });
+
+                const toast = document.getElementById('baseToast');
+                document.body.addEventListener('notify-toast-form-error', function() {
+                    toast.text = 'Hubo un error en el formulario por favor verifica.';
+                    toast.style.setProperty('--paper-toast-background-color', getComputedStyle(document.body).getPropertyValue('--error-color'));
+                    toast.style.setProperty('--paper-toast-color', 'white');
+                    toast.open();
+                });
+            })();            
         </script>
 
         {% block js %}{% endblock js %}

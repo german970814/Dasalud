@@ -105,6 +105,9 @@
                 return errorResponse.json();
             })
             .then(function (errors) {
+                // @todo ver pq entra aca aunque esta todo bien.
+                console.log('no deberia entrar si esta todo bien');
+                // form.dispatchEvent(new CustomEvent('notify-toast-form-error', { bubbles: true, composed: true }));
                 setFormErrors(form, errors);
             });
         }
