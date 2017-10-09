@@ -1,3 +1,4 @@
+import waffle
 from django.db import transaction
 from rest_framework.reverse import reverse
 from rest_framework import serializers
@@ -90,12 +91,14 @@ class OrdenSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
                 servicio = models.ServicioRealizar.objects.create(orden=orden, **servicio_data)
                 for sesion_data in sesiones_data:
                     sesion = models.Sesion.objects.create(servicio=servicio, **sesion_data)
-                    cita = sesion_data.get('cita', None)
-                    if cita:
-                        cita.sesion = sesion
-                        cita.save()
-                    else:
-                        self.crear_cita(sesion, servicio.servicio, orden.paciente)
+
+                    if waffle.switch_is_active('citas'):
+                        cita = sesion_data.get('cita', None)
+                        if cita:
+                            cita.sesion = sesion
+                            cita.save()
+                        else:
+                            self.crear_cita(sesion, servicio.servicio, orden.paciente)
             
             # raise ValueError
             return orden

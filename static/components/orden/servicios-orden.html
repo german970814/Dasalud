@@ -211,11 +211,11 @@
             </div>
             <div class="servicio-info">
                 <p><b>Numero de sesiones:</b> [[selectedServicio.node.numeroSesiones]]</p>
-                <p><b>Cumplidas:</b> 5</p>
-                <p><b>Pendientes:</b> 5</p>
+                <p><b>Cumplidas:</b> CALCULAR</p>
+                <p><b>Pendientes:</b> CALCULAR</p>
                 <p><b>Valor de la sesión:</b> $[[selectedServicio.node.valor]]</p>
                 <p><b>Coopago/Cuota Moderadora:</b> $[[selectedServicio.node.coopago]]</p>
-                <p><b>Fecha Inicio:</b> 10/10/2017</p>
+                <p><b>Total:</b> CALCULAR</p>
             </div>
             <div class="sesiones">
                 <vaadin-grid id="grid" items="[[selectedServicio.node.sesiones.edges]]">
@@ -491,9 +491,7 @@
              */
             ready() {
                 super.ready();
-
                 Polymer.RenderStatus.afterNextRender(this, function() {
-                    
                 });
             }
 
@@ -525,7 +523,7 @@
                 }
 
                 this.push('servicios', servicioRealizar);
-                this.$.serviciosList.selectItem(servicioRealizar);
+                this.selectServicio(servicioRealizar);
             }
 
             /**
@@ -604,7 +602,25 @@
              */
              validate() {
                 return this.servicios.length > 0;
-            }            
+            }
+
+            /**
+             * Selecciona un servicio de las lista de servicios.
+             * 
+             * @param {object} servicio Servicio a seleccionar.
+             */
+             selectServicio(servicio) {
+                this.$.serviciosList.selectItem(servicio);
+            }
+
+            /**
+             * Selecciona un servicio de las lista de servicios según su indice.
+             * 
+             * @param {number} index Indice del servicio a seleccionar.
+             */
+             selectServicioByIndex(index) {
+                this.$.serviciosList.selectIndex(index);
+            }         
         }
 
         window.customElements.define(ServiciosOrden.is, ServiciosOrden);

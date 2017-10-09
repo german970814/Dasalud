@@ -45,6 +45,7 @@ SHARED_APPS = [
     'rest_framework',
     'django_filters',
     'graphene_django',
+    'waffle',
 
     'tenants',
     'globales',
@@ -59,6 +60,7 @@ TENANT_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'reversion',
+    'waffle',
 
     'pacientes',
     'servicios',
@@ -80,6 +82,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'waffle.middleware.WaffleMiddleware',
     'reversion.middleware.RevisionMiddleware'
 ]
 

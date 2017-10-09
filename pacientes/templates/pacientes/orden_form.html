@@ -54,7 +54,7 @@
         <br>
         <servicios-orden></servicios-orden>
         <br>
-        <paper-button id="save">{% trans "Guardar" %}</paper-button>
+        <paper-button id="save" {% if edit %}hidden{% endif %}>{% trans "Guardar" %}</paper-button>
 
         {% if edit %}
         <graphql-query id="ordenQuery" variables='{"id": "{{ orden }}"}' hold>
@@ -224,8 +224,8 @@
         ordenQuery.execute().result().then(result => {
             serviciosOrden.servicios = result.data.orden.serviciosRealizar.edges;
             ordenForm.value = deserializeOrden(result.data.orden);
+            serviciosOrden.selectServicioByIndex(0);
             ordenForm.readonly= true;
-            console.log(result);
         });
 
         function deserializeOrden(ordenData) {

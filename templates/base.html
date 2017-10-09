@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n waffle_tags %}
 
 <!DOCTYPE html>
 <html lang="es">
@@ -104,16 +104,18 @@
                     <a class="app-menu-item" href="{% url 'agenda:listar' %}">
                         <app-menu-icon-item icon="my-icons:people">{% trans "Agenda" %}</app-menu-icon-item>
                     </a>
-                    {% if perms.agenda.add_horario_atencion %}
-                    <a class="app-menu-item" href="{% url 'agenda:horario-atencion' %}">
-                        <app-menu-icon-item icon="my-icons:people">{% trans "Horario de atención" %}</app-menu-icon-item>
-                    </a>                    
-                    {% endif %}
-                    {% if perms.agenda.add_cita %}
-                    <a class="app-menu-item" href="{% url 'agenda:citas' %}">
-                        <app-menu-icon-item icon="my-icons:people">{% trans "Agendar citas" %}</app-menu-icon-item>
-                    </a>                    
-                    {% endif %}
+                    {% switch "citas" %}
+                        {% if perms.agenda.add_horario_atencion %}
+                        <a class="app-menu-item" href="{% url 'agenda:horario-atencion' %}">
+                            <app-menu-icon-item icon="my-icons:people">{% trans "Horario de atención" %}</app-menu-icon-item>
+                        </a>                    
+                        {% endif %}
+                        {% if perms.agenda.add_cita %}
+                        <a class="app-menu-item" href="{% url 'agenda:citas' %}">
+                            <app-menu-icon-item icon="my-icons:people">{% trans "Agendar citas" %}</app-menu-icon-item>
+                        </a>                    
+                        {% endif %}
+                    {% endswitch %}
                 </app-menu>
             </app-drawer>
 
