@@ -6,6 +6,7 @@
 <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
 <link rel="import" href="/static/bower_components/paper-input/paper-input.html">
 <link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
+<link rel="import" href="/static/bower_components/vaadin-material-theme/vaadin-date-picker.html">
 <link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
 <link rel="import" href="/static/bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="/static/bower_components/show-json/show-json.html">
@@ -19,7 +20,7 @@
 <link rel="import" href="/static/my-icons.html">
 
 
-<dom-module id="servicio-form2">
+<dom-module id="servicio-form">
     <template>
         <style>
             :host {
@@ -259,18 +260,18 @@
         let servicioFormInstance = null;
 
         /**
-         * `servicio-form2` Formulario para agregar un servicio a una orden.
+         * `servicio-form` Formulario para agregar un servicio a una orden.
          *
          * @customElement
          * @polymer
          * @extends {Polymer.Element}
          */
-         class ServicioForm2 extends Polymer.Element {
+         class ServicioForm extends Polymer.Element {
             /**
              * String providing the tag name to register the element under.
              */
             static get is() {
-                return 'servicio-form2';
+                return 'servicio-form';
             }
 
             /**
@@ -416,7 +417,7 @@
 
         }
 
-        window.customElements.define(ServicioForm2.is, ServicioForm2);
+        window.customElements.define(ServicioForm.is, ServicioForm);
 
         /**
          * `servicios-orden` Muestra los servicios de una orden.

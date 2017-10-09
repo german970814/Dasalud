@@ -102,7 +102,7 @@
 {% endblock content %}
 
 {% block dialogs %}
-    <servicio-form2></servicio-form2>
+    <servicio-form></servicio-form>
     <paper-dialog>
         <div>
             {% trans "Debe agregar por lo menos un servicio." %}                
@@ -132,7 +132,7 @@
         const request = document.getElementById('request');
         const ordenForm = document.querySelector('orden-form');
         const serviciosOrden = document.querySelector('servicios-orden');
-        const servicioForm = document.querySelector('servicio-form2');
+        const servicioForm = document.querySelector('servicio-form');
 
         ordenForm.addEventListener('institucion-plan-changed', function(e) {
             let institucion = e.detail.institucion
