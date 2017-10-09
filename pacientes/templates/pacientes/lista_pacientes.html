@@ -10,10 +10,10 @@
     <custom-style>
         <style>
             iron-list {
-                height: calc(100vh - 100px);
+                height: calc(100vh - 150px);
             }
 
-            paciente-info {
+            .paciente-info {
                 width: 410px;
                 height: 245px;
             }
@@ -22,11 +22,16 @@
 {% endblock css %}
 
 {% block content %}
-    <div class="list-container">
-        <iron-list items='{{ pacientes }}' grid>
-            <template>
+    <header class="header-title">
+        <h1>{% trans "resultados de la busqueda" %}</h1>
+    </header>
+
+    <iron-list items='{{ pacientes }}' grid>
+        <template>
+            <div class="paciente-info">
                 <paciente-info paciente="[[item]]"></paciente-info>
-            </template>
-        </iron-list>
-    </div>
+            </div>
+        </template>
+    </iron-list>
+
 {% endblock content %}

@@ -19,7 +19,7 @@ class PacientesList(generics.ListCreateAPIView):
     queryset = Paciente.objects.all()
     serializer_class = PacienteSerializer
     filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
-    search_fields = ('nombres', 'apellidos', 'numero_documento')
+    search_fields = ('primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'numero_documento')
     filter_fields = ('numero_documento',)
 
 
@@ -39,7 +39,7 @@ class ListarPacientesView(generics.ListCreateAPIView):
     serializer_class = PacienteSerializer
     queryset = Paciente.objects.all()
     filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
-    search_fields = ('nombres', 'apellidos', 'numero_documento')
+    search_fields = ('primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'numero_documento')
     filter_fields = ('numero_documento',)
 
     def get(self, request, *args, **kwargs):
