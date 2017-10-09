@@ -8,7 +8,6 @@
     <link rel="import" href="/static/components/ig-iron-ajax.html">
     <link rel="import" href="/static/components/paciente-info.html">
     <link rel="import" href="/static/components/orden/servicios-orden.html">
-    <link rel="import" href="/static/components/orden/servicios-orden2.html">
     <link rel="import" href="/static/components/orden/orden-form.html">
     <link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
 {% endblock imports %}
@@ -53,12 +52,7 @@
             </div>
         </div>
         <br>
-        <servicios-orden2></servicios-orden2>
-        {% if cita %}
-            <!-- <servicios-orden cita='{{ cita }}'></servicios-orden>           -->
-        {% else %}
-            <!-- <servicios-orden></servicios-orden> -->
-        {% endif %}
+        <servicios-orden></servicios-orden>
         <br>
         <paper-button id="save">{% trans "Guardar" %}</paper-button>
 
@@ -137,7 +131,7 @@
     <script>
         const request = document.getElementById('request');
         const ordenForm = document.querySelector('orden-form');
-        const serviciosOrden = document.querySelector('servicios-orden2');
+        const serviciosOrden = document.querySelector('servicios-orden');
         const servicioForm = document.querySelector('servicio-form2');
 
         ordenForm.addEventListener('institucion-plan-changed', function(e) {
