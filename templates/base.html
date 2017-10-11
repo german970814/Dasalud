@@ -14,7 +14,7 @@
         {% block imports %}{% endblock imports %}
 
         <custom-style>
-            <style is="custom-style" include="vaadin-grid-material-styles">
+            <style is="custom-style">
                 body {
                     margin: 0;
                     font-family: 'Roboto', 'Noto', sans-serif;
@@ -92,7 +92,7 @@
     </head>
     <body>
         <paper-toast id="baseToast"></paper-toast>
-        <graphql-client config='{"uri": "{% url 'graphql' %}"}'></graphql-client>
+        <graphql-client config='{"uri": "{% url 'graphql' %}", "opts": { "credentials": "same-origin" }}'></graphql-client>
         <app-drawer-layout force-narrow fullbleed id="drawerLayout">
             <app-drawer slot="drawer">
                 <app-menu selected="0">

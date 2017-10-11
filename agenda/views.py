@@ -27,11 +27,12 @@ class AgendaView(APIView):
             edges {
                 node {
                     id
+                    fecha
                     urlHistoria
                     servicio {
                         servicio { nombre }
                         orden {
-                            paciente { nombres, apellidos, numeroDocumento }
+                            paciente { primerNombre, primerApellido, numeroDocumento }
                             plan { nombre }
                         }
                     }
@@ -40,8 +41,12 @@ class AgendaView(APIView):
         }}
         """
 
-        result = schema.execute(query)
-        sesiones = JSONRenderer().render(result.data['sesiones']['edges'])
+        result = schema.execute(query, context_value=request)
+        if result.data['sesiones']:
+            sesiones = JSONRenderer().render(result.data['sesiones']['edges'])
+        else:
+            print(result.errors)
+            sesiones = JSONRenderer().render([])
 
         return Response({'sesiones': sesiones})
 

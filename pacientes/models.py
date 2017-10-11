@@ -301,6 +301,7 @@ class Sesion(models.Model):
     class Meta:
         verbose_name = 'sesión'
         verbose_name_plural = 'sesiones'
+        ordering = ['fecha']
     
     def __str__(self):
         return '{} {}'.format(self.servicio, self.pk)

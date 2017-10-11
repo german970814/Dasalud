@@ -1,10 +1,12 @@
 import graphene
+import django_filters
 from graphene_django import DjangoObjectType, DjangoConnectionField
 from graphene_django.filter import DjangoFilterConnectionField
 from common.schema import BaseNode
 
 from historias.schema import Historia
 from . import models
+from . import filters
 
 
 class Paciente(DjangoObjectType):
@@ -39,7 +41,6 @@ class Sesion(DjangoObjectType):
 
     class Meta:
         model = models.Sesion
-        filter_fields = ['estado']
         interfaces = (BaseNode,)
 
     def resolve_url_historia(self, args, context, info):
@@ -56,10 +57,13 @@ class Acompanante(DjangoObjectType):
 
 class Query(graphene.AbstractType):
     sesion = BaseNode.Field(Sesion)
-    sesiones = DjangoFilterConnectionField(Sesion, description='Todas las sesiones')
+    sesiones = DjangoFilterConnectionField(Sesion, filterset_class=filters.SesionFilter,  description='Todas las sesiones')
     servicio_realizar = BaseNode.Field(ServicioRealizar)
     servicios_realizar = DjangoFilterConnectionField(ServicioRealizar, description='Todos los servicios a realizar')
     orden = BaseNode.Field(Orden)
     ordenes = DjangoFilterConnectionField(Orden, description='Todas las ordenes')
     paciente = BaseNode.Field(Paciente)
     pacientes = DjangoFilterConnectionField(Paciente, description='Todas las ordenes')
+
+    def resolve_sesiones(self, args, context, info):
+        return models.Sesion.objects.filter(medico__usuario=context.user)

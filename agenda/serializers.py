@@ -19,7 +19,7 @@ class PersonaSerializer(FlexFieldsModelSerializer):
 
     class Meta:
         model = models.Persona
-        fields = ['id', 'numero_documento', 'tipo_documento', 'nombres', 'apellidos', 'telefono', 'celular', 'direccion']
+        fields = ['id', 'numero_documento', 'tipo_documento', 'primer_nombre', 'primer_apellido', 'telefono', 'celular', 'direccion']
 
 
 class CitaSerializer(FlexFieldsModelSerializer):
