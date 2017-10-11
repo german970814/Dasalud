@@ -147,17 +147,3 @@ class SesionSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
         super().__init__(*args, **kwargs)
         self.fields['cita'].required = False
 
-
-class ServicioOrdenSerializer(FlexFieldsModelSerializer):
-    """Serializer para el modelo ServicioOrden."""
-
-    historias_link = serializers.HyperlinkedIdentityField(view_name='pacientes:historias')
-    servicio_nombre = serializers.StringRelatedField(source='servicio')
-
-    class Meta:
-        model = models.ServicioOrden
-        fields = ['medico', 'servicio', 'tipo_pago', 'valor', 'descuento', 'orden', 'historias_link', 'servicio_nombre']
-
-    expandable_fields = {
-        'orden': (OrdenSerializer, {'source': 'orden'})
-    }

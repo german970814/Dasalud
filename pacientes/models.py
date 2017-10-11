@@ -328,49 +328,6 @@ class Sesion(models.Model):
             historia = resolve()
         return historia
 
-# TODO borrar este modelo
-class ServicioOrden(models.Model):
-    """Modelo para guardar los servicios que maneja una orden."""
-
-    COOPAGO = 'CO'
-    CUOTA_MODERADORA = 'CM'
-    TIPOS_PAGO = (
-        (COOPAGO, _lazy('Coopago')),
-        (CUOTA_MODERADORA, _lazy('Cuota moderadora'))
-    )
-
-    orden = models.ForeignKey(Orden, related_name='servicios_orden', verbose_name=_lazy('orden'))
-    servicio = models.ForeignKey('servicios.Servicio', related_name='servicios_orden', verbose_name=_lazy('servicio'))
-    tipo_pago = models.CharField(_lazy('tipo de pago'), max_length=2, choices=TIPOS_PAGO, blank=True)
-    valor = models.PositiveIntegerField(_lazy('valor'))
-    descuento = models.PositiveIntegerField(_lazy('descuento'), default=0)
-    medico = models.ForeignKey('organizacional.Empleado', related_name='servicios', verbose_name=_lazy('medico'))
-
-    class Meta:
-        verbose_name = 'servicio orden'
-        verbose_name_plural = 'servicios orden'
-
-    def __str__(self):
-        return '{} - {} - {}'.format(self.orden.pk, self.pk, self.servicio.nombre)
-
-    def get_historia(self, force_instance=False):
-        """
-        :returns:
-            Retorna la historia del servicio. Si el servicio no tiene historia guardada, devuelve  ``None`` o una
-            instancia de Historia dependiendo de force_instance.
-        
-        :param bool force_instance:
-            Fuerza que devuelva una instancia de Historia
-        """
-        from historias.models import Historia
-
-        try:
-            return self.historia
-        except:
-            if force_instance:
-                return Historia(contenido=self.servicio.formato.contenido, servicio_orden=self)
-            return None
-
 
 class Acompanante(ParentescoMixin, models.Model):
     """Modelo que guarda la información del acompañante de un paciente según el ordenamiento."""

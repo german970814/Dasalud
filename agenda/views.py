@@ -6,8 +6,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from pacientes.models import Paciente
-from pacientes.serializers import ServicioOrdenSerializer
-
 from .filters import CitaFilter
 from .models import Cita, HorarioAtencion, Persona
 from .serializers import (CitaSerializer, HorarioAtencionSerializer, PersonaSerializer)

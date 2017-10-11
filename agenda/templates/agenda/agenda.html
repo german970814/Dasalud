@@ -77,11 +77,11 @@
                     <template class="header">{% trans 'Empresa' %}</template>
                     <template>[[item.node.servicio.orden.plan.nombre]]</template>
                 </vaadin-grid-column>
-                <vaadin-grid-column>
+                <vaadin-grid-column flex-grow="0">
                     <template class="header">{% trans "Hora" %}</template>
                     <template>[[_formatHora(item.node.fecha)]]</template>
                 </vaadin-grid-column>
-                <vaadin-grid-column>
+                <vaadin-grid-column flex-grow="0">
                     <template class="header"></template>
                     <template>
                         <div>

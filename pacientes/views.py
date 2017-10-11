@@ -10,7 +10,7 @@ from dasalud.schema import schema
 from common.schema import BaseNode
 from agenda.models import Cita
 from historias.serializers import HistoriaSerializer
-from .models import Paciente, Orden, ServicioOrden, Sesion
+from .models import Paciente, Orden, Sesion
 from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSerializer
 from . import serializers
 
