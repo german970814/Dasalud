@@ -23,6 +23,11 @@
         .card > vaadin-date-picker {
             padding-top: 0px;
         }
+
+        .card > div {
+            text-align: center;
+            text-transform: uppercase;
+        }
     </style>
 {% endblock css %}
 
@@ -35,7 +40,7 @@
         <template>
             <graphql-query id="sesionesQuery" hold>
                 query agendaDoctor($fecha: String){
-                    sesiones(fecha: $fecha) {
+                    sesiones(fecha: $fecha, estado: "CU") {
                         edges {
                             node {
                                 id
@@ -57,8 +62,9 @@
             <div class="card">
                 <vaadin-date-picker label="Fecha" value="{% now 'Y-m-d' %}" required error-message="Debes escoger una fecha">
                 </vaadin-date-picker>
+                <div hidden="[[_haySesiones(sesiones)]]">No existen ordenes activas en la fecha escogida.</div>
             </div>
-            <vaadin-grid id="sesionesGrid">
+            <vaadin-grid id="sesionesGrid" items="[[sesiones]]">
                 <vaadin-grid-column>
                     <template class="header">{% trans 'Cédula' %}</template>
                     <template>[[item.node.servicio.orden.paciente.numeroDocumento]]</template>
@@ -106,16 +112,19 @@
                 return moment.utc(fecha).format('hh:mm A');
             }
 
+            autoBind._haySesiones = (sesiones) => {
+                return sesiones.length != 0;
+            }
+
             const datePicker = document.querySelector('vaadin-date-picker');
             const sesionesQuery = document.getElementById('sesionesQuery');
-            const sesionesGrid = document.getElementById('sesionesGrid');
             
             getSesiones();
 
             datePicker.addEventListener('value-changed', function() {
                 if (datePicker.value == '') {
                     datePicker.invalid = true;
-                    sesionesGrid.items = [];
+                    autoBind.sesiones = [];
                 }
                 else {
                     datePicker.invalid = false;
@@ -126,7 +135,7 @@
             function getSesiones() {
                 sesionesQuery.variables = {fecha: datePicker.value};
                 sesionesQuery.execute().result().then(result => {
-                    sesionesGrid.items = result.data.sesiones.edges;
+                    autoBind.sesiones = result.data.sesiones.edges;
                 });
             }
         })();

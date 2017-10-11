@@ -18,35 +18,7 @@ class AgendaView(APIView):
     template_name = 'agenda/agenda.html'
 
     def get(self, request):
-        from dasalud.schema import schema
-
-        query = """
-        query { sesiones {
-            edges {
-                node {
-                    id
-                    fecha
-                    urlHistoria
-                    servicio {
-                        servicio { nombre }
-                        orden {
-                            paciente { primerNombre, primerApellido, numeroDocumento }
-                            plan { nombre }
-                        }
-                    }
-                }
-            }
-        }}
-        """
-
-        result = schema.execute(query, context_value=request)
-        if result.data['sesiones']:
-            sesiones = JSONRenderer().render(result.data['sesiones']['edges'])
-        else:
-            print(result.errors)
-            sesiones = JSONRenderer().render([])
-
-        return Response({'sesiones': sesiones})
+        return Response()
 
 
 class HorarioAtencionMedicosView(generics.ListCreateAPIView):
