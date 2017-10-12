@@ -213,9 +213,9 @@
                 <p><b>Numero de sesiones:</b> [[selectedServicio.node.numeroSesiones]]</p>
                 <p><b>Cumplidas:</b> [[selectedServicio.node.sesionesCumplidas]]</p>
                 <p><b>Pendientes:</b> [[_calcularSesionesPendientes(selectedServicio.node.numeroSesiones, selectedServicio.node.sesionesCumplidas)]]</p>
-                <p><b>Valor de la sesión:</b> $[[selectedServicio.node.valor]]</p>
-                <p><b>Coopago/Cuota Moderadora:</b> $[[selectedServicio.node.coopago]]</p>
-                <p><b>Total:</b> CALCULAR</p>
+                <p><b>Valor de la sesión:</b> [[_formatCurrency(selectedServicio.node.valor)]]</p>
+                <p><b>Total:</b> [[_calcularTotal(selectedServicio.node.numeroSesiones, selectedServicio.node.valor)]]</p>
+                <p><b>Coopago/Cuota Moderadora:</b> [[_formatCurrency(selectedServicio.node.coopago)]]</p>
             </div>
             <div class="sesiones">
                 <vaadin-grid id="grid" items="[[selectedServicio.node.sesiones.edges]]">
@@ -597,7 +597,18 @@
             }
 
             /**
-             * Calcula el número de sesiones que el paciente tiene perndientes para el servicio seleccionado.
+             * Formatea el valor ingresado. 
+             * 
+             * @param {number} value Valor a formatear
+             * @return {string} Valor formateado
+             */
+             _formatCurrency(value) {
+                 if (value != undefined) return value.toLocaleString('es', {style: 'currency', currency: 'COP'});
+                 return value;
+            }
+
+            /**
+             * Calcula el número de sesiones que el paciente tiene pendientes para el servicio seleccionado.
              * 
              * @param {number} numSesiones Número de sesiones
              * @param {number} sesionesCumplidas Número de sesiones cumplidas
@@ -606,6 +617,18 @@
              */
              _calcularSesionesPendientes(numSesiones, sesionesCumplidas) {
                 return numSesiones - sesionesCumplidas || 0;
+            }
+
+            /**
+             * Calcula el valor total de las sesiones del servicio.
+             * 
+             * @param {number} numSesiones Número de sesiones
+             * @param {number} valorSesion Valor por sesión
+             *
+             * @return {number} Valor total de las sesiones.
+             */
+             _calcularTotal(numSesiones, valorSesion) {
+                return this._formatCurrency(numSesiones*valorSesion);
             }
 
             /**
