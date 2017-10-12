@@ -270,6 +270,9 @@ class ServicioRealizar(models.Model):
     def __str__(self):
         return '{} - {} - {}'.format(self.orden_id, self.pk, self.servicio.nombre)
 
+    def numero_sesiones_cumplidas(self):
+        return self.sesiones.filter(estado=Sesion.CUMPLIDA).count();
+
 
 class Sesion(models.Model):
     """Modelo para guardar las sesiones de un servicio de una orden."""

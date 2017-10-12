@@ -211,8 +211,8 @@
             </div>
             <div class="servicio-info">
                 <p><b>Numero de sesiones:</b> [[selectedServicio.node.numeroSesiones]]</p>
-                <p><b>Cumplidas:</b> CALCULAR</p>
-                <p><b>Pendientes:</b> CALCULAR</p>
+                <p><b>Cumplidas:</b> [[selectedServicio.node.sesionesCumplidas]]</p>
+                <p><b>Pendientes:</b> [[_calcularSesionesPendientes(selectedServicio.node.numeroSesiones, selectedServicio.node.sesionesCumplidas)]]</p>
                 <p><b>Valor de la sesión:</b> $[[selectedServicio.node.valor]]</p>
                 <p><b>Coopago/Cuota Moderadora:</b> $[[selectedServicio.node.coopago]]</p>
                 <p><b>Total:</b> CALCULAR</p>
@@ -510,6 +510,7 @@
                 let servicioRealizar = {
                     node: {
                         numeroSesiones: data.numeroSesiones,
+                        sesionesCumplidas: 0,
                         valor: data.valor,
                         coopago: data.coopago,
                         servicio: {
@@ -593,6 +594,18 @@
              */
              _formatHora(date) {
                 return moment(date).format("hh:mm a");
+            }
+
+            /**
+             * Calcula el número de sesiones que el paciente tiene perndientes para el servicio seleccionado.
+             * 
+             * @param {number} numSesiones Número de sesiones
+             * @param {number} sesionesCumplidas Número de sesiones cumplidas
+             *
+             * @return {number} Número de sesiones pendientes por cumplir
+             */
+             _calcularSesionesPendientes(numSesiones, sesionesCumplidas) {
+                return numSesiones - sesionesCumplidas || 0;
             }
 
             /**

@@ -30,6 +30,8 @@ class Orden(DjangoObjectType):
 
 class ServicioRealizar(DjangoObjectType):
 
+    sesiones_cumplidas = graphene.Int(source='numero_sesiones_cumplidas', description='Número de sesiones cumplidas')
+
     class Meta:
         model = models.ServicioRealizar
         interfaces = (BaseNode,)
