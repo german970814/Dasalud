@@ -147,12 +147,33 @@
                 });
 
                 const toast = document.getElementById('baseToast');
-                document.body.addEventListener('notify-toast-form-error', function() {
-                    toast.text = 'Hubo un error en el formulario por favor verifica.';
-                    toast.style.setProperty('--paper-toast-background-color', getComputedStyle(document.body).getPropertyValue('--error-color'));
-                    toast.style.setProperty('--paper-toast-color', 'white');
+                document.body.addEventListener('notify-toast', function(e) {
+                    toast.text = e.detail.text;
+                    setToastStyle(toast);
                     toast.open();
                 });
+
+                document.body.addEventListener('notify-toast-error', function(e) {
+                    toast.text = e.detail.text;
+                    setErrorStyle(toast);
+                    toast.open();
+                });
+
+                document.body.addEventListener('notify-toast-form-error', function() {
+                    toast.text = 'Hubo un error en el formulario por favor verifica.';
+                    setErrorStyle(toast);
+                    toast.open();
+                });
+
+                function setToastStyle(toast, backgroundColor, color) {
+                    toast.style.setProperty('--paper-toast-background-color', backgroundColor || '#323232');
+                    toast.style.setProperty('--paper-toast-color', color || '#f1f1f1');
+                }
+
+                function setErrorStyle(toast) {
+                    toast.style.setProperty('--paper-toast-background-color', getComputedStyle(document.body).getPropertyValue('--error-color'));
+                    toast.style.setProperty('--paper-toast-color', 'white');
+                }
             })();            
         </script>
 

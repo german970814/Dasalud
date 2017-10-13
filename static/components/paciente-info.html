@@ -37,6 +37,10 @@
             .info > * {
                 margin: 0px;
             }
+
+            .card-actions > a {
+                text-decoration: none;                
+            }
         </style>
 
         <paper-card id="card">
@@ -49,8 +53,8 @@
                 </div>
             </div>
             <div class="card-actions">
-                <a href="[[paciente.edit_link]]"><paper-icon-button icon="my-icons:edit"></paper-icon-button></a>
-                <a href="[[paciente.ordenes_link]]"><paper-icon-button icon="my-icons:menu"></paper-icon-button></a>
+                <a href="[[paciente.edit_link]]" title="Editar paciente"><paper-icon-button icon="my-icons:edit"></paper-icon-button></a>
+                <a href="[[paciente.ordenes_link]]" title="Crear orden"><paper-icon-button icon="my-icons:menu"></paper-icon-button></a>
             </div>
         </paper-card>
     </template>

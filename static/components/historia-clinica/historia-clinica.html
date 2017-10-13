@@ -43,7 +43,7 @@
                 <paper-tab>[[item.nombre]]</paper-tab>
             </template>
             <paper-tab>Adjuntos</paper-tab>
-            <paper-tab>Historial</paper-tab>
+            <!-- <paper-tab>Historial</paper-tab> -->
         </paper-tabs>
 
         <iron-pages id="pages" selected="{{selected}}">
@@ -51,7 +51,7 @@
                 <historia-clinica-content on-close-historia="_close" on-validate-historia="_checkValidity" fields="[[item.fields]]" is-editable=[[historia.is_editable]]></historia-clinica-content>
             </template>
             <historia-clinica-adjuntos url="[[historia.url_adjunto]]" is-editable=[[historia.is_editable]]></historia-clinica-adjuntos>
-            <historia-clinica-historias paciente="[[historia.paciente_graph_id]]"></historia-clinica-historias>
+            <!-- <historia-clinica-historias paciente="[[historia.paciente_graph_id]]"></historia-clinica-historias> -->
         </iron-pages>
 
     </template>

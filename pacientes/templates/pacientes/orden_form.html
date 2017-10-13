@@ -144,14 +144,22 @@
         });
 
         document.getElementById('save').addEventListener('click', function(e) {
-            console.log(e);
             let ordenValid = ordenForm.validate();
             let serviciosValid = serviciosOrden.validate();
             if( ordenValid && serviciosValid) {
                 let orden = serializeOrden(ordenForm.value, serviciosOrden.servicios);
                 request.body = orden;
                 request.generateRequest();
-            }            
+            }
+            else {
+                let msg = '';
+                if (!serviciosValid) msg = 'Debes agregar por lo menos un servicio.';
+                this.dispatchEvent(new CustomEvent('notify-toast-error', { 
+                    bubbles: true, composed: true, detail: {
+                        text: `Hubo errores en el formulario por favor verifica. ${msg}`
+                    }
+                }));
+            }      
         });
 
         request.addEventListener('response', function(e) {

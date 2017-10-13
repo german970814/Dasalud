@@ -105,7 +105,7 @@
                             </vaadin-combo-box>
                         </div>
                         <div class="row">
-                            <vaadin-date-picker label="Fecha*" required auto-validate value="{{value.fecha}}">
+                            <vaadin-date-picker id="fecha" label="Fecha*" required auto-validate value="{{value.fecha}}">
                             </vaadin-date-picker>
                             <paper-input type="time" label="Hora*" required value="{{value.hora}}"></paper-input>
                         </div>
@@ -128,7 +128,7 @@
                         </div>                
                     </form>
                 </iron-form>
-                <show-json json="[[value]]"></show-json>
+                <!-- <show-json json="[[value]]"></show-json> -->
             </paper-dialog-scrollable>
 
             <div class="buttons">
@@ -205,7 +205,10 @@
                 </app-toolbar>
                 <iron-list id="serviciosList" items="[[servicios]]" selection-enabled selected-item="{{selectedServicio}}">
                     <template>
-                        <paper-item selected$="[[selected]]">[[item.node.servicio.nombre]]</paper-item>
+                        <paper-item selected$="[[selected]]">
+                            [[item.node.servicio.nombre]]
+                            <paper-icon-button icon="my-icons:delete" on-tap="_deleteServicio"></paper-icon-button>
+                        </paper-item>
                     </template>
                 </iron-list>
             </div>
@@ -254,6 +257,7 @@
 
 </dom-module>
 
+<script src="/static/bower_components/moment/min/moment.min.js"></script>
 <script>
     (function() {
 
@@ -303,13 +307,31 @@
                     },
 
                     /**
+                     * Valores iniciales del formulario.
+                     */
+                     _initialValue: {
+                        type: Object,
+                        value: () => {
+                            return {
+                                fecha: moment().format('YYYY-MM-DD'),
+                                hora: moment().format('HH:mm')
+                            }
+                        }
+                    },
+
+                    /**
                      * Datos del formulario.
                      *
                      * @type {{sucursal: string, sucursalItem: Object, medico: string, medicoItem: Object, servicio: string, servicioItem: Object, fecha: string, hora: string, autorizacion: string, fechaAutorizacion: string, numeroSesiones: number, valor: number, coopago: number}}
                      */
                     value: {
                         type: Object,
-                        value: () => { return {}; }
+                        value: () => { 
+                            return {
+                                fecha: moment().format('YYYY-MM-DD'),
+                                hora: moment().format('HH:mm')
+                            }
+                        }
                     }
                 };
             }
@@ -333,6 +355,20 @@
             constructor() {
                 super();
                 if (!servicioFormInstance) servicioFormInstance = this;
+            }
+
+            /**
+             * Use for one-time configuration of your component after local DOM is initialized. 
+             */
+            ready() {
+                super.ready();
+            
+                // When possible, use afterNextRender to defer non-critical
+                // work until after first paint.
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    this.$.fecha.min = moment().format('YYYY-MM-DD');
+                });
+            
             }
 
             /**
@@ -390,7 +426,9 @@
 
             /** Limpia el formulario. */
             clean() {
-                this.value = {};
+                this._initialValue.autorizacion = this.value.autorizacion;
+                this._initialValue.fechaAutorizacion = this.value.fechaAutorizacion;
+                this.value = JSON.parse(JSON.stringify(this._initialValue));
             }
 
             /**
@@ -500,6 +538,13 @@
              */
             _addServicio() {
                 servicioFormInstance.open();
+            }
+
+            /**
+             * Borra el servicio. 
+             */
+            _deleteServicio(e) {
+                this.splice('servicios', e.model.index, 1);
             }
 
             /**
@@ -628,7 +673,7 @@
              * @return {number} Valor total de las sesiones.
              */
              _calcularTotal(numSesiones, valorSesion) {
-                return this._formatCurrency(numSesiones*valorSesion);
+                return this._formatCurrency(numSesiones*valorSesion || 0);
             }
 
             /**
