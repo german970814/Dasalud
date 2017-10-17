@@ -37,6 +37,17 @@ class HorarioAtencionMedicosView(generics.ListCreateAPIView):
             return Response()
 
 
+class CitasMultipleView(APIView):
+    """Permite agendar citas usando la agenda de multiples medicos."""
+
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'agenda/citas_multiple.html'
+
+    def get(self, request):
+        form = CitaSerializer(fields=['paciente', 'servicio', 'estado'], expand=['paciente'])
+        return Response({'form': form})
+
+
 class CitasView(generics.ListCreateAPIView):
     """Permite agendar citas a un medico."""
 

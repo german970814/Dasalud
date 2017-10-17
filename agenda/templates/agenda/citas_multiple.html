@@ -8,21 +8,13 @@
     <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
     <link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
     <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
+    <link rel="import" href="/static/bower_components/scheduler-component/scheduler-component.html">
     <link rel="import" href="/static/components/form-cita.html">
+    <link rel="import" href="/static/components/agenda-multiple.html">
 {% endblock imports %}
 
 {% block css %}
-    <link rel='stylesheet' href='{% static "bower_components/fullcalendar/dist/fullcalendar.min.css" %}' />
     <style>
-        .filtros {
-            display: flex;
-        }
-
-        .filtros > * {
-            flex: 1;
-            margin: auto 10px;
-        }
-
         #cita-dialog {
             width: 75%;
         }
@@ -39,15 +31,11 @@
     </header>
 
     <div class="card">
-        <div class="filtros">
-            <vaadin-combo-box id="sucursales" label="{% trans 'Sucursal' %}" items='{{ sucursales }}'></vaadin-combo-box>
-            <vaadin-combo-box id="medicos" label="{% trans 'Medico' %}" items='{{ medicos }}'></vaadin-combo-box>
-        </div>
-        <br><br>
         <iron-ajax id="save-event-request" url="{% url "agenda:citas" %}" method="POST" handle-as="json"
                 content-type="application/json"></iron-ajax>
-        <div id="calendar"></div>
 
+        <agenda-multiple id="agenda"></agenda-multiple>
+        <!-- <scheduler-component default-view="agendaWeek" selectable></scheduler-component> -->
     </div>
 {% endblock content %}
 
@@ -67,6 +55,17 @@
     <script src="{% static 'js/utils.js' %}"></script>
 
     <script>
+        (function() {
+            const agenda = document.getElementById('agenda');
+            const citaDialog = document.querySelector('form-cita');
+
+            agenda.addEventListener('disponible-click', function(e) {
+                console.log('nueva cita');
+                let event = e.detail.event;
+                citaDialog.nuevaCita(event);
+            });
+        })();
+
         const calendar = $('#calendar');
         const medicosNode = document.getElementById('medicos');
         const sucursalesNode = document.getElementById('sucursales');

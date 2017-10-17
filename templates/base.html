@@ -114,6 +114,9 @@
                         <a class="app-menu-item" href="{% url 'agenda:citas' %}">
                             <app-menu-icon-item icon="my-icons:people">{% trans "Agendar citas" %}</app-menu-icon-item>
                         </a>                    
+                        <a class="app-menu-item" href="{% url 'agenda:citas-multiple' %}">
+                            <app-menu-icon-item icon="my-icons:people">{% trans "Agendar citas multiple" %}</app-menu-icon-item>
+                        </a>  
                         {% endif %}
                     {% endswitch %}
                 </app-menu>

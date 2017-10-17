@@ -110,7 +110,7 @@
             }
 
             /*
-            * Observer method for the defaultView attribute. Se soobrescribe para que no haga la verificación.
+            * Observer method for the defaultView attribute. Se sobrescribe para que no haga la verificación.
             *
             */
             _viewChanged(newValue, oldValue) {
@@ -132,7 +132,7 @@
             * re-render resources on the scheduler when the resources property changes.
             */
             _backgroundEventsChanged(newValue, oldValue) {
-                if (oldValue) {
+                if (this._scheduler) {
                     this._scheduler.fullCalendar('refetchEventSources', 'background');
                 }
             }
@@ -142,8 +142,24 @@
             * re-renders the scheduler when the slotDuration property changes.
             */
             _slotDurationChanged(newValue, oldValue) {
-                if (newValue) {
+                if (this._scheduler) {
                     this.changeOptions({slotDuration: newValue});
+                }
+            }
+
+            /**
+            * Observer method for events property.
+            * re-render events on the scheduler when the events property changes.
+            * Override to work with other event sources.
+            */
+            _eventsChanged(newValue, oldValue) {
+                // make sure that the oldValue is not undefined.
+                // For thr first call, the newValue will have the currentValue of the property
+                // oldValue will be undefined
+                if (this._scheduler) {
+                    this._removeEvents();
+                    this._refetchEvents();
+                    this._scheduler.fullCalendar('refetchEvents'); // Refetching other sources
                 }
             }
 
