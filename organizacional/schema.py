@@ -7,6 +7,8 @@ from . import models
 
 class Sucursal(DjangoObjectType):
 
+    pk = graphene.Int(source='pk')
+
     class Meta:
         model = models.Sucursal
         interfaces = (BaseNode,)
@@ -21,14 +23,19 @@ class Institucion(DjangoObjectType):
 
 class Empleado(DjangoObjectType):
 
+    pk = graphene.Int(source='pk')
     title = graphene.String(source='__str__')
     nombre_completo = graphene.String(source='__str__')
     instituciones = DjangoFilterConnectionField(Institucion)
+    duracion = graphene.String(description='Duración de la atención de las citas.')
 
     class Meta:
         model = models.Empleado
         interfaces = (BaseNode,)
         filter_fields = ['instituciones', 'agenda', 'sucursal']
+    
+    def resolve_duracion(self, args, context, info):
+        return str(self.duracion_cita or self.agenda.duracion)
 
 
 class Query(graphene.AbstractType):

@@ -3,6 +3,9 @@
 
 {% block imports %}
     <link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
+    <link rel="import" href="/static/bower_components/polymer/lib/elements/dom-bind.html">
+    <link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
+    <link rel="import" href="/static/bower_components/show-json/show-json.html">
     <link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
 {% endblock imports %}
 
@@ -26,16 +29,44 @@
         <small>{% trans "Ingresa el horario de atención que tendra un medico para atender pacientes en una sucursal." %}</small>
     </header>
 
-    <div class="card">
-        <div class="filtros">
-            <vaadin-combo-box id="sucursales" label="{% trans 'Sucursal' %}" items='{{ sucursales }}'></vaadin-combo-box>
-            <vaadin-combo-box id="medicos" label="{% trans 'Medico' %}" items='{{ medicos }}'></vaadin-combo-box>
-        </div>
-        <br><br>
-        <iron-ajax id="save-event-request" url="{% url "agenda:horario-atencion" %}" method="POST" handle-as="json"
-                content-type="application/json"></iron-ajax>
-        <div id="calendar"></div>
-    </div>
+    <dom-bind>
+        <template>
+            {% verbatim %}
+            <graphql-query result="{{filtrosResult}}">
+                query horarioAtencionFiltrosQuery{
+                    sucursales {
+                        edges {
+                            node { id, nombre, pk }
+                        }
+                    }
+                    medicos {
+                        edges {
+                            node { id, nombreCompleto, duracion, pk }
+                        }
+                    }
+                }
+            </graphql-query>
+            {% endverbatim %}
+
+            <div class="card">
+                {% verbatim %}
+                <div class="filtros">
+                    <vaadin-combo-box id="sucursales" label="Sucursal" items="[[filtrosResult.sucursales.edges]]"
+                        item-value-path="node.pk" item-label-path="node.nombre" selected-item="{{filtros.sucursalItem}}">
+                    </vaadin-combo-box>
+                    <vaadin-combo-box id="medicos" label="Medico" items="[[filtrosResult.medicos.edges]]"
+                        item-value-path="node.pk" item-label-path="node.nombreCompleto" selected-item="{{filtros.medicoItem}}">
+                    </vaadin-combo-box>
+                    <!-- <show-json json="[[filtros]]"></show-json> -->
+                </div>
+                {% endverbatim %}
+                <br><br>
+                <iron-ajax id="save-event-request" url="{% url "agenda:horario-atencion" %}" method="POST" handle-as="json"
+                        content-type="application/json"></iron-ajax>
+                <div id="calendar"></div>
+            </div>
+        </template>
+    </dom-bind>
 {% endblock content %}
 
 {% block js %}
@@ -46,6 +77,22 @@
     <script src="{% static 'js/utils.js' %}"></script>
     
     <script>
+        (function(){
+            const calendar = document.querySelector('resource-scheduler');
+            const autoBind = document.querySelector('dom-bind');
+            const queryNode = autoBind.$.horarioAtencionQuery;
+
+            autoBind.filtros = {};
+            autoBind._createMethodObserver('_getHorarioAtencion(filtros.sucursalItem, filtros.medicoItem)');
+
+            autoBind._getHorarioAtencion = (sucursal, medico) => {
+                if (medico) cambiarDuracion(medico);
+                
+                if (sucursal && medico) {
+                    refrescarEventos();
+                }
+            }
+        })();
         const calendar = $('#calendar');
         const medicosNode = document.getElementById('medicos');
         const sucursalesNode = document.getElementById('sucursales');
@@ -71,25 +118,9 @@
             }
         });
 
-        medicosNode.addEventListener('selected-item-changed', function(e) {
-            if (this.selectedItem != null) {
-                cambiarDuracion(this.selectedItem);
-            }
-
-            if (medicosNode.selectedItem && sucursalesNode.selectedItem) {
-                refrescarEventos();
-            }
-        });
-
-        sucursalesNode.addEventListener('selected-item-changed', function(e) {
-            if (medicosNode.selectedItem && sucursalesNode.selectedItem) {
-                refrescarEventos();
-            }
-        });
-
         function cambiarDuracion(item) {
-            if (item.duracion_cita != null) {
-                calendar.fullCalendar('option', 'slotDuration', item.duracion_cita);
+            if (item.node.duracion != null) {
+                calendar.fullCalendar('option', 'slotDuration', item.node.duracion);
             }
         }
 
@@ -106,8 +137,8 @@
             }
             else {
                 return {
-                    medico: medicosNode.selectedItem.value,
-                    sucursal: sucursalesNode.selectedItem.value,
+                    medico: medicosNode.value,
+                    sucursal: sucursalesNode.value,
                 }
             }
         }
@@ -129,12 +160,12 @@
 
         function createEvent(date) {
             const FORMAT = 'YYYY-MM-DD HH:mm';
-            let duracion = moment.duration(medicosNode.selectedItem.duracion_cita);
+            let duracion = moment.duration(medicosNode.selectedItem.node.duracion);
             let event = {
                 start: date.format(FORMAT),
                 end: date.add(duracion).format(FORMAT),
-                medico: medicosNode.selectedItem.value,
-                sucursal: sucursalesNode.selectedItem.value,
+                medico: medicosNode.value,
+                sucursal: sucursalesNode.value,
             }
 
             return event;

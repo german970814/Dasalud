@@ -34,23 +34,7 @@ class HorarioAtencionMedicosView(generics.ListCreateAPIView):
         if request.META.get('HTTP_ACCEPT', '').lower() == 'application/json':
             return super().get(request, *args, **kwargs)
         else:
-            data = self.html_response()
-            return Response(data)
-        
-
-    def html_response(self):
-        from organizacional.serializers import SucursalSerializer, EmpleadoSerializer
-        from organizacional.models import Sucursal, Empleado
-
-        _sucursales = Sucursal.objects.all()
-        _medicos = Empleado.objects.medicos()
-
-        sucursales_s = SucursalSerializer(_sucursales, many=True)
-        medicos_s = EmpleadoSerializer(_medicos, many=True)
-
-        sucursales = JSONRenderer().render(sucursales_s.data)
-        medicos = JSONRenderer().render(medicos_s.data)
-        return {'sucursales': sucursales, 'medicos': medicos}
+            return Response()
 
 
 class CitasView(generics.ListCreateAPIView):
