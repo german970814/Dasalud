@@ -59,7 +59,7 @@
 
             citaDialog.addEventListener('cita-saved', function(e) {
                 console.log('cita guardada');
-                if (e.detail.redirecciona) {
+                if (e.detail.redirecciona_link) {
                     window.location = e.detail.redirecciona_link;
                 }
                 else {

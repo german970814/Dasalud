@@ -44,7 +44,9 @@ class Persona(DjangoObjectType):
 
 class Cita(DjangoObjectType):
 
+    estado_display = graphene.String(source='get_estado_display')
     start = graphene.types.datetime.DateTime(source='start')
+    category = graphene.String(source='get_estado_display')
     end = graphene.types.datetime.DateTime(source='end')
     redirecciona_link = graphene.String()
     resource_id = graphene.String()

@@ -57,7 +57,8 @@
                 citas(agenda: $agenda, sucursal: $sucursal) {
                     edges {
                         node { 
-                            id, start, end, title, resourceId, estado, editLink, redireccionaLink
+                            id, start, end, title, resourceId, estado
+                            category, editLink, redireccionaLink
                             paciente {
                                 numeroDocumento, tipoDocumento
                                 primerNombre, segundoNombre
@@ -84,6 +85,7 @@
         <br>
         <resource-scheduler header='{"left": "prev,next, today", "center": "title", "right": "timelineDay,timelineWeek"}'
             default-view="timelineDay" slot-duration="[[filtros.agendaItem.node.duracion]]" id="calendar"
+            show-categories categories="[[estados]]"
             on-event-click="_citaClicked" selectable on-select-overlap="_espacioDisponibleClicked">
         </resource-scheduler>
 
@@ -118,6 +120,23 @@
                     filtros: {
                         type: Object,
                         value: () => { return {}; }
+                    },
+
+                    /**
+                     * Estados de las citas @todo Obtener del servidor
+                     */
+                    estados: {
+                        type: Array,
+                        value: () => { 
+                            return [
+                                {label: 'No confirmada', color: 'red'},
+                                {label: 'Confirmada', color: 'yellow'},
+                                {label: 'Cumplida', color: 'green'},
+                                {label: 'Cancelada', color: 'blue'},
+                                {label: 'Excusada', color: 'blue'},
+                                {label: 'No asistio', color: 'purple'},
+                            ]; 
+                        }
                     }
                 };
             }
