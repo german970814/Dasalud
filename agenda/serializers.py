@@ -10,16 +10,24 @@ from . import models
 class HorarioAtencionSerializer(FlexFieldsModelSerializer):
     """Serializer para el modelo HorarioAtencion."""
 
+    pk = serializers.SerializerMethodField()
+
     class Meta:
         model = models.HorarioAtencion
-        fields = ['id', 'title', 'start', 'end', 'medico', 'sucursal']
+        fields = ['id', 'title', 'start', 'end', 'medico', 'sucursal', 'pk']
+    
+    def get_pk(self, obj):
+        return obj.pk
 
 class PersonaSerializer(FlexFieldsModelSerializer):
     """Serializer para el modelo Persona."""
 
     class Meta:
         model = models.Persona
-        fields = ['id', 'numero_documento', 'tipo_documento', 'primer_nombre', 'primer_apellido', 'telefono', 'celular', 'direccion']
+        fields = [
+            'id', 'numero_documento', 'tipo_documento', 'primer_nombre', 'segundo_nombre',
+            'primer_apellido', 'segundo_apellido', 'telefono', 'celular', 'direccion'
+        ]
 
 
 class CitaSerializer(FlexFieldsModelSerializer):

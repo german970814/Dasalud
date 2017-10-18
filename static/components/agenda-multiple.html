@@ -42,7 +42,7 @@
             }
         </graphql-query>
 
-        <graphql-query id="citasQuery" hold>
+        <graphql-query id="citasQuery" hold fetch-policy="network-only">
             query agendaMultipleCitasQuery($agenda: ID!, $sucursal: ID!){
                 medicos(agenda: $agenda, sucursal: $sucursal) {
                     edges {
@@ -51,13 +51,22 @@
                 }
                 horariosAtencion(agenda: $agenda, sucursal: $sucursal) {
                     edges {
-                        node { id, start, end, resourceId }
+                        node { id, start, end, resourceId, pk }
                     }
                 }
                 citas(agenda: $agenda, sucursal: $sucursal) {
                     edges {
                         node { 
-                            id, start, end, title, resourceId
+                            id, start, end, title, resourceId, estado
+                            paciente {
+                                numeroDocumento, tipoDocumento
+                                primerNombre, segundoNombre
+                                primerApellido, segundoApellido
+                                telefono, celular, direccion
+                            }
+                            servicio {
+                                pk
+                            }
                         }
                     }
                 }
@@ -196,17 +205,22 @@
             getCalendarInfo(agenda, sucursal) {
                 if (agenda && sucursal) {
                     this.$.citasQuery.variables = {agenda, sucursal};
-                    this.$.citasQuery.execute().result().then(result => {
-                        this.$.calendar.resources = this._normalizeConnections(result.data.medicos.edges);
-                        this.$.calendar.backgroundEvents = this._normalizeConnections(result.data.horariosAtencion.edges);
-                        this.$.calendar.events = this._normalizeConnections(result.data.citas.edges);
-                    });
+                    this.refecthCitas();
                 }
                 else {
                     this.$.calendar.resources = [];
                     this.$.calendar.backgroundEvents = [];
                     this.$.calendar.events = [];
                 }
+            }
+
+            /** Refecth citas */
+            refecthCitas() {
+                this.$.citasQuery.execute().result().then(result => {
+                    this.$.calendar.resources = this._normalizeConnections(result.data.medicos.edges);
+                    this.$.calendar.backgroundEvents = this._normalizeConnections(result.data.horariosAtencion.edges);
+                    this.$.calendar.events = this._normalizeConnections(result.data.citas.edges);
+                });
             }
         }
 

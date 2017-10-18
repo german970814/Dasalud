@@ -8,6 +8,8 @@ from . import models
 
 class Servicio(DjangoObjectType):
 
+    pk = graphene.Int(source='pk')
+
     class Meta:
         model = models.Servicio
         interfaces = (BaseNode,)

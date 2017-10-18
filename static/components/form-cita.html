@@ -6,6 +6,7 @@
 <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
 <link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
 <link rel="import" href="/static/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
 <link rel="import" href="/static/bower_components/show-json/show-json.html">
 <link rel="import" href="/static/components/ig-iron-ajax.html">
 
@@ -55,10 +56,16 @@
                                 auto-validate required value="{{cita.paciente.tipo_documento}}"></vaadin-combo-box>
                         </div>
                         <div class="row">
-                            <paper-input name="nombres" label="Nombres*" required auto-validate
-                                value="{{cita.paciente.nombres}}"></paper-input>
-                            <paper-input name="apellidos" label="Apellidos*" required auto-validate
-                                value="{{cita.paciente.apellidos}}"></paper-input>
+                            <paper-input name="nombres" label="Primer nombre*" required auto-validate
+                                value="{{cita.paciente.primer_nombre}}"></paper-input>
+                            <paper-input name="nombres" label="Segundo nombre" auto-validate
+                                value="{{cita.paciente.segundo_nombre}}"></paper-input>
+                        </div>
+                        <div class="row">
+                            <paper-input name="nombres" label="Primer apellido*" required auto-validate
+                                value="{{cita.paciente.primer_apellido}}"></paper-input>
+                            <paper-input name="nombres" label="Segundo apellido" auto-validate
+                                value="{{cita.paciente.segundo_apellido}}"></paper-input>
                         </div>
                         <div class="row">
                             <paper-input name="telefono" label="Telefono" type="number" min="0" auto-validate
@@ -76,7 +83,7 @@
                             <vaadin-combo-box name="estado" label="Estado*" items="[[estados]]" auto-validate required
                                 value="{{cita.estado}}"></vaadin-combo-box>
                         </div>
-                        <!-- <show-json json="[[cita]]"></show-json> -->
+                        <show-json json="[[cita]]"></show-json>
                     </form>
                 </iron-form>
             </paper-dialog-scrollable>
@@ -89,6 +96,13 @@
     </template>
 
     <script>
+        /**
+         * `form-cita` Muestra el formulario para agendar una cita.
+         *
+         * @customElement
+         * @polymer
+         * @extends {Polymer.Element}
+         */
         class FormCita extends Polymer.Element {
 
             static get is() { return 'form-cita'; }
@@ -146,8 +160,6 @@
             }
 
             _cleanNumberValues(telefono, celular) {
-                console.log(telefono);
-                console.log(celular);
                 if(telefono == '') {
                     this.set('cita.paciente.telefono', null);
                 }
@@ -203,7 +215,7 @@
 
             nuevaCita(event) {
                 this._resetCita();
-                this.set('cita.horario', event.id);
+                this.set('cita.horario', event.pk);
                 this.fecha = event.start;
                 this._setPost();
                 this.open();
@@ -211,6 +223,7 @@
 
             verCita(cita) {
                 this.cita = JSON.parse(JSON.stringify(cita));
+                // this.cita = cita;
                 this.fecha = cita.start;
                 this._setPut();
                 this.open();

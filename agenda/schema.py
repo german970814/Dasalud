@@ -21,6 +21,7 @@ class Agenda(DjangoObjectType):
 
 class HorarioAtencion(DjangoObjectType):
 
+    pk = graphene.Int(source='pk')
     resource_id = graphene.String()
 
     class Meta:

@@ -13,18 +13,6 @@
     <link rel="import" href="/static/components/agenda-multiple.html">
 {% endblock imports %}
 
-{% block css %}
-    <style>
-        #cita-dialog {
-            width: 75%;
-        }
-        
-        #cita-dialog paper-dialog-scrollable {
-            height: 500px;
-        }
-    </style>
-{% endblock css %}
-
 {% block content %}
     <header class="header-title">
         <h1>{% trans "agendar citas" %}</h1>
@@ -61,123 +49,45 @@
 
             agenda.addEventListener('disponible-click', function(e) {
                 console.log('nueva cita');
-                let event = e.detail.event;
-                citaDialog.nuevaCita(event);
+                citaDialog.nuevaCita(e.detail.event);
             });
-        })();
 
-        const calendar = $('#calendar');
-        const medicosNode = document.getElementById('medicos');
-        const sucursalesNode = document.getElementById('sucursales');
-        const citaDialog = document.querySelector('form-cita');
+            agenda.addEventListener('cita-click', function(e) {
+                console.log('ver cita');
+                citaDialog.verCita(_normalizeCita(e.detail.cita));
+            });
 
-        calendar.fullCalendar({
-            header: {
-                'left': 'prev,next, today',
-                'center': 'title',
-                'right': 'month,agendaWeek,agendaDay'
-            },
-            allDaySlot: false,
-            slotLabelFormat: 'h(:mm)a',
-            navLinks: true,
-            selectable: true,
-            eventSources: [
-                {
-                    url: '{% url "agenda:horario-atencion" %}',
-                    headers: {ACCEPT: 'application/json'},
-                    data: function() {
-                        return dataEvents();
-                    },
-                    rendering: 'background'
-                },
-                {
-                    url: '{% url "agenda:citas" %}',
-                    headers: {ACCEPT: 'application/json'},
-                    data: function() {
-                        return dataEvents();
-                    }
+            citaDialog.addEventListener('cita-saved', function(e) {
+                console.log('cita guardada');
+                if (e.detail.redirecciona) {
+                    window.location = e.detail.redirecciona_link;
                 }
-            ],
-            dayClick: function(date, jsEvent, view) {
-                dayClick(date, jsEvent, view);
-            },
-            eventClick: function(calEvent, jsEvent, view) {
-                console.log('event clicked');
-                console.log(calEvent);
-                showCita(calEvent);
-            },
-            selectOverlap: function(event) {
-                if (calendar.fullCalendar('getView').name != 'month') {
-                    if (event.source.rendering == 'background') {
-                        console.log(event);
-                        showCitaFromBgEvent(event);
-                    }
+                else {
+                    agenda.refecthCitas();
                 }
-            }
-        });
+            });
 
-        medicosNode.addEventListener('selected-item-changed', function(e) {
-            if (this.selectedItem != null) {
-                cambiarDuracion(this.selectedItem);
-            }
-
-            refrescarEventos();
-        });
-
-        sucursalesNode.addEventListener('selected-item-changed', function(e) {
-            refrescarEventos();
-        });
-
-        citaDialog.addEventListener('cita-saved', function(e) {
-            console.log('cita guardada');
-            console.log(e.detail);
-            if (e.detail.redirecciona) {
-                window.location = e.detail.redirecciona_link;
-            }
-            else {
-                refrescarEventos();
-            }
-        });
-
-        function cambiarDuracion(item) {
-            if (item.duracion_cita != null) {
-                calendar.fullCalendar('option', 'slotDuration', item.duracion_cita);
-            }
-        }
-
-        function refrescarEventos() {
-            calendar.fullCalendar('refetchEvents');
-        }
-
-        function dataEvents() {
-            if (!medicosNode.selectedItem || !sucursalesNode.selectedItem) {
+            /** @todo integrar graphql en el forulario */
+            function _normalizeCita(cita) {
                 return {
-                    medico: 0,
-                    sucursal: 0
+                    id: cita.id,
+                    start: cita.start,
+                    end: cita.end,
+                    servicio: cita.servicio.pk,
+                    estado: cita.estado,
+                    paciente: {
+                        numero_documento: cita.paciente.numeroDocumento,
+                        tipo_documento: cita.paciente.tipoDocumento,
+                        primer_nombre: cita.paciente.primerNombre,
+                        segundo_nombre: cita.paciente.segundoNombre,
+                        primer_apellido: cita.paciente.primerApellido,
+                        segundo_apellido: cita.paciente.segundoApellido,
+                        telefono: cita.paciente.telefono,
+                        celular: cita.paciente.celular,
+                        direccion: cita.paciente.direccion
+                    }
                 };
             }
-            else {
-                return {
-                    medico: medicosNode.selectedItem.value,
-                    sucursal: sucursalesNode.selectedItem.value,
-                }
-            }
-        }
-
-        function dayClick(date, event, view) {
-            if (view.name == 'month') {  // If click on month view change to agendaWeek on the day clicked
-                calendar.fullCalendar('changeView', 'agendaWeek', date.format());
-            }
-        }
-
-        // --------- Cita Functions --------------------
-
-        function showCitaFromBgEvent(event) {
-            citaDialog.nuevaCita(event);
-        }
-
-        function showCita(event) {
-            citaDialog.verCita(event);
-        }
+        })();        
     </script>
 {% endblock js %}
