@@ -1,6 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType, DjangoConnectionField
 from graphene_django.filter import DjangoFilterConnectionField
+from rest_framework.reverse import reverse
 from common.schema import BaseNode
 from . import models
 from .filters import CitaFilter, HorarioAtencionFilter
@@ -65,7 +66,6 @@ class Cita(DjangoObjectType):
         return BaseNode.to_global_id('Empleado', self.horario.medico_id)
 
     def resolve_edit_link(self, args, context, info):
-        from rest_framework.reverse import reverse
         return reverse('agenda:citas-detail', args=[self.pk])
 
     def resolve_redirecciona_link(self, args, context, info):
