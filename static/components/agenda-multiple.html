@@ -57,16 +57,15 @@
                 citas(agenda: $agenda, sucursal: $sucursal) {
                     edges {
                         node { 
-                            id, start, end, title, resourceId, estado
+                            id, start, end, title, resourceId, estado, editLink, redireccionaLink
                             paciente {
                                 numeroDocumento, tipoDocumento
                                 primerNombre, segundoNombre
                                 primerApellido, segundoApellido
                                 telefono, celular, direccion
                             }
-                            servicio {
-                                pk
-                            }
+                            servicio { pk }
+                            horario { pk }
                         }
                     }
                 }

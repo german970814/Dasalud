@@ -46,7 +46,9 @@ class Cita(DjangoObjectType):
 
     start = graphene.types.datetime.DateTime(source='start')
     end = graphene.types.datetime.DateTime(source='end')
+    redirecciona_link = graphene.String()
     resource_id = graphene.String()
+    edit_link = graphene.String()
     title = graphene.String()
     
     class Meta:
@@ -59,6 +61,25 @@ class Cita(DjangoObjectType):
 
     def resolve_resource_id(self, args, context, info):
         return BaseNode.to_global_id('Empleado', self.horario.medico_id)
+
+    def resolve_edit_link(self, args, context, info):
+        from rest_framework.reverse import reverse
+        return reverse('agenda:citas-detail', args=[self.pk])
+
+    def resolve_redirecciona_link(self, args, context, info):
+        from pacientes.models import Paciente, Orden
+        if not self.cumplida:
+            return None
+        
+        if not self.sesion:
+            try:
+                paciente = Paciente.objects.get(numero_documento=self.paciente.numero_documento)
+                return reverse('pacientes:ordenes-nueva', args=(paciente.id,))
+            except Exception as e:
+                return reverse('pacientes:crear', request=request)
+        else:
+            orden = Orden.objects.get(servicios_realizar__sesiones=self.sesion_id)
+            return reverse('pacientes:ordenes-detalle', kwargs={'paciente': orden.paciente_id, 'pk': orden.pk})
 
 
 class Query(graphene.AbstractType):
