@@ -41,7 +41,7 @@
                 margin-right: 10px;
             }
 
-            .row:last-child paper-input:first-child {
+            .row:nth-last-child(2) paper-input:first-child {
                 flex: 0 1 auto;
             }
         </style>
@@ -82,6 +82,28 @@
             }
         </graphql-query>
 
+        <graphql-query id="citaQuery" hold>
+            query citaInfo($id: ID!) {
+                cita(id: $id) {
+                    id
+                    start
+                    estado
+                    estadoDisplay
+                    servicio {
+                      id
+                    }
+                    horario {
+                      sucursal {
+                        id
+                      }
+                      medico {
+                        id
+                      }
+                    }
+                }
+            }
+        </graphql-query>
+
         <paper-dialog modal id="dialog">
             <h2>Nuevo Servicio</h2>
 
@@ -93,15 +115,15 @@
                                 auto-validate value="[[value.sucursal]]" selected-item="{{value.sucursalItem}}"
                                 item-label-path="node.nombre" item-value-path="node.id">
                             </vaadin-combo-box>
-                            <vaadin-combo-box label="Medico*" required items="[[queryResult.medicos.edges]]" 
+                            <vaadin-combo-box label="Medico*" required items="[[queryResult.medicos.edges]]"
                                 auto-validate value="[[value.medico]]" selected-item="{{value.medicoItem}}"
-                                item-label-path="node.nombreCompleto" item-value-path="node.id">
+                                item-label-path="node.nombreCompleto" item-value-path="node.id" allow-custom-value>
                             </vaadin-combo-box>
                         </div>
                         <div class="row">
                             <vaadin-combo-box label="Servicio*" required items="[[queryResult.servicios.edges]]" 
                                 auto-validate value="[[value.servicio]]" selected-item="{{value.servicioItem}}"
-                                item-label-path="node.nombre" item-value-path="node.id">
+                                item-label-path="node.nombre" item-value-path="node.id" allow-custom-value>
                             </vaadin-combo-box>
                         </div>
                         <div class="row">
@@ -119,13 +141,18 @@
                             <paper-input label="# de sesiones*" type="number" required 
                                 auto-validate min="1" value="{{value.numeroSesiones}}">
                             </paper-input>
-                            <paper-input label="Valor de la sesión*" type="number" required 
+                            <paper-input label="Valor de la sesión*" type="number" required readonly
                                 auto-validate min="0" value="{{value.valor}}">
                             </paper-input>
-                            <paper-input label="Coopago/Moderadora" type="number" auto-validate min="0" 
+                        </div>
+                        <div class="row">
+                            <paper-input label="Valor total*" type="number" auto-validate min="0" readonly
+                                value="{{value.total}}" required>
+                            </paper-input>
+                            <paper-input label="Coopago/Moderadora*" type="number" auto-validate min="0" 
                                 value="{{value.coopago}}" required>
                             </paper-input>
-                        </div>                
+                        </div>            
                     </form>
                 </iron-form>
                 <!-- <show-json json="[[value]]"></show-json> -->
@@ -222,33 +249,54 @@
             </div>
             <div class="sesiones">
                 <vaadin-grid id="grid" items="[[selectedServicio.node.sesiones.edges]]">
-                    <vaadin-grid-column>
+                    <vaadin-grid-column resizable>
                         <template class="header">Fecha</template>
-                        <template>[[_formatFecha(item.node.fecha)]]</template>
+                        <template>
+                            [[_formatFecha(item.node.fecha)]]
+                            <!-- <paper-input type="date" value="{{item.node.fecha}}"></paper-input> -->
+                        </template>
                     </vaadin-grid-column>
-                    <vaadin-grid-column>
+                    <vaadin-grid-column resizable>
                         <template class="header">Hora</template>
-                        <template>[[_formatHora(item.node.fecha)]]</template>
+                        <template>
+                            [[_formatHora(item.node.fecha)]]
+                            <!-- <paper-input type="time"></paper-input> -->
+                        </template>
                     </vaadin-grid-column>
-                    <vaadin-grid-column>
+                    <vaadin-grid-column resizable>
                         <template class="header">Estado</template>
-                        <template>[[item.node.estado]]</template>
+                        <template>
+                            [[item.node.estadoDisplay]]
+                            <!-- <paper-input value="{{item.node.estado}}"></paper-input> -->
+                        </template>
                     </vaadin-grid-column>
-                    <vaadin-grid-column>
+                    <vaadin-grid-column resizable>
                         <template class="header">Medico</template>
-                        <template>[[item.node.medico.nombreCompleto]]</template>
+                        <template>
+                            [[item.node.medico.nombreCompleto]]
+                            <!-- <paper-input></paper-input> -->
+                        </template>
                     </vaadin-grid-column>
-                    <vaadin-grid-column>
+                    <vaadin-grid-column resizable>
                         <template class="header">Autorización</template>
-                        <template>[[item.node.autorizacion]]</template>
+                        <template>
+                            [[item.node.autorizacion]]
+                            <!-- <paper-input></paper-input> -->
+                        </template>
                     </vaadin-grid-column>
-                    <vaadin-grid-column>
+                    <vaadin-grid-column resizable>
                         <template class="header">Fecha Autorización</template>
-                        <template>[[item.node.fechaAutorizacion]]</template>
+                        <template>
+                            [[item.node.fechaAutorizacion]]
+                            <!-- <paper-input type="date"></paper-input> -->
+                        </template>
                     </vaadin-grid-column>
-                    <vaadin-grid-column>
+                    <vaadin-grid-column resizable>
                         <template class="header">Sucursal</template>
-                        <template>[[item.node.sucursal.nombre]]</template>
+                        <template>
+                            [[item.node.sucursal.nombre]]
+                            <!-- <vaadin-combo-box items='["hola", "hola"]'></vaadin-combo-box> -->
+                        </template>
                     </vaadin-grid-column>
                 </vaadin-grid>
             </div>
@@ -307,12 +355,22 @@
                     },
 
                     /**
+                     * Id de la cita, usada para llenar el formulario.
+                     */
+                    cita: {
+                        type: String,
+                        value: '',
+                        observer: '_citaChanged'
+                    },
+
+                    /**
                      * Valores iniciales del formulario.
                      */
                      _initialValue: {
                         type: Object,
                         value: () => {
                             return {
+                                numeroSesiones: 1,
                                 fecha: moment().format('YYYY-MM-DD'),
                                 hora: moment().format('HH:mm')
                             }
@@ -322,12 +380,13 @@
                     /**
                      * Datos del formulario.
                      *
-                     * @type {{sucursal: string, sucursalItem: Object, medico: string, medicoItem: Object, servicio: string, servicioItem: Object, fecha: string, hora: string, autorizacion: string, fechaAutorizacion: string, numeroSesiones: number, valor: number, coopago: number}}
+                     * @type {{sucursal: string, sucursalItem: Object, medico: string, medicoItem: Object, servicio: string, servicioItem: Object, fecha: string, hora: string, autorizacion: string, fechaAutorizacion: string, numeroSesiones: number, valor: number, total: number, coopago: number}}
                      */
                     value: {
                         type: Object,
                         value: () => { 
                             return {
+                                numeroSesiones: 1,
                                 fecha: moment().format('YYYY-MM-DD'),
                                 hora: moment().format('HH:mm')
                             }
@@ -342,7 +401,8 @@
               */
             static get observers() {
                 return [
-                    '_cleanNumberValues(value.numeroSesiones, value.valor, value.coopago)',
+                    '_cleanNumberValues(value.numeroSesiones, value.valor, valor.total, value.coopago)',
+                    '_calcularTotal(value.numeroSesiones, value.valor)',
                     '_setFieldValorServicio(value.servicioItem)'
                 ];
             }
@@ -372,6 +432,27 @@
             }
 
             /**
+            * Observer method for cita property. Executes citaInfo query and fill form data.
+            */
+            _citaChanged(newValue, oldValue) {      
+                console.log(newValue);
+                if(newValue) {
+                    this.$.citaQuery.variables = {id: newValue};
+                    this.$.citaQuery.execute().result().then(result => {
+                        let cita = result.data.cita;
+                        this.set('value.sucursal', cita.horario.sucursal.id);
+                        this.set('value.medico', cita.horario.medico.id);
+                        this.set('value.servicio', cita.servicio.id);
+                        this.set('value.fecha', moment.utc(cita.start).format('YYYY-MM-DD'));
+                        this.set('value.hora', moment.utc(cita.start).format('HH:mm'));
+                        this.set('value.cita', this.cita);
+                        this.set('value.estado', cita.estado);
+                        this.set('value.estadoDisplay', cita.estadoDisplay);
+                    });
+                }
+            }
+
+            /**
             * Normaliza las variables en un objecto para ser usadas en graphql query
             * 
             * @param {string} institucion institucion escogida
@@ -387,9 +468,10 @@
             * 
             * @param {number} numeroSesiones Valor del input numeroSesiones
             * @param {number} valor Valor del input valor 
+            * @param {number} total Valor del input total 
             * @param {number} coopago Valor del input coopago 
             */
-            _cleanNumberValues(numeroSesiones, valor, coopago) {
+            _cleanNumberValues(numeroSesiones, valor, total, coopago) {
                 if (numeroSesiones == '') {
                     this.set('value.numeroSesiones', null);
                 }
@@ -398,8 +480,15 @@
                     this.set('value.valor', null);
                 }
 
+                if (total == '') {
+                    this.set('value.total', null);
+                }
+
                 if (coopago == '') {
                     this.set('value.coopago', null);
+                }
+                else {
+                    this.set('value.coopago', Number(coopago));
                 }
             }
 
@@ -411,6 +500,21 @@
             _setFieldValorServicio(servicio) {
                 if (servicio) {
                     this.set('value.valor', servicio.node.tarifas.edges[0].node.valor);
+                }
+            }
+
+            /**
+            * Calcula el valor total de acuerdo al número de sesiones y el valor de la sesión.
+            * 
+            * @param {number} cantidad Número de sesiones
+            * @param {number} valor valor de la sesión
+            */
+            _calcularTotal(cantidad, valor) {
+                if (cantidad && valor) {
+                    this.set('value.total', cantidad*valor);
+                }
+                else {
+                    this.set('value.total', null);
                 }
             }
 
@@ -429,6 +533,7 @@
                 this._initialValue.autorizacion = this.value.autorizacion;
                 this._initialValue.fechaAutorizacion = this.value.fechaAutorizacion;
                 this.value = JSON.parse(JSON.stringify(this._initialValue));
+                this.cita = '';
             }
 
             /**
@@ -573,7 +678,7 @@
             }
 
             /**
-             * Crea las sesiones a partir número de sesiones ingresadas.
+             * Crea las sesiones a partir número de sesiones ingresadas. @todo traer estados del servidor
              * 
              * @param {Param} data Datos del formulario con los cuales se crean las sesiones.
              */
@@ -581,13 +686,17 @@
                 let sesiones = [];
                 let fechaActual = `${data.fecha} ${data.hora}`;
                 console.log(data);
+                let estado =  (data.cita) ? data.estado : 'CU';
+                let estadoDisplay =  (data.cita) ? data.estadoDisplay : 'Cumplida';
                 for (let i = 0; i < data.numeroSesiones; i++) {
                     let sesion = {
                         node: {
                             fecha: fechaActual,
-                            estado: 'No cumplida',
+                            estado: (i == 0) ? estado : 'NC',
+                            estadoDisplay: (i == 0) ? estadoDisplay : 'No cumplida',
                             autorizacion: data.autorizacion,
                             fechaAutorizacion: data.fechaAutorizacion,
+                            cita: (i == 0 && data.cita) ? data.cita : null,
                             medico: {
                                 id: data.medicoItem.node.id,
                                 nombreCompleto: data.medicoItem.node.nombreCompleto
@@ -614,8 +723,8 @@
              */
             _getNextDate(date) {
                 let next = moment(date).add(1, 'days');
-                if (next.day() == 6) {
-                    next = next.add(2, 'days');
+                if (next.day() == 0) {
+                    next = next.add(1, 'days');
                 }
 
                 return next.format('YYYY-MM-DD HH:mm');

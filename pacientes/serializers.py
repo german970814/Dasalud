@@ -129,7 +129,7 @@ class ServicioRealizarSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSeriali
     
     expandable_fields = {
         'sesiones': ('pacientes.SesionSerializer', {'source': 'sesiones', 'many': True, 'fields': [
-            'id', 'fecha', 'medico', 'sucursal', 'cita', 'autorizacion', 'fecha_autorizacion'
+            'id', 'fecha', 'medico', 'sucursal', 'cita', 'autorizacion', 'fecha_autorizacion', 'estado'
         ]})
     }
 

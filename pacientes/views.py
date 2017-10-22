@@ -73,7 +73,7 @@ class CrearPacienteView(APIView):
         paciente = None
         cita = request.session.get('cita', None)
         if cita:
-            paciente = Paciente(**request.session.pop('paciente-cita'))
+            paciente = Paciente(**request.session.pop('paciente-cita', {}))
         form = PacienteSerializer(paciente, context={'request': None})
         return Response({'form': form, 'VERBO': self.VERBO, 'URL': self.URL, 'MSJ': self.MSJ, 'METHOD': self.METHOD})
 
@@ -111,7 +111,7 @@ class CrearOrdenView(APIView):
 
         cita = None
         request.session.pop('paciente-cita', None)
-        cita_id = request.session.pop('cita', None)
+        cita_id = request.session.get('cita', None)
         if cita_id:
             query = """query a($id: ID!) { cita(id: $id) {
                 id
@@ -126,8 +126,9 @@ class CrearOrdenView(APIView):
                 }
             }}"""
             # TODO una vez se usa graphql para guardar la cita quitar to_global_id. id ej: "Q2l0YTox"
-            result = schema.execute(query, variable_values={'id': BaseNode.to_global_id('Cita', cita_id)})
-            cita = JSONRenderer().render(result.data['cita'])
+            # result = schema.execute(query, variable_values={'id': BaseNode.to_global_id('Cita', cita_id)})
+            # cita = JSONRenderer().render(result.data['cita'])
+            cita = BaseNode.to_global_id('Cita', cita_id)
 
         return Response({
             'paciente': paciente_json, 'orden_s': orden_s, 'cita': cita,

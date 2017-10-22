@@ -85,6 +85,7 @@
                                             id
                                             fecha
                                             estado
+                                            estadoDisplay
                                             autorizacion
                                             fechaAutorizacion
                                             medico { nombreCompleto }
@@ -103,15 +104,7 @@
 {% endblock content %}
 
 {% block dialogs %}
-    <servicio-form></servicio-form>
-    <paper-dialog>
-        <div>
-            {% trans "Debe agregar por lo menos un servicio." %}                
-        </div>
-        <div class="buttons">
-            <paper-button  dialog-dismiss>{% trans "Cerrar" %}</paper-button>
-        </div>
-    </paper-dialog>
+    <servicio-form cita="{% firstof cita '' %}"></servicio-form>
     <paper-dialog id="calendario" modal style="width: 75%; height: 90%;">
         <h2>{% trans "Citas" %}</h2>
 
@@ -203,12 +196,15 @@
                 servicioNode.sesiones.edges.forEach(function(sesionD) {
                     let sesionNode = sesionD.node;
                     let sesion = {
+                        estado: sesionNode.estado,
                         medico: sesionNode.medico.id,
                         sucursal: sesionNode.sucursal.id,
                         fecha: sesionNode.fecha,
                         autorizacion: sesionNode.autorizacion,
-                        fecha_autorizacion: sesionNode.fechaAutorizacion
+                        fecha_autorizacion: sesionNode.fechaAutorizacion || null
                     };
+
+                    if (sesionNode.cita) sesion.cita = sesionNode.cita;
 
                     sesiones.push(JSON.parse(JSON.stringify(sesion)));
                 }, this);

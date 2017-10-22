@@ -40,6 +40,7 @@ class ServicioRealizar(DjangoObjectType):
 class Sesion(DjangoObjectType):
 
     url_historia = graphene.String()
+    estado_display = graphene.String(source='get_estado_display')
 
     class Meta:
         model = models.Sesion
