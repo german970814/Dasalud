@@ -152,7 +152,7 @@
                             <paper-input label="Coopago/Moderadora*" type="number" auto-validate min="0" 
                                 value="{{value.coopago}}" required>
                             </paper-input>
-                        </div>            
+                        </div>          
                     </form>
                 </iron-form>
                 <!-- <show-json json="[[value]]"></show-json> -->
@@ -219,12 +219,37 @@
                 border-bottom: 1px solid #e8e8e8;
                 padding: 5px;
             }
+
             .sesiones {
                 grid-area: sesiones;
                 padding: 5px;
             }
         </style>
-        
+
+        <graphql-query id="query" variables="[[_queryVariables(institucion)]]" result="{{queryResult}}">
+            query sesionForm($institucion: ID){
+                medicos(instituciones: [$institucion]) {
+                    edges {
+                        node {
+                            id
+                            nombreCompleto
+                        }
+                    }
+                }
+                sucursales {
+                    edges {
+                        node {
+                            id
+                            nombre
+                        }
+                    }
+                }
+            }
+        </graphql-query>
+        <!-- <div style="display: flex">
+            <show-json json="[[editingSesion]]"></show-json>
+            <show-json json="[[sesionValue]]"></show-json>
+        </div>         -->
         <div class="grid">
             <div class="servicios">
                 <app-toolbar>
@@ -249,53 +274,80 @@
             </div>
             <div class="sesiones">
                 <vaadin-grid id="grid" items="[[selectedServicio.node.sesiones.edges]]">
-                    <vaadin-grid-column resizable>
+                    <vaadin-grid-column resizable width="174px">
                         <template class="header">Fecha</template>
                         <template>
-                            [[_formatFecha(item.node.fecha)]]
-                            <!-- <paper-input type="date" value="{{item.node.fecha}}"></paper-input> -->
+                            <span hidden="[[_isEditingSesion(editingSesion, item)]]">[[_formatFecha(item.node.fecha)]]</span>
+                            <paper-input type="date" value="{{sesionValue.fecha}}" 
+                                hidden="[[!_isEditingSesion(editingSesion, item)]]"></paper-input>
                         </template>
                     </vaadin-grid-column>
-                    <vaadin-grid-column resizable>
+                    <vaadin-grid-column resizable width="128px">
                         <template class="header">Hora</template>
                         <template>
-                            [[_formatHora(item.node.fecha)]]
-                            <!-- <paper-input type="time"></paper-input> -->
+                            <span hidden="[[_isEditingSesion(editingSesion, item)]]">[[_formatHora(item.node.fecha)]]</span>
+                            <paper-input type="time" value="{{sesionValue.hora}}"
+                                hidden="[[!_isEditingSesion(editingSesion, item)]]"></paper-input>
                         </template>
                     </vaadin-grid-column>
-                    <vaadin-grid-column resizable>
+                    <vaadin-grid-column resizable width="216px">
                         <template class="header">Estado</template>
                         <template>
-                            [[item.node.estadoDisplay]]
-                            <!-- <paper-input value="{{item.node.estado}}"></paper-input> -->
+                            <span hidden="[[_isEditingSesion(editingSesion, item)]]">[[item.node.estadoDisplay]]</span>
+                            <span hidden="[[!_isEditingSesion(editingSesion, item)]]">
+                                <vaadin-combo-box items="[[estados]]" value="[[sesionValue.estado]]"
+                                    selected-item="{{sesionValue.estadoItem}}"></vaadin-combo-box>
+                            </span>
                         </template>
                     </vaadin-grid-column>
-                    <vaadin-grid-column resizable>
+                    <vaadin-grid-column resizable width="235px">
                         <template class="header">Medico</template>
                         <template>
-                            [[item.node.medico.nombreCompleto]]
-                            <!-- <paper-input></paper-input> -->
+                            <span hidden="[[_isEditingSesion(editingSesion, item)]]">[[item.node.medico.nombreCompleto]]</span>
+                            <span hidden="[[!_isEditingSesion(editingSesion, item)]]">
+                                <vaadin-combo-box items="[[queryResult.medicos.edges]]" item-value-path="node.id"
+                                    item-label-path="node.nombreCompleto" value="[[sesionValue.medico]]"
+                                    selected-item="{{sesionValue.medicoItem}}">
+                                </vaadin-combo-box>
+                            </span>
                         </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column resizable>
                         <template class="header">Autorización</template>
                         <template>
-                            [[item.node.autorizacion]]
-                            <!-- <paper-input></paper-input> -->
+                            <span hidden="[[_isEditingSesion(editingSesion, item)]]">[[item.node.autorizacion]]</span>
+                            <paper-input hidden="[[!_isEditingSesion(editingSesion, item)]]"
+                                value="{{sesionValue.autorizacion}}"></paper-input>
                         </template>
                     </vaadin-grid-column>
-                    <vaadin-grid-column resizable>
+                    <vaadin-grid-column resizable width="185px">
                         <template class="header">Fecha Autorización</template>
                         <template>
-                            [[item.node.fechaAutorizacion]]
-                            <!-- <paper-input type="date"></paper-input> -->
+                            <span hidden="[[_isEditingSesion(editingSesion, item)]]">[[item.node.fechaAutorizacion]]</span>
+                            <paper-input type="date" hidden="[[!_isEditingSesion(editingSesion, item)]]"
+                                value="{{sesionValue.fechaAutorizacion}}"></paper-input>
                         </template>
                     </vaadin-grid-column>
-                    <vaadin-grid-column resizable>
+                    <vaadin-grid-column resizable width="170px">
                         <template class="header">Sucursal</template>
                         <template>
-                            [[item.node.sucursal.nombre]]
-                            <!-- <vaadin-combo-box items='["hola", "hola"]'></vaadin-combo-box> -->
+                            <span hidden="[[_isEditingSesion(editingSesion, item)]]">[[item.node.sucursal.nombre]]</span>
+                            <span hidden="[[!_isEditingSesion(editingSesion, item)]]">
+                                <vaadin-combo-box items="[[queryResult.sucursales.edges]]" item-value-path="node.id"
+                                    item-label-path="node.nombre" value="[[sesionValue.sucursal]]"
+                                    selected-item="{{sesionValue.sucursalItem}}">
+                                </vaadin-combo-box>
+                            </span>
+                        </template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column flex-grow="0">
+                        <template>
+                            <div style="display: flex;">
+                                <paper-icon-button icon="my-icons:edit" on-tap="_editSesion" hidden="[[editingSesion]]"></paper-icon-button>
+                                <paper-icon-button icon="my-icons:done" on-tap="_saveEditedSesion" hidden="[[!_isEditingSesion(editingSesion, item)]]"></paper-icon-button>
+                                <paper-icon-button icon="my-icons:close" on-tap="_cancelEditSesion" hidden="[[!_isEditingSesion(editingSesion, item)]]">
+                                </paper-icon-button>
+                            </div>
                         </template>
                     </vaadin-grid-column>
                 </vaadin-grid>
@@ -596,6 +648,47 @@
                     selectedServicio: {
                         type: Object,
                         value: () => { return {}; }
+                    },
+
+                    /**
+                     * Sesión a editar.
+                     */
+                    editingSesion:  {
+                        type: Object,
+                        value: () => { return null; }
+                    },
+
+                     /**
+                     * Datos editados
+                     */
+                     sesionValue:  {
+                        type: Object,
+                        value: () => { return null; }
+                    },
+
+                    /**
+                     * Estados de las sesiones.
+                     */
+                    estados: {
+                        type: Array,
+                        value: () => { 
+                            return [
+                                {label: 'No confirmada', value: 'NC'},
+                                {label: 'Confirmada', value: 'CO'},
+                                {label: 'Cumplida', value: 'CU'},
+                                {label: 'Cancelada', value: 'CA'},
+                                {label: 'Excusada', value: 'EX'},
+                                {label: 'No asistio', value: 'NA'},
+                            ];
+                        }
+                    },
+
+                    /**
+                     * Filtra los medicos permitidos a escoger.
+                     */
+                     institucion: {
+                        type: String,
+                        value: ''
                     }
                 };
             }
@@ -645,11 +738,56 @@
                 servicioFormInstance.open();
             }
 
-            /**
-             * Borra el servicio. 
-             */
+            /** Borra el servicio. */
             _deleteServicio(e) {
                 this.splice('servicios', e.model.index, 1);
+            }
+
+            /** Activa formulario para editar sesion. */
+            _editSesion(e) {
+                this.editingSesion = e.model.item;
+
+                let sesion = e.model.item.node;
+                this.sesionValue = {
+                    fecha: moment.utc(sesion.fecha).format('YYYY-MM-DD'),
+                    hora: moment.utc(sesion.fecha).format('hh:mm'),
+                    estado: sesion.estado,
+                    medico: sesion.medico.id,
+                    autorizacion: sesion.autorizacion,
+                    fechaAutorizacion: (sesion.fechaAutorizacion) ? moment.utc(sesion.fechaAutorizacion).format('YYYY-MM-DD') : null,
+                    sucursal: sesion.sucursal.id
+                };
+
+                this.$.grid.clearCache();
+            }
+
+            /** Cancela la edición de la sesión. */
+            _cancelEditSesion() {
+                this.editingSesion = null;
+                this.sesionValue = null;
+                this.$.grid.clearCache();
+            }
+
+            /** Guarda la sesión editada. */
+            _saveEditedSesion(e) {
+                let sesion = e.model.item.node;
+                sesion.fecha = `${this.sesionValue.fecha} ${this.sesionValue.hora}`;
+                sesion.estado = this.sesionValue.estado;
+                sesion.estadoDisplay = this.sesionValue.estadoItem.label;
+                sesion.autorizacion = this.sesionValue.autorizacion;
+                sesion.fechaAutorizacion = (this.sesionValue.fechaAutorizacion) ? this.sesionValue.fechaAutorizacion : null;
+                sesion.medico = {
+                    id: this.sesionValue.medicoItem.node.id,
+                    nombreCompleto: this.sesionValue.medicoItem.node.nombreCompleto
+                };
+                sesion.sucursal = {
+                    id: this.sesionValue.sucursalItem.node.id,
+                    nombre: this.sesionValue.sucursalItem.node.nombre
+                }
+
+                this.editingSesion = null;
+                this.sesionValue = null;
+                this.$.grid.clearCache();
             }
 
             /**
@@ -731,6 +869,16 @@
             }
 
             /**
+            * Normaliza las variables en un objecto para ser usadas en graphql query
+            * 
+            * @param {string} institucion institucion escogida
+            * @return {{institucion: string}} Objeto para ser usado en query
+            */
+            _queryVariables(institucion) {
+                return { institucion };
+            }
+
+            /**
              * Formatea la fecha de la sesion 
              * 
              * @param {string} date Fecha en que se realiza la sesión
@@ -747,7 +895,7 @@
              * @return {string} La hora en formato 02:30 PM
              */
              _formatHora(date) {
-                return moment(date).format("hh:mm a");
+                return moment.utc(date).format("hh:mm a");
             }
 
             /**
@@ -783,6 +931,18 @@
              */
              _calcularTotal(numSesiones, valorSesion) {
                 return this._formatCurrency(numSesiones*valorSesion || 0);
+            }
+
+            /**
+             * Indica si la sesión en la fila actual se esta editando.
+             * 
+             * @param {object} editingSesion Sesión que se esta editando.
+             * @param {object} item Sesion de la fila
+             *
+             * @return {boolean}
+             */
+             _isEditingSesion(editingSesion, item) {
+                return editingSesion == item;
             }
 
             /**

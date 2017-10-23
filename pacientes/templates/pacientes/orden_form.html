@@ -42,6 +42,7 @@
     </ig-iron-ajax>
 
     <div class="card">
+        {{ cita }}
         <div class="row">
             <paciente-info class="no-flex" flat paciente="{{ paciente }}"></paciente-info>
             <div>
@@ -88,8 +89,8 @@
                                             estadoDisplay
                                             autorizacion
                                             fechaAutorizacion
-                                            medico { nombreCompleto }
-                                            sucursal { nombre }
+                                            medico { id, nombreCompleto }
+                                            sucursal { id, nombre }
                                         }
                                     }
                                 }
@@ -132,7 +133,11 @@
             let institucion = e.detail.institucion
             let plan = e.detail.plan;
 
-            if(institucion) servicioForm.institucion = institucion.value;
+            if(institucion) {
+                servicioForm.institucion = institucion.value;                
+                serviciosOrden.institucion = institucion.value;                
+            } 
+
             if(plan) servicioForm.plan = plan.node.id;
         });
 

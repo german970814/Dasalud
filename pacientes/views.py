@@ -113,21 +113,7 @@ class CrearOrdenView(APIView):
         request.session.pop('paciente-cita', None)
         cita_id = request.session.get('cita', None)
         if cita_id:
-            query = """query a($id: ID!) { cita(id: $id) {
-                id
-                start
-                end
-                title
-                paciente { nombreCompleto }
-                servicio { id, nombre } 
-                horario {
-                    medico { id, nombreCompleto }
-                sucursal { id }
-                }
-            }}"""
             # TODO una vez se usa graphql para guardar la cita quitar to_global_id. id ej: "Q2l0YTox"
-            # result = schema.execute(query, variable_values={'id': BaseNode.to_global_id('Cita', cita_id)})
-            # cita = JSONRenderer().render(result.data['cita'])
             cita = BaseNode.to_global_id('Cita', cita_id)
 
         return Response({
@@ -169,7 +155,10 @@ class OrdenesPacienteView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         self.paciente = get_object_or_404(Paciente, pk=kwargs.get('pk'))
-        return super().post(request, *args, **kwargs)
+        response = super().post(request, *args, **kwargs)
+        request.session.pop('cita', None)
+        return response
+
 
     def get_serializer(self, *args, **kwargs):
         fields = [
