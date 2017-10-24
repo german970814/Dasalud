@@ -167,7 +167,16 @@
         });
 
         request.addEventListener('error', function(e) {
-            console.log(e);
+            console.log('error');
+            let request = e.detail.request;
+            if (request.status == 400) {
+                serviciosOrden.setErrors(request.response);
+                this.dispatchEvent(new CustomEvent('notify-toast-error', {
+                    bubbles: true, composed: true, detail: {
+                        text: 'No hay horario de atención en algunas de las fechas escogidos por favor verifica.'
+                    }
+                }));
+            }
         });
 
         function serializeOrden(ordenData, serviciosData) {

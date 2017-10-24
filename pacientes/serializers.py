@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_flex_fields import FlexFieldsModelSerializer
 from common.serializers import PrimaryKeyGlobalIDMixin
 from common.schema import BaseNode
+from agenda.models import Cita, Persona, HorarioAtencion
 from . import models
 
 
@@ -115,7 +116,6 @@ class OrdenSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
         return reverse('pacientes:ordenes-detalle', kwargs={'paciente': obj.paciente_id, 'pk': obj.id})
 
     def crear_cita(self, sesion, servicio, paciente):
-        from agenda.models import Cita, Persona, HorarioAtencion
         persona = Persona.objects.get(numero_documento=paciente.numero_documento)
         horario = HorarioAtencion.objects.get(medico=sesion.medico_id, sucursal=sesion.sucursal_id, start=sesion.fecha)
         Cita.objects.create(sesion=sesion, estado=Cita.NO_CONFIRMADA, servicio=servicio, paciente=persona, horario=horario)
@@ -146,4 +146,21 @@ class SesionSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['cita'].required = False
+    
+    def validate(self, data):
+        """
+        Valida que el medico tenga un horario disponible  en la sucursal para la fecha escogido.
+        Solo usado cuando el switch 'citas' se encuentra activo.
+        """
+
+        if waffle.switch_is_active('citas'):
+            hay_horario = HorarioAtencion.objects.filter(
+                    medico=data['medico'], sucursal=data['sucursal'], start=data['fecha']
+                ).exists()
+            
+            if not hay_horario:
+                raise serializers.ValidationError({'fecha': 'No hay horario de atención disponible.'})
+            
+        return data
+                
 

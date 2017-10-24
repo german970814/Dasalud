@@ -186,12 +186,15 @@
                 height: 540px;
             }
 
+            .grid [invalid] {
+                color: var(--error-color, red) !important;
+            }
+
             .servicios {
                 grid-area: servicios;
                 display: flex;
                 flex-direction: column;
                 border-right: 1px solid #e8e8e8;
-                /* padding: 5px; */
             }
 
             .servicios app-toolbar {
@@ -257,7 +260,7 @@
                 </app-toolbar>
                 <iron-list id="serviciosList" items="[[servicios]]" selection-enabled selected-item="{{selectedServicio}}">
                     <template>
-                        <paper-item selected$="[[selected]]">
+                        <paper-item selected$="[[selected]]" invalid$="[[item.node.invalid]]">
                             [[item.node.servicio.nombre]]
                             <paper-icon-button icon="my-icons:delete" on-tap="_deleteServicio"></paper-icon-button>
                         </paper-item>
@@ -277,23 +280,31 @@
                     <vaadin-grid-column resizable width="174px">
                         <template class="header">Fecha</template>
                         <template>
-                            <span hidden="[[_isEditingSesion(editingSesion, item)]]">[[_formatFecha(item.node.fecha)]]</span>
+                            <span hidden="[[_isEditingSesion(editingSesion, item)]]" invalid$="[[item.node.invalid]]">
+                                [[_formatFecha(item.node.fecha)]]
+                            </span>
                             <paper-input type="date" value="{{sesionValue.fecha}}" 
-                                hidden="[[!_isEditingSesion(editingSesion, item)]]"></paper-input>
+                                hidden="[[!_isEditingSesion(editingSesion, item)]]">
+                            </paper-input>
                         </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column resizable width="128px">
                         <template class="header">Hora</template>
                         <template>
-                            <span hidden="[[_isEditingSesion(editingSesion, item)]]">[[_formatHora(item.node.fecha)]]</span>
+                            <span hidden="[[_isEditingSesion(editingSesion, item)]]" invalid$="[[item.node.invalid]]">
+                                [[_formatHora(item.node.fecha)]]
+                            </span>
                             <paper-input type="time" value="{{sesionValue.hora}}"
-                                hidden="[[!_isEditingSesion(editingSesion, item)]]"></paper-input>
+                                hidden="[[!_isEditingSesion(editingSesion, item)]]">
+                            </paper-input>
                         </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column resizable width="216px">
                         <template class="header">Estado</template>
                         <template>
-                            <span hidden="[[_isEditingSesion(editingSesion, item)]]">[[item.node.estadoDisplay]]</span>
+                            <span hidden="[[_isEditingSesion(editingSesion, item)]]" invalid$="[[item.node.invalid]]">
+                                [[item.node.estadoDisplay]]
+                            </span>
                             <span hidden="[[!_isEditingSesion(editingSesion, item)]]">
                                 <vaadin-combo-box items="[[estados]]" value="[[sesionValue.estado]]"
                                     selected-item="{{sesionValue.estadoItem}}"></vaadin-combo-box>
@@ -303,7 +314,9 @@
                     <vaadin-grid-column resizable width="235px">
                         <template class="header">Medico</template>
                         <template>
-                            <span hidden="[[_isEditingSesion(editingSesion, item)]]">[[item.node.medico.nombreCompleto]]</span>
+                            <span hidden="[[_isEditingSesion(editingSesion, item)]]" invalid$="[[item.node.invalid]]">
+                                [[item.node.medico.nombreCompleto]]
+                            </span>
                             <span hidden="[[!_isEditingSesion(editingSesion, item)]]">
                                 <vaadin-combo-box items="[[queryResult.medicos.edges]]" item-value-path="node.id"
                                     item-label-path="node.nombreCompleto" value="[[sesionValue.medico]]"
@@ -315,7 +328,9 @@
                     <vaadin-grid-column resizable>
                         <template class="header">Autorización</template>
                         <template>
-                            <span hidden="[[_isEditingSesion(editingSesion, item)]]">[[item.node.autorizacion]]</span>
+                            <span hidden="[[_isEditingSesion(editingSesion, item)]]" invalid$="[[item.node.invalid]]">
+                                [[item.node.autorizacion]]
+                            </span>
                             <paper-input hidden="[[!_isEditingSesion(editingSesion, item)]]"
                                 value="{{sesionValue.autorizacion}}"></paper-input>
                         </template>
@@ -323,7 +338,9 @@
                     <vaadin-grid-column resizable width="185px">
                         <template class="header">Fecha Autorización</template>
                         <template>
-                            <span hidden="[[_isEditingSesion(editingSesion, item)]]">[[item.node.fechaAutorizacion]]</span>
+                            <span hidden="[[_isEditingSesion(editingSesion, item)]]" invalid$="[[item.node.invalid]]">
+                                [[item.node.fechaAutorizacion]]
+                            </span>
                             <paper-input type="date" hidden="[[!_isEditingSesion(editingSesion, item)]]"
                                 value="{{sesionValue.fechaAutorizacion}}"></paper-input>
                         </template>
@@ -331,7 +348,9 @@
                     <vaadin-grid-column resizable width="170px">
                         <template class="header">Sucursal</template>
                         <template>
-                            <span hidden="[[_isEditingSesion(editingSesion, item)]]">[[item.node.sucursal.nombre]]</span>
+                            <span hidden="[[_isEditingSesion(editingSesion, item)]]" invalid$="[[item.node.invalid]]">
+                                [[item.node.sucursal.nombre]]
+                            </span>
                             <span hidden="[[!_isEditingSesion(editingSesion, item)]]">
                                 <vaadin-combo-box items="[[queryResult.sucursales.edges]]" item-value-path="node.id"
                                     item-label-path="node.nombre" value="[[sesionValue.sucursal]]"
@@ -750,7 +769,7 @@
                 let sesion = e.model.item.node;
                 this.sesionValue = {
                     fecha: moment.utc(sesion.fecha).format('YYYY-MM-DD'),
-                    hora: moment.utc(sesion.fecha).format('hh:mm'),
+                    hora: moment.utc(sesion.fecha).format('HH:mm'),
                     estado: sesion.estado,
                     medico: sesion.medico.id,
                     autorizacion: sesion.autorizacion,
@@ -784,6 +803,7 @@
                     id: this.sesionValue.sucursalItem.node.id,
                     nombre: this.sesionValue.sucursalItem.node.nombre
                 }
+                sesion.invalid = false;
 
                 this.editingSesion = null;
                 this.sesionValue = null;
@@ -823,7 +843,6 @@
             _createSesiones(data) {
                 let sesiones = [];
                 let fechaActual = `${data.fecha} ${data.hora}`;
-                console.log(data);
                 let estado =  (data.cita) ? data.estado : 'CU';
                 let estadoDisplay =  (data.cita) ? data.estadoDisplay : 'Cumplida';
                 for (let i = 0; i < data.numeroSesiones; i++) {
@@ -831,7 +850,7 @@
                         node: {
                             fecha: fechaActual,
                             estado: (i == 0) ? estado : 'NC',
-                            estadoDisplay: (i == 0) ? estadoDisplay : 'No cumplida',
+                            estadoDisplay: (i == 0) ? estadoDisplay : 'No comfirmada',
                             autorizacion: data.autorizacion,
                             fechaAutorizacion: data.fechaAutorizacion,
                             cita: (i == 0 && data.cita) ? data.cita : null,
@@ -970,7 +989,33 @@
              */
              selectServicioByIndex(index) {
                 this.$.serviciosList.selectIndex(index);
-            }         
+            }
+
+            /**
+            * Muestra los errores obtenidos de la respuesta del servidor.
+            *
+            * @param {object} errors Respuesta del servidor.
+            */
+            setErrors(errors) {
+                errors.servicios_realizar.forEach((servicio, iServicio) => {
+                    let invalid = false;
+                    if ('sesiones' in servicio) {
+                        servicio.sesiones.forEach((sesion, iSesion) => {
+                            if (Object.keys(sesion).length > 0) {
+                                this.servicios[iServicio].node.sesiones.edges[iSesion].node.invalid = true;
+                                invalid = true;
+                            }
+                            else {
+                                this.servicios[iServicio].node.sesiones.edges[iSesion].node.invalid = false;
+                            }
+                        });
+                    }
+
+                    this.set(`servicios.${iServicio}.node.invalid`, invalid);
+                });
+
+                this.$.grid.clearCache();
+            }
         }
 
         window.customElements.define(ServiciosOrden.is, ServiciosOrden);
