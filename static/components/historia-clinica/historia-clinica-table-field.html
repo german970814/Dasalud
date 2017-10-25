@@ -1,9 +1,9 @@
 <link rel="import" href="/static/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/static/bower_components/vaadin-material-theme/vaadin-grid.html">
 <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="/static/bower_components/polymer/polymer-element.html">
 <link rel="import" href="/static/bower_components/paper-button/paper-button.html">
 <link rel="import" href="/static/bower_components/polymer/lib/elements/dom-repeat.html">
-<link rel="import" href="/static/bower_components/vaadin-material-theme/vaadin-grid.html">
 <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="/static/my-icons.html">
 <link rel="import" href="historia-clinica-field.html">
@@ -43,11 +43,11 @@
         <vaadin-grid id="grid" items="{{field.items}}">
             <template is="dom-repeat" items="{{field.fields}}" as="field">
                 <vaadin-grid-column>
-                    <template class="header">
-                        <div class="cell">[[field.nombre]]</div>
+                    <template>
+                        <div>[[field.nombre]]</div>
                     </template>
                     <template>
-                        <div class="cell">[[get(field.nombre, item)]]</div>
+                        <div>[[get(field.nombre, item)]]</div>
                     </template>
                 </vaadin-grid-column>
             </template>
