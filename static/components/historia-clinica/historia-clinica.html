@@ -38,20 +38,20 @@
 
         <div class="header">[[historia.nombre_servicio]]</div>
 
-        <paper-tabs id="tabs" selected="{{selected}}" scrollable>
+        <paper-tabs id="tabs" selected="{{selected}}" scrollable attr-for-selected="index">
             <template is="dom-repeat" items="[[historia.contenido]]">
-                <paper-tab>[[item.nombre]]</paper-tab>
+                <paper-tab index$="[[index]]">[[item.nombre]]</paper-tab>
             </template>
-            <paper-tab>Adjuntos</paper-tab>
-            <!-- <paper-tab>Historial</paper-tab> -->
+            <paper-tab index$="[[_adjuntosIndex(historia.contenido)]]">Adjuntos</paper-tab>
+            <paper-tab index$="[[_historialIndex(historia.contenido)]]">Historial</paper-tab>
         </paper-tabs>
 
-        <iron-pages id="pages" selected="{{selected}}">
+        <iron-pages id="pages" selected="{{selected}}" attr-for-selected="index">
             <template is="dom-repeat" items="[[historia.contenido]]">
-                <historia-clinica-content on-close-historia="_close" on-validate-historia="_checkValidity" fields="[[item.fields]]" is-editable=[[historia.is_editable]]></historia-clinica-content>
+                <historia-clinica-content index$="[[index]]" on-close-historia="_close" on-validate-historia="_checkValidity" fields="[[item.fields]]" is-editable=[[historia.is_editable]]></historia-clinica-content>
             </template>
-            <historia-clinica-adjuntos url="[[historia.url_adjunto]]" is-editable=[[historia.is_editable]]></historia-clinica-adjuntos>
-            <!-- <historia-clinica-historias paciente="[[historia.paciente_graph_id]]"></historia-clinica-historias> -->
+            <historia-clinica-adjuntos index$="[[_adjuntosIndex(historia.contenido)]]" url="[[historia.url_adjunto]]" is-editable=[[historia.is_editable]]></historia-clinica-adjuntos>
+            <historia-clinica-historias index$="[[_historialIndex(historia.contenido)]]" paciente="[[historia.paciente_graph_id]]"></historia-clinica-historias>
         </iron-pages>
 
     </template>
@@ -85,8 +85,8 @@
                     },
 
                     selected: {
-                        type: Number,
-                        value: 0
+                        type: String,
+                        value: "0"
                     }
                 };
             }
@@ -126,6 +126,22 @@
                     this.historia.terminada = true;
                     this.dispatchEvent(new CustomEvent('save-historia', {detail: {terminada: true}}));
                 }
+            }
+
+            /**
+            * 
+            * @param contenido
+            */
+            _adjuntosIndex(contenido) {
+                return `${contenido.length}`;
+            }
+
+            /**
+            * 
+            * @param contenido
+            */
+            _historialIndex(contenido) {
+                return `${contenido.length + 1}`;
             }
         }
 
