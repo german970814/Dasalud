@@ -171,8 +171,9 @@
     <template>
         <style>
             :host {
+                --border-conf: 1px solid #e8e8e8;
                 display: block;
-                border: 1px solid #e8e8e8;
+                border: var(--border-conf);
             }
 
             .grid {
@@ -184,6 +185,7 @@
                 "servicios sesiones";
                 box-sizing: border-box;
                 height: 540px;
+                border-bottom: var(--border-conf);
             }
 
             .grid [invalid] {
@@ -194,22 +196,22 @@
                 grid-area: servicios;
                 display: flex;
                 flex-direction: column;
-                border-right: 1px solid #e8e8e8;
+                border-right: var(--border-conf);
             }
 
             .servicios app-toolbar {
-                border-bottom: 1px solid #e8e8e8;
+                border-bottom: var(--border-conf);
             }
 
-            .servicios iron-list {
+            iron-list {
                 flex: 1;
             }
 
-            .servicios iron-list paper-item {
-                border-bottom: 1px solid #e8e8e8;
+            iron-list paper-item {
+                border-bottom: var(--border-conf);
             }
 
-            .servicios iron-list paper-item[selected] {
+            iron-list paper-item[selected] {
                 background-color: #e4e2e2;
                 font-weight: bold;
                 color: #3e3c3c;
@@ -218,14 +220,23 @@
             .servicio-info {
                 grid-area: servicio-info;
                 display: grid;
-                grid-template: 1fr 1fr / 1fr 1fr 1fr;
-                border-bottom: 1px solid #e8e8e8;
+                grid-template: 1fr 1fr / 1fr 1fr 1fr 1fr;
+                border-bottom: var(--border-conf);
                 padding: 5px;
+            }
+
+            .servicio-info p:last-child {
+                grid-column: span 2;
             }
 
             .sesiones {
                 grid-area: sesiones;
                 padding: 5px;
+            }
+
+            .row {
+                display: flex;
+                justify-content: space-around;
             }
         </style>
 
@@ -271,6 +282,7 @@
                 <p><b>Numero de sesiones:</b> [[selectedServicio.node.numeroSesiones]]</p>
                 <p><b>Cumplidas:</b> [[selectedServicio.node.sesionesCumplidas]]</p>
                 <p><b>Pendientes:</b> [[_calcularSesionesPendientes(selectedServicio.node.numeroSesiones, selectedServicio.node.sesionesCumplidas)]]</p>
+                <p><b>Inició:</b> [[_formatFecha(selectedServicio.node.sesiones.edges.0.node.fecha, 1)]]</p>
                 <p><b>Valor de la sesión:</b> [[_formatCurrency(selectedServicio.node.valor)]]</p>
                 <p><b>Total:</b> [[_calcularTotal(selectedServicio.node.numeroSesiones, selectedServicio.node.valor)]]</p>
                 <p><b>Coopago/Cuota Moderadora:</b> [[_formatCurrency(selectedServicio.node.coopago)]]</p>
@@ -281,7 +293,7 @@
                         <template class="header">Fecha</template>
                         <template>
                             <span hidden="[[_isEditingSesion(editingSesion, item)]]" invalid$="[[item.node.invalid]]">
-                                [[_formatFecha(item.node.fecha)]]
+                                [[_formatFecha(item.node.fecha, 0)]]
                             </span>
                             <paper-input type="date" value="{{sesionValue.fecha}}" 
                                 hidden="[[!_isEditingSesion(editingSesion, item)]]">
@@ -339,7 +351,7 @@
                         <template class="header">Fecha Autorización</template>
                         <template>
                             <span hidden="[[_isEditingSesion(editingSesion, item)]]" invalid$="[[item.node.invalid]]">
-                                [[item.node.fechaAutorizacion]]
+                                [[_formatFecha(item.node.fechaAutorizacion, 1)]]
                             </span>
                             <paper-input type="date" hidden="[[!_isEditingSesion(editingSesion, item)]]"
                                 value="{{sesionValue.fechaAutorizacion}}"></paper-input>
@@ -372,6 +384,11 @@
                 </vaadin-grid>
             </div>
         </div>
+        <div class="row">
+            <p><b>Valor a pagar:</b> [[_formatCurrency(_totalPagar)]]</p>
+            <p><b>Pagado:</b> [[_formatCurrency(0)]]</p>
+            <p><b>Saldo Actual:</b> [[_formatCurrency(0)]]</p>
+        </div>
     </template>
 
 </dom-module>
@@ -383,13 +400,13 @@
         let servicioFormInstance = null;
 
         /**
-         * `servicio-form` Formulario para agregar un servicio a una orden.
-         *
-         * @customElement
-         * @polymer
-         * @extends {Polymer.Element}
-         */
-         class ServicioForm extends Polymer.Element {
+        * `servicio-form` Formulario para agregar un servicio a una orden.
+        *
+        * @customElement
+        * @polymer
+        * @extends {Polymer.Element}
+        */
+        class ServicioForm extends Polymer.Element {
             /**
              * String providing the tag name to register the element under.
              */
@@ -634,13 +651,13 @@
         window.customElements.define(ServicioForm.is, ServicioForm);
 
         /**
-         * `servicios-orden` Muestra los servicios de una orden.
-         *
-         * @customElement
-         * @polymer
-         * @extends {Polymer.Element}
-         */
-         class ServiciosOrden extends Polymer.Element {
+        * `servicios-orden` Muestra los servicios de una orden.
+        *
+        * @customElement
+        * @polymer
+        * @extends {Polymer.Element}
+        */
+        class ServiciosOrden extends Polymer.Element {
             /**
              * String providing the tag name to register the element under.
              */
@@ -708,6 +725,14 @@
                      institucion: {
                         type: String,
                         value: ''
+                    },
+
+                    /**
+                     * Valor total que el paciente debe pagar. Se calcula sumando el coopago de cada servicio en la orden.
+                     */
+                    _totalPagar: {
+                        type: Number,
+                        computed: '_calcularValorPagar(servicios.splices)'
                     }
                 };
             }
@@ -898,13 +923,19 @@
             }
 
             /**
-             * Formatea la fecha de la sesion 
+             * Formatea la fecha de la sesion.
              * 
              * @param {string} date Fecha en que se realiza la sesión
+             * @param {number} formato Formato de la fecha a mostrar. 0: dddd, DD/MM/YYYY 1: DD/MM/YYYY
              * @return {string} La fecha en formato Martes, 12/02/2017
              */
-             _formatFecha(date) {
-                return moment(date).format("dddd, DD/MM/YYYY");
+             _formatFecha(date, style) {
+                 if (date) {
+                    if (style == 0) return moment(date).format("dddd, DD/MM/YYYY");
+                    return moment(date).format("DD/MM/YYYY");
+                 }
+
+                 return ''
             }
 
             /**
@@ -950,6 +981,22 @@
              */
              _calcularTotal(numSesiones, valorSesion) {
                 return this._formatCurrency(numSesiones*valorSesion || 0);
+            }
+
+            /**
+             * Calcula el valor total que debe pagar el paciente.
+             * 
+             * @param {object} changeRecord Número de sesiones
+             *
+             * @return {number} Valor total a pagar
+             */
+            _calcularValorPagar(changeRecord) {
+                let total = 0;
+                this.servicios.forEach(servicio => {
+                    total = total + servicio.node.coopago;
+                })
+
+                return total;
             }
 
             /**
