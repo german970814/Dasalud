@@ -37,9 +37,16 @@
         <h1>{% trans "Orden" %}</h1>
     </header>
 
-    <ig-iron-ajax id="request" method="POST" url="{% url 'pacientes:ordenes' paciente_id %}" 
+    {% if edit %}
+    <ig-iron-ajax id="request" method="PUT" url="{% url 'pacientes:ordenes-detalle' paciente_id orden_pk %}" 
         handle-as="json" content-type="application/json">
     </ig-iron-ajax>
+    {% else %}
+    <ig-iron-ajax id="request" method="POST" url="{% url 'pacientes:ordenes' paciente_id %}" 
+        handle-as="json" content-type="application/json">
+    </ig-iron-ajax>      
+    {% endif %}
+
 
     <div class="card">
         {{ cita }}
@@ -55,7 +62,8 @@
         <br>
         <servicios-orden></servicios-orden>
         <br>
-        <paper-button id="save" {% if edit %}hidden{% endif %}>{% trans "Guardar" %}</paper-button>
+        <!-- <paper-button id="save" {% if edit %}hidden{% endif %}>{% trans "Guardar" %}</paper-button> -->
+        <paper-button id="save">{% trans "Guardar" %}</paper-button>
 
         {% if edit %}
         <graphql-query id="ordenQuery" variables='{"id": "{{ orden }}"}' hold>
@@ -75,6 +83,8 @@
                     serviciosRealizar {
                         edges {
                             node {
+                                id
+                                pk
                                 numeroSesiones
                                 sesionesCumplidas
                                 valor
@@ -84,6 +94,7 @@
                                     edges {
                                         node {
                                             id
+                                            pk
                                             fecha
                                             estado
                                             estadoDisplay
@@ -176,6 +187,13 @@
                         text: 'No hay horario de atención en algunas de las fechas escogidos por favor verifica.'
                     }
                 }));
+            } 
+            else if (request.status == 500) {
+                this.dispatchEvent(new CustomEvent('notify-toast-error', {
+                    bubbles: true, composed: true, detail: {
+                        text: 'Hubo un problema al guardar la orden. Por favor intentalo de nuevo'
+                    }
+                }));
             }
         });
 
@@ -219,6 +237,7 @@
                     };
 
                     if (sesionNode.cita) sesion.cita = sesionNode.cita;
+                    if (sesionNode.id) sesion.id = sesionNode.pk;
 
                     sesiones.push(JSON.parse(JSON.stringify(sesion)));
                 }, this);
@@ -230,6 +249,8 @@
                     numero_sesiones: servicioNode.numeroSesiones,
                     sesiones: sesiones
                 };
+
+                if(servicioNode.id) servicio.id = servicioNode.pk;
 
                 servicios.push(JSON.parse(JSON.stringify(servicio)));
             }, this);

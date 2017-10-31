@@ -78,8 +78,6 @@ class OrdenSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
         self.fields['tipo_usuario'].initial = models.Orden.PARTICULAR
         self.fields['plan'].label = 'Entidad'
 
-    # TODO validar campos
-
     def create(self, validated_data):  #  TODO ver si se crea metodo create en manager de Orden
         servicios_data = validated_data.pop('servicios_realizar')
         acompanante_data = validated_data.pop('acompanante')
@@ -97,12 +95,30 @@ class OrdenSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
                         cita = sesion_data.get('cita', None)
                         if cita:
                             cita.sesion = sesion
+                            cita.estado = sesion.estado
                             cita.save()
                         else:
                             self.crear_cita(sesion, servicio.servicio, orden.paciente)
             
-            # raise ValueError
+            # raise ValueError('force error')
             return orden
+    
+    def update(self, instance, validated_data):
+        servicios_data = validated_data.pop('servicios_realizar')
+        acompanante_data = validated_data.pop('acompanante')
+
+        with transaction.atomic():
+            instance.update(**validated_data)
+            instance.acompanante.update(**acompanante_data)
+
+            for servicio_data in servicios_data:
+                sesiones_data = servicio_data.pop('sesiones')
+                models.ServicioRealizar.objects.get(id=servicio_data.pop('id')).update(**servicio_data)
+                for sesion_data in sesiones_data:
+                    sesion = models.Sesion.objects.get(id=sesion_data.pop('id')).update(**sesion_data)
+
+            # raise ValueError('error force ')
+        return instance
 
     def get_cliente(self, obj):
         """
@@ -118,14 +134,17 @@ class OrdenSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
     def crear_cita(self, sesion, servicio, paciente):
         persona = Persona.objects.get(numero_documento=paciente.numero_documento)
         horario = HorarioAtencion.objects.get(medico=sesion.medico_id, sucursal=sesion.sucursal_id, start=sesion.fecha)
-        Cita.objects.create(sesion=sesion, estado=Cita.NO_CONFIRMADA, servicio=servicio, paciente=persona, horario=horario)
+        Cita.objects.create(sesion=sesion, estado=sesion.estado, servicio=servicio, paciente=persona, horario=horario)
 
 class ServicioRealizarSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
     """Serializer para el modelo ServicioRealizar."""
 
+    id = serializers.IntegerField(required=False, read_only=False)
+
     class Meta:
         model = models.ServicioRealizar
         fields = ['id', 'orden', 'servicio', 'numero_sesiones', 'valor', 'coopago']
+        # extra_kwargs = {'id': {'required': 'False', 'read_only': 'False'}}
     
     expandable_fields = {
         'sesiones': ('pacientes.SesionSerializer', {'source': 'sesiones', 'many': True, 'fields': [
@@ -136,6 +155,8 @@ class ServicioRealizarSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSeriali
 
 class SesionSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSerializer):
     """Serializer para el modelo Sesion."""
+
+    id = serializers.IntegerField(required=False, read_only=False)
 
     class Meta:
         model = models.Sesion

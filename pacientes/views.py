@@ -1,6 +1,7 @@
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _lazy
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -18,7 +19,7 @@ from . import serializers
 class PacientesList(generics.ListCreateAPIView):
     queryset = Paciente.objects.all()
     serializer_class = PacienteSerializer
-    filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
+    filter_backends = (filters.SearchFilter, DjangoFilterBackend)
     search_fields = ('primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'numero_documento')
     filter_fields = ('numero_documento',)
 
@@ -38,7 +39,7 @@ class ListarPacientesView(generics.ListCreateAPIView):
     template_name = 'pacientes/lista_pacientes.html'
     serializer_class = PacienteSerializer
     queryset = Paciente.objects.all()
-    filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
+    filter_backends = (filters.SearchFilter, DjangoFilterBackend)
     search_fields = ('primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'numero_documento')
     filter_fields = ('numero_documento',)
 
@@ -122,18 +123,19 @@ class CrearOrdenView(APIView):
         })
 
 
-class EditarOrdenView(APIView):
+class EditarOrdenView(generics.RetrieveUpdateAPIView):
     """Muestra el formulario de edicion de una orden."""
 
-    renderer_classes = [TemplateHTMLRenderer]
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'pacientes/orden_form.html'
+    serializer_class = serializers.OrdenSerializer
     VERBO = _lazy('Editar')
 
     def get(self, request, paciente, pk):
         cita = None
-        paciente = get_object_or_404(Paciente, pk=paciente)
-        orden = get_object_or_404(paciente.ordenes.all(), pk=pk)
-        serializer = PacienteSerializer(paciente, context={'request': request})
+        self.paciente = get_object_or_404(Paciente, pk=paciente)
+        orden = self.get_object()
+        serializer = PacienteSerializer(self.paciente, context={'request': request})
         paciente_json = JSONRenderer().render(serializer.data)
 
         orden_s = serializers.OrdenSerializer(
@@ -142,9 +144,24 @@ class EditarOrdenView(APIView):
 
         return Response({
             'paciente': paciente_json, 'orden_s': orden_s, 'cita': cita, 'orden': BaseNode.to_global_id('Orden', pk),
-            'VERBO': self.VERBO, 'paciente_id': paciente.id, 'edit': True
+            'VERBO': self.VERBO, 'paciente_id': self.paciente.id, 'edit': True, 'orden_pk': pk
         })
+    
+    def put(self, request, paciente, pk, *args, **kwargs):
+        self.paciente = get_object_or_404(Paciente, pk=paciente)
+        response = super().put(request, *args, **kwargs)
+        return response
 
+    def get_queryset(self):
+        return self.paciente.ordenes.all()
+
+    def get_serializer(self, *args, **kwargs):
+        fields = [
+            'id', 'institucion', 'plan', 'afiliacion', 'orden_link',
+            'tipo_usuario', 'acompanante', 'servicios_realizar'
+        ]
+        expand = ['acompanante', 'servicios_realizar.sesiones']
+        return super().get_serializer(fields=fields, expand=expand, *args, **kwargs)
 
 
 class OrdenesPacienteView(generics.CreateAPIView):
@@ -158,7 +175,6 @@ class OrdenesPacienteView(generics.CreateAPIView):
         response = super().post(request, *args, **kwargs)
         request.session.pop('cita', None)
         return response
-
 
     def get_serializer(self, *args, **kwargs):
         fields = [

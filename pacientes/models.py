@@ -2,6 +2,8 @@ from contextlib import suppress
 from django.db import models
 from django.utils.translation import ugettext_lazy as _lazy
 from rest_framework.reverse import reverse
+from common.models import UpdateModelMixin
+from agenda.models import Cita
 
 
 class ParentescoMixin(object):
@@ -193,7 +195,7 @@ class Paciente(ParentescoMixin, models.Model):
         return Historia.objects.filter(sesion__servicio__orden__paciente=self)
 
 
-class Orden(models.Model):
+class Orden(UpdateModelMixin, models.Model):
     """Modelo que maneja la información de una orden de un paciente."""
 
     COTIZANTE = 'C'
@@ -254,7 +256,7 @@ class Orden(models.Model):
         return reverse('pacientes:ordenes-detalle', kwargs={'paciente': self.paciente_id, 'pk': self.id})
 
 
-class ServicioRealizar(models.Model):
+class ServicioRealizar(UpdateModelMixin, models.Model):
     """Modelo que guarda los servicios que maneja una orden."""
 
     orden = models.ForeignKey(Orden, related_name='servicios_realizar', verbose_name=_lazy('orden'))
@@ -274,7 +276,7 @@ class ServicioRealizar(models.Model):
         return self.sesiones.filter(estado=Sesion.CUMPLIDA).count();
 
 
-class Sesion(models.Model):
+class Sesion(UpdateModelMixin, models.Model):
     """Modelo para guardar las sesiones de un servicio de una orden."""
 
     CUMPLIDA = 'CU'
@@ -300,7 +302,6 @@ class Sesion(models.Model):
     fecha_autorizacion = models.DateField(_lazy('Fecha de autorización'), blank=True, null=True)
     estado = models.CharField(_lazy('estado'), max_length=2, choices=ESTADOS, default=NO_CONFIRMADA)
 
-
     class Meta:
         verbose_name = 'sesión'
         verbose_name_plural = 'sesiones'
@@ -308,6 +309,31 @@ class Sesion(models.Model):
     
     def __str__(self):
         return '{} {}'.format(self.servicio, self.pk)
+
+    def update(self, **options):
+        """Se sobreescribe metodo para modificar la cita asociada a la sesión cuando sea necesario."""
+
+        with suppress(Cita.DoesNotExist):
+            if self.cita:
+                save = False
+                if self.estado != options.get('estado', self.estado):
+                    self.cita.estado = options.get('estado')
+                    save = True
+                
+                medico = options.get('medico', self.medico)
+                sucursal = options.get('sucursal', self.sucursal)
+                fecha = options.get('fecha', self.fecha)
+
+                if self.medico != medico or self.sucursal != sucursal or self.fecha != fecha:
+                    from agenda.models import HorarioAtencion
+                    horario = HorarioAtencion.objects.get(medico=medico, sucursal=sucursal, start=fecha)
+                    self.cita.horario = horario
+                    save = True
+                
+                if save:
+                    self.cita.save()
+             
+        super().update(**options)
 
     def get_historia(self, force_instance=False):
         """
@@ -332,7 +358,7 @@ class Sesion(models.Model):
         return historia
 
 
-class Acompanante(ParentescoMixin, models.Model):
+class Acompanante(UpdateModelMixin, ParentescoMixin, models.Model):
     """Modelo que guarda la información del acompañante de un paciente según el ordenamiento."""
 
     orden = models.OneToOneField(Orden, verbose_name=_lazy('orden'))

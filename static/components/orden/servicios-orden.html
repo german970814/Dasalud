@@ -536,7 +536,7 @@
                         this.set('value.cita', this.cita);
                         this.set('value.estado', cita.estado);
                         this.set('value.estadoDisplay', cita.estadoDisplay);
-                    });
+                    }); // todo use set properties
                 }
             }
 
@@ -561,22 +561,22 @@
             */
             _cleanNumberValues(numeroSesiones, valor, total, coopago) {
                 if (numeroSesiones == '') {
-                    this.set('value.numeroSesiones', null);
+                    this.value.numeroSesiones = null;
                 }
 
                 if (valor == '') {
-                    this.set('value.valor', null);
+                    this.value.valor = null;
                 }
 
                 if (total == '') {
-                    this.set('value.total', null);
+                    this.value.total = null;
                 }
 
                 if (coopago == '') {
-                    this.set('value.coopago', null);
+                    this.value.coopago = null;
                 }
                 else {
-                    this.set('value.coopago', Number(coopago));
+                    this.value.coopago = Number(coopago)
                 }
             }
 
@@ -598,12 +598,15 @@
             * @param {number} valor valor de la sesión
             */
             _calcularTotal(cantidad, valor) {
+                let value;
                 if (cantidad && valor) {
-                    this.set('value.total', cantidad*valor);
+                    value = cantidad * valor;
                 }
                 else {
-                    this.set('value.total', null);
+                    value = null;
                 }
+
+                this.set('value.total', value);
             }
 
             /** Muestra el formulario. */
@@ -802,21 +805,21 @@
                     sucursal: sesion.sucursal.id
                 };
 
-                this.$.grid.clearCache();
+                this.$.grid.notifyResize();
             }
 
             /** Cancela la edición de la sesión. */
             _cancelEditSesion() {
                 this.editingSesion = null;
                 this.sesionValue = null;
-                this.$.grid.clearCache();
+                this.$.grid.notifyResize();
             }
 
             /** Guarda la sesión editada. */
             _saveEditedSesion(e) {
                 let sesion = e.model.item.node;
                 sesion.fecha = `${this.sesionValue.fecha} ${this.sesionValue.hora}`;
-                sesion.estado = this.sesionValue.estado;
+                sesion.estado = this.sesionValue.estadoItem.value;
                 sesion.estadoDisplay = this.sesionValue.estadoItem.label;
                 sesion.autorizacion = this.sesionValue.autorizacion;
                 sesion.fechaAutorizacion = (this.sesionValue.fechaAutorizacion) ? this.sesionValue.fechaAutorizacion : null;

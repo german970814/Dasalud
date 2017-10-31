@@ -3,8 +3,6 @@ from django.utils.translation import ugettext_lazy as _lazy
 from common.models import UpdateModelMixin
 
 
-# TODO asociar los doctores a esta agenda o una agenda individual
-
 class Agenda(models.Model):
     """Modelo para guardar las distintas agendas que maneja un cliente."""
 

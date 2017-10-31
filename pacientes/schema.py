@@ -30,6 +30,7 @@ class Orden(DjangoObjectType):
 
 class ServicioRealizar(DjangoObjectType):
 
+    pk = graphene.Int(source='pk')
     sesiones_cumplidas = graphene.Int(source='numero_sesiones_cumplidas', description='Número de sesiones cumplidas')
 
     class Meta:
@@ -39,6 +40,7 @@ class ServicioRealizar(DjangoObjectType):
 
 class Sesion(DjangoObjectType):
 
+    pk = graphene.Int(source='pk')
     url_historia = graphene.String()
     estado_display = graphene.String(source='get_estado_display')
 
