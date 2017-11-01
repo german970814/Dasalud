@@ -85,6 +85,7 @@
                             node {
                                 id
                                 pk
+                                canDelete
                                 numeroSesiones
                                 sesionesCumplidas
                                 valor
@@ -97,6 +98,7 @@
                                             pk
                                             fecha
                                             estado
+                                            canEdit
                                             estadoDisplay
                                             autorizacion
                                             fechaAutorizacion
@@ -265,7 +267,8 @@
             serviciosOrden.servicios = result.data.orden.serviciosRealizar.edges;
             ordenForm.value = deserializeOrden(result.data.orden);
             serviciosOrden.selectServicioByIndex(0);
-            ordenForm.readonly= true;
+            ordenForm.readonly = true;
+            serviciosOrden.edit = true;
         });
 
         function deserializeOrden(ordenData) {

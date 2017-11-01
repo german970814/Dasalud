@@ -267,13 +267,13 @@
         <div class="grid">
             <div class="servicios">
                 <app-toolbar>
-                    <paper-icon-button icon="my-icons:add" on-tap="_addServicio"></paper-icon-button>
+                    <paper-icon-button disabled="[[edit]]" icon="my-icons:add" on-tap="_addServicio"></paper-icon-button>
                 </app-toolbar>
                 <iron-list id="serviciosList" items="[[servicios]]" selection-enabled selected-item="{{selectedServicio}}">
                     <template>
                         <paper-item selected$="[[selected]]" invalid$="[[item.node.invalid]]">
                             [[item.node.servicio.nombre]]
-                            <paper-icon-button icon="my-icons:delete" on-tap="_deleteServicio"></paper-icon-button>
+                            <paper-icon-button hidden="[[!item.node.canDelete]]" icon="my-icons:delete" on-tap="_deleteServicio"></paper-icon-button>
                         </paper-item>
                     </template>
                 </iron-list>
@@ -374,8 +374,10 @@
                     <vaadin-grid-column flex-grow="0">
                         <template>
                             <div style="display: flex;">
-                                <paper-icon-button icon="my-icons:edit" on-tap="_editSesion" hidden="[[editingSesion]]"></paper-icon-button>
-                                <paper-icon-button icon="my-icons:done" on-tap="_saveEditedSesion" hidden="[[!_isEditingSesion(editingSesion, item)]]"></paper-icon-button>
+                                <paper-icon-button icon="my-icons:edit" on-tap="_editSesion" hidden="[[editingSesion]]" disabled="[[!item.node.canEdit]]">
+                                </paper-icon-button>
+                                <paper-icon-button icon="my-icons:done" on-tap="_saveEditedSesion" hidden="[[!_isEditingSesion(editingSesion, item)]]">
+                                </paper-icon-button>
                                 <paper-icon-button icon="my-icons:close" on-tap="_cancelEditSesion" hidden="[[!_isEditingSesion(editingSesion, item)]]">
                                 </paper-icon-button>
                             </div>
@@ -730,6 +732,13 @@
                         value: ''
                     },
 
+                    /** Indica si se esta creando una nueva orden */
+                    edit: {
+                        type: Boolean,
+                        value: false,
+                        reflectToAttribute: true
+                    },
+
                     /**
                      * Valor total que el paciente debe pagar. Se calcula sumando el coopago de cada servicio en la orden.
                      */
@@ -845,6 +854,7 @@
                 let data = e.detail.data;
                 let servicioRealizar = {
                     node: {
+                        canDelete: true,
                         numeroSesiones: data.numeroSesiones,
                         sesionesCumplidas: 0,
                         valor: data.valor,
@@ -876,6 +886,7 @@
                 for (let i = 0; i < data.numeroSesiones; i++) {
                     let sesion = {
                         node: {
+                            canEdit: true,
                             fecha: fechaActual,
                             estado: (i == 0) ? estado : 'NC',
                             estadoDisplay: (i == 0) ? estadoDisplay : 'No comfirmada',

@@ -32,10 +32,14 @@ class ServicioRealizar(DjangoObjectType):
 
     pk = graphene.Int(source='pk')
     sesiones_cumplidas = graphene.Int(source='numero_sesiones_cumplidas', description='Número de sesiones cumplidas')
+    can_delete = graphene.Boolean()
 
     class Meta:
         model = models.ServicioRealizar
         interfaces = (BaseNode,)
+    
+    def resolve_can_delete(self, args, context, info):
+        return False
 
 
 class Sesion(DjangoObjectType):
@@ -43,6 +47,7 @@ class Sesion(DjangoObjectType):
     pk = graphene.Int(source='pk')
     url_historia = graphene.String()
     estado_display = graphene.String(source='get_estado_display')
+    can_edit = graphene.Boolean()
 
     class Meta:
         model = models.Sesion
@@ -51,6 +56,9 @@ class Sesion(DjangoObjectType):
     def resolve_url_historia(self, args, context, info):
         from django.core.urlresolvers import reverse
         return reverse('pacientes:historias', args=(self.id, ))
+
+    def resolve_can_edit(self, args, context, info):
+        return True
 
 
 class Acompanante(DjangoObjectType):
