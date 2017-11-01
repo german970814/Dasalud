@@ -24,7 +24,7 @@ class PacienteSerializer(serializers.ModelSerializer):
             'celular', 'email', 'grupo_sanguineo', 'grupo_etnico', 'profesion', 'lugar_nacimiento', 'lugar_residencia',
             'activo', 'fecha_ingreso', 'nombre_responsable', 'direccion_responsable', 'telefono_responsable',
             'edit_link', 'ordenes_link', 'identificacion_padre', 'nombre_padre', 'identificacion_madre',
-            'nombre_madre', 'foto', 'firma', 'graph_id'
+            'nombre_madre', 'foto', 'firma', 'graph_id', 'procedencia'
         ]
 
     def __init__(self, *args, **kwargs):

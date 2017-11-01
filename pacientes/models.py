@@ -129,6 +129,17 @@ class Paciente(ParentescoMixin, models.Model):
         (OTRO, _lazy('Otro'))
     )
 
+    FACEBOOK = 'FB'
+    INSTAGRAM = 'IG'
+    INTERNET = 'IN'
+    REFERIDO = 'R'
+    PROCEDENCIAS = (
+        (INSTAGRAM, _lazy('Instagram')),
+        (FACEBOOK, _lazy('Facebook')),
+        (INTERNET, _lazy('Internet')),
+        (REFERIDO, _lazy('Referido'))
+    )
+
     primer_nombre = models.CharField(_lazy('primer nombre'), max_length=150)
     segundo_nombre = models.CharField(_lazy('segundo nombre'), max_length=150, blank=True)
     primer_apellido = models.CharField(_lazy('primer apellido'), max_length=150)
@@ -152,6 +163,7 @@ class Paciente(ParentescoMixin, models.Model):
     lugar_residencia = models.ForeignKey('globales.Poblado', related_name='pacientes_viven_en', verbose_name=_lazy('donde vive'))
     foto = models.ImageField(upload_to=paciente_foto_path, verbose_name=_lazy('foto'), blank=True)
     firma = models.ImageField(upload_to=paciente_firma_path, verbose_name=_lazy('firma'), blank=True)
+    procedencia = models.CharField(_lazy('como se entero'), max_length=2, choices=PROCEDENCIAS, blank=True)
 
     # Datos responsable
     nombre_responsable = models.CharField(_lazy('nombre completo del responsable'), max_length=300)
