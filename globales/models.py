@@ -66,7 +66,7 @@ class Cie(models.Model):
     """Modelo que guarda los codigos internacionales de enfermedades usados en los RIPS de las historias clinicas."""
 
     codigo = models.CharField(_lazy('codigo'), max_length=4)
-    nombre = models.CharField(_lazy('nombre'), max_length=200)
+    nombre = models.CharField(_lazy('nombre'), max_length=400)
 
     class Meta:
         verbose_name = 'Cie'

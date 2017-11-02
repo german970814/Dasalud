@@ -9,4 +9,5 @@ class ListarCiesView(generics.ListAPIView):
 
     serializer_class = CieSerializer
     queryset = Cie.objects.all()
-    filter_fields = ('nombre',)
+    search_fields = ('nombre',)
+    filter_backends = [filters.SearchFilter]
