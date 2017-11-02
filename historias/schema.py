@@ -4,6 +4,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 from common.schema import BaseNode
 
 from . import models
+from . import filters
 
 
 class Historia(DjangoObjectType):
@@ -15,4 +16,4 @@ class Historia(DjangoObjectType):
 
 class Query(graphene.AbstractType):
     historia = BaseNode.Field(Historia)
-    historias = DjangoFilterConnectionField(Historia, description='Todas las historias')
+    historias = DjangoFilterConnectionField(Historia, filterset_class=filters.HistoriaFilter, description='Todas las historias')

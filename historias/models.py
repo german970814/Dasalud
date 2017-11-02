@@ -27,6 +27,7 @@ class Historia(models.Model):
     class Meta:
         verbose_name = 'historia'
         verbose_name_plural = 'historias'
+        ordering = ['-sesion']
     
     def __str__(self):
         return '{0} - {1}'.format(self.pk, self.sesion)

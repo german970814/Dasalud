@@ -1,7 +1,10 @@
 <link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/vaadin-material-theme/vaadin-grid.html">
 <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
+<link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/static/my-icons.html">
 
 <dom-module id="historia-clinica-historias">
     <template>
@@ -12,21 +15,19 @@
             }
         </style>
 
-        <graphql-query id="query" variables="[[_handleVariables(paciente)]]" hold>
-            query ($paciente: ID!){
-                paciente (id: $paciente) {
-                    historias {
-                        edges {
-                            node {
+        <graphql-query id="query" hold>
+            query historialPaciente($paciente: ID!){
+                historias(paciente: $paciente) {
+                    edges {
+                        node {
+                            id
+                            contenido
+                            sesion {
                                 id
-                                contenido
-                                sesion {
-                                    fecha
-                                    servicio {
-                                        servicio {
-                                            nombre
-                                        }
-                                    }
+                                fecha
+                                medico { nombreCompleto }
+                                servicio {
+                                    servicio { nombre }
                                 }
                             }
                         }
@@ -38,40 +39,38 @@
         <div class="content">
             <vaadin-grid items={{historias}}>
                 <vaadin-grid-column>
-                    <template class="header">
-                        <div class="cell">Nombre</div>
-                    </template>
-                    <template>
-                        <div class="cell">[[item.sesion.servicio.servicio.nombre]]</div>
-                    </template>
+                    <template class="header">Fecha</template>
+                    <template>[[_formatFecha(item.sesion.fecha)]]</template>
                 </vaadin-grid-column>
                 <vaadin-grid-column>
-                    <template class="header">
-                        <div class="cell">Fecha</div>
-                    </template>
-                    <template>
-                        <div class="cell">[[item.sesion.fecha]]</div>
-                    </template>
+                    <template class="header">Servicio</template>
+                    <template>[[_formatTextUpper(item.sesion.servicio.servicio.nombre)]]</template>
                 </vaadin-grid-column>
                 <vaadin-grid-column>
-                    <template class="header">
-                        <div class="cell">Ver</div>
-                    </template>
+                    <template class="header">Medico</template>
+                    <template>[[_formatTextUpper(item.sesion.medico.nombreCompleto)]]</template>
+                </vaadin-grid-column>             
+                <vaadin-grid-column flex-grow="0">
+                    <template class="header"></template>
                     <template>
-                        <div class="cell"></div>
+                        <div style="display: flex;">
+                            <paper-icon-button icon="my-icons:remove-red-eye"></paper-icon-button>
+                        </div>
                     </template>
                 </vaadin-grid-column>
             </vaadin-grid>
         </div>
-
-        <paper-dialog id="dialog" with-backdrop style="width: 75%; height: 90%;">
-            <!-- <div style="width: 90%; height: 90%;">  
-                <object width="100%" height="100%" data="/static/a.pdf"></object>
-            </div> -->
-        </paper-dialog>
     </template>
 
+    <script src="/static/bower_components/moment/min/moment.min.js"></script>
     <script>
+        /**
+        * `historia-clinica-historias` Historial de las historias clinicas de un paciente.
+        *
+        * @customElement
+        * @polymer
+        * @extends {Polymer.Element}
+        */
         class HistoriaClinicaHistorias extends Polymer.Element {
 
             static get is() { return 'historia-clinica-historias'; }
@@ -98,23 +97,32 @@
             ready() {
                 super.ready();
                 Polymer.RenderStatus.afterNextRender(this, function() {
+                    this.$.query.variables = { paciente: this.paciente };
                     let response = this.$.query.execute();
                     response.result().then(result => {
-                        if (result.data.paciente) {
-                            this.historias = this._normalizeHistorias(result.data.paciente.historias.edges);
-                        }
+                        this.historias = this._normalizeHistorias(result.data.historias.edges);
                     });
                 });
-            }
-
-            _handleVariables(paciente) {
-                return { paciente };
             }
 
             _normalizeHistorias(historias) {
                 return historias.map(function(element) {
                     return element.node;
                 }, this);
+            }
+
+            /**
+            * Formatea la fecha.
+            */
+            _formatFecha(fecha) {
+                return moment.utc(fecha).format("DD/MM/YYYY hh:mm A");
+            }
+
+            /**
+            * Formatea el texto a mayuscula.
+            */
+            _formatTextUpper(text) {
+                return text.toUpperCase();
             }
 
         }
