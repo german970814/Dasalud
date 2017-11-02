@@ -28,6 +28,10 @@
             text-align: center;
             text-transform: uppercase;
         }
+
+        vaadin-grid [done] {
+            color: #55d665;
+        }
     </style>
 {% endblock css %}
 
@@ -46,6 +50,7 @@
                                 id
                                 fecha
                                 urlHistoria
+                                terminada
                                 servicio {
                                     servicio { nombre }
                                     orden {
@@ -67,32 +72,42 @@
             <vaadin-grid id="sesionesGrid" items="[[sesiones]]">
                 <vaadin-grid-column>
                     <template class="header">{% trans 'Cédula' %}</template>
-                    <template>[[item.node.servicio.orden.paciente.numeroDocumento]]</template>
+                    <template>
+                        <div done$="[[item.node.terminada]]">[[item.node.servicio.orden.paciente.numeroDocumento]]</div>
+                    </template>
                 </vaadin-grid-column>
                 <vaadin-grid-column>
                     <template class="header">{% trans 'Nombre' %}</template>
                     <template>
-                        [[item.node.servicio.orden.paciente.primerNombre]] [[item.node.servicio.orden.paciente.primerApellido]]
+                        <div done$="[[item.node.terminada]]">
+                            [[item.node.servicio.orden.paciente.primerNombre]] [[item.node.servicio.orden.paciente.primerApellido]]
+                        </div>                        
                     </template>
                 </vaadin-grid-column>
                 <vaadin-grid-column>
                     <template class="header">{% trans 'Servicio' %}</template>
-                    <template>[[item.node.servicio.servicio.nombre]]</template>
+                    <template>
+                        <div done$="[[item.node.terminada]]">[[item.node.servicio.servicio.nombre]]</div>
+                    </template>
                 </vaadin-grid-column>
                 <vaadin-grid-column>
                     <template class="header">{% trans 'Empresa' %}</template>
-                    <template>[[item.node.servicio.orden.plan.nombre]]</template>
+                    <template>
+                        <div done$="[[item.node.terminada]]">[[item.node.servicio.orden.plan.nombre]]</div>
+                    </template>
                 </vaadin-grid-column>
                 <vaadin-grid-column flex-grow="0">
                     <template class="header">{% trans "Hora" %}</template>
-                    <template>[[_formatHora(item.node.fecha)]]</template>
+                    <template>
+                        <div done$="[[item.node.terminada]]">[[_formatHora(item.node.fecha)]]</div>
+                    </template>
                 </vaadin-grid-column>
                 <vaadin-grid-column flex-grow="0">
-                    <template class="header"></template>
+                    <template class="header">Historia</template>
                     <template>
-                        <div>
+                        <div style="display: flex;">
                             <a title="historia" href="[[item.node.urlHistoria]]" tabindex="-1">
-                                <paper-icon-button icon="my-icons:menu" title="{% trans 'Historias' %}"></paper-icon-button>
+                                <paper-icon-button icon="my-icons:menu" title="{% trans 'Historia' %}"></paper-icon-button>
                             </a>
                         </div>
                     </template>

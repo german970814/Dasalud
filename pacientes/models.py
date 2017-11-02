@@ -322,6 +322,16 @@ class Sesion(UpdateModelMixin, models.Model):
     def __str__(self):
         return '{} {}'.format(self.servicio, self.pk)
 
+    @property
+    def terminada(self):
+        """Indica si la historia se encuentra cerrada."""
+
+        historia = self.get_historia()
+        if historia and historia.terminada:
+            return True
+
+        return False
+
     def update(self, **options):
         """Se sobreescribe metodo para modificar la cita asociada a la sesión cuando sea necesario."""
 

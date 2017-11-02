@@ -48,6 +48,7 @@ class Sesion(DjangoObjectType):
     url_historia = graphene.String()
     estado_display = graphene.String(source='get_estado_display')
     can_edit = graphene.Boolean()
+    terminada = graphene.Boolean(source='terminada')
 
     class Meta:
         model = models.Sesion
