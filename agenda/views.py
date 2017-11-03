@@ -20,6 +20,14 @@ class AgendaView(APIView):
     def get(self, request):
         return Response()
 
+class TriageView(APIView):
+    """Lista las sesiones que la historia maneja triage."""
+
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'agenda/triage.html'
+
+    def get(self, request):
+        return Response()
 
 class HorarioAtencionMedicosView(generics.ListCreateAPIView):
     """Permite agendar el horario de atención de los medicos."""

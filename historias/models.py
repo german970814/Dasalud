@@ -8,6 +8,7 @@ class Formato(models.Model):
 
     nombre = models.CharField(_lazy('nombre'), max_length=100)
     contenido = fields.JSONField()
+    triage = models.BooleanField(_lazy('triage'), default=False, help_text=_lazy('Indica si la historia incluye triage'))
 
     class Meta:
         verbose_name = 'formato'
@@ -28,6 +29,9 @@ class Historia(models.Model):
         verbose_name = 'historia'
         verbose_name_plural = 'historias'
         ordering = ['-sesion']
+        permissions = [
+            ('puede_agregar_triage', 'Puede agregar triage')
+        ]
     
     def __str__(self):
         return '{0} - {1}'.format(self.pk, self.sesion)

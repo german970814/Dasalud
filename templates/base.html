@@ -101,9 +101,16 @@
                         <app-menu-icon-item icon="my-icons:people">{% trans "Crear paciente" %}</app-menu-icon-item>
                     </a>                      
                     {% endif %}
+                    {% if perms.historias.add_historia %}
                     <a class="app-menu-item" href="{% url 'agenda:listar' %}">
                         <app-menu-icon-item icon="my-icons:people">{% trans "Agenda" %}</app-menu-icon-item>
                     </a>
+                    {% endif %}
+                    {% if perms.historias.puede_agregar_triage %}
+                    <a class="app-menu-item" href="{% url 'agenda:triage' %}">
+                        <app-menu-icon-item icon="my-icons:people">{% trans "Triage" %}</app-menu-icon-item>
+                    </a>                      
+                    {% endif %}
                     {% switch "citas" %}
                         {% if perms.agenda.add_horario_atencion %}
                         <a class="app-menu-item" href="{% url 'agenda:horario-atencion' %}">

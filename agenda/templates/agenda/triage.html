@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block imports %}
+<link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
+<link rel="import" href="/static/bower_components/polymer/lib/elements/dom-bind.html">
+<link rel="import" href="/static/bower_components/vaadin-material-theme/vaadin-grid.html">
+<link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/static/bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="/static/bower_components/vaadin-material-theme/vaadin-date-picker.html">  
+{% endblock imports %}
+
+{% block css %}
+<style>
+    .card {
+        box-shadow: initial;
+        border-radius: initial;
+        border: 1px solid var(--material-divider-color);
+        border-bottom: initial;
+    }
+
+    .card > vaadin-date-picker {
+        padding-top: 0px;
+    }
+
+    .card > div {
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    vaadin-grid [done] {
+        color: #55d665;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+    <header class="header-title">
+        <h1>{% trans "Triage" %}</h1>
+    </header>
+
+    <dom-bind>
+        <template>
+
+            <graphql-query id="sesionesQuery" hold>
+                query agendaEnfermera($fecha: String){
+                    sesionesConTriage(fecha: $fecha, estado: "CU") {
+                        edges {
+                            node {
+                                id
+                                fecha
+                                urlHistoria
+                                terminada
+                                servicio {
+                                    servicio { nombre }
+                                    orden {
+                                        paciente { primerNombre, primerApellido, numeroDocumento }
+                                        plan { nombre }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            </graphql-query>
+
+            <div class="card">
+                <vaadin-date-picker label="Fecha" value="{% now 'Y-m-d' %}" required error-message="Debes escoger una fecha">
+                </vaadin-date-picker>
+                <div hidden="[[_haySesiones(sesiones)]]">No existen ordenes activas en la fecha escogida.</div>
+            </div>
+            <vaadin-grid id="sesionesGrid" items="[[sesiones]]">
+                <vaadin-grid-column>
+                    <template class="header">{% trans 'Cédula' %}</template>
+                    <template>
+                        <div done$="[[item.node.terminada]]">[[item.node.servicio.orden.paciente.numeroDocumento]]</div>
+                    </template>
+                </vaadin-grid-column>
+                <vaadin-grid-column>
+                    <template class="header">{% trans 'Nombre' %}</template>
+                    <template>
+                        <div done$="[[item.node.terminada]]">
+                            [[item.node.servicio.orden.paciente.primerNombre]] [[item.node.servicio.orden.paciente.primerApellido]]
+                        </div>                        
+                    </template>
+                </vaadin-grid-column>
+                <vaadin-grid-column>
+                    <template class="header">{% trans 'Servicio' %}</template>
+                    <template>
+                        <div done$="[[item.node.terminada]]">[[item.node.servicio.servicio.nombre]]</div>
+                    </template>
+                </vaadin-grid-column>
+                <vaadin-grid-column>
+                    <template class="header">{% trans 'Empresa' %}</template>
+                    <template>
+                        <div done$="[[item.node.terminada]]">[[item.node.servicio.orden.plan.nombre]]</div>
+                    </template>
+                </vaadin-grid-column>
+                <vaadin-grid-column flex-grow="0">
+                    <template class="header">{% trans "Hora" %}</template>
+                    <template>
+                        <div done$="[[item.node.terminada]]">[[_formatHora(item.node.fecha)]]</div>
+                    </template>
+                </vaadin-grid-column>
+                <vaadin-grid-column flex-grow="0">
+                    <template class="header">Historia</template>
+                    <template>
+                        <div style="display: flex;">
+                            <a title="historia" href="[[item.node.urlHistoria]]" tabindex="-1">
+                                <paper-icon-button icon="my-icons:menu" title="{% trans 'Historia' %}"></paper-icon-button>
+                            </a>
+                        </div>
+                    </template>
+                </vaadin-grid-column>
+            </vaadin-grid>
+        </template>
+    </dom-bind>
+{% endblock content %}
+
+{% block js %}
+<script src="/static/bower_components/moment/min/moment.min.js"></script>
+<script>
+    (function() {
+        const autoBind = document.querySelector('dom-bind');
+
+        autoBind._formatHora = (fecha) => {
+            return moment.utc(fecha).format('hh:mm A');
+        }
+
+        autoBind._haySesiones = (sesiones) => {
+            return sesiones.length != 0;
+        }
+
+        const datePicker = document.querySelector('vaadin-date-picker');
+        const sesionesQuery = document.getElementById('sesionesQuery');
+        
+        getSesiones();
+
+        datePicker.addEventListener('value-changed', function() {
+            if (datePicker.value == '') {
+                datePicker.invalid = true;
+                autoBind.sesiones = [];
+            }
+            else {
+                datePicker.invalid = false;
+                getSesiones();
+            }
+        })
+
+        function getSesiones() {
+            sesionesQuery.variables = {fecha: datePicker.value};
+            sesionesQuery.execute().result().then(result => {
+                autoBind.sesiones = result.data.sesionesConTriage.edges;
+            });
+        }
+    })();
+</script>
+{% endblock js %}

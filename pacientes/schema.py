@@ -73,6 +73,7 @@ class Acompanante(DjangoObjectType):
 class Query(graphene.AbstractType):
     sesion = BaseNode.Field(Sesion)
     sesiones = DjangoFilterConnectionField(Sesion, filterset_class=filters.SesionFilter,  description='Todas las sesiones')
+    sesiones_con_triage = DjangoFilterConnectionField(Sesion, filterset_class=filters.SesionFilter, description='Sesiones que en la historia se les ingresa triage')
     servicio_realizar = BaseNode.Field(ServicioRealizar)
     servicios_realizar = DjangoFilterConnectionField(ServicioRealizar, description='Todos los servicios a realizar')
     orden = BaseNode.Field(Orden)
@@ -82,3 +83,6 @@ class Query(graphene.AbstractType):
 
     def resolve_sesiones(self, args, context, info):
         return models.Sesion.objects.filter(medico__usuario=context.user)
+
+    def resolve_sesiones_con_triage(self, args, context, info):
+        return models.Sesion.objects.filter(servicio__servicio__formato__triage=True)
