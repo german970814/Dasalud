@@ -1,7 +1,9 @@
 import graphene
 import django_filters
+
 from graphene_django import DjangoObjectType, DjangoConnectionField
 from graphene_django.filter import DjangoFilterConnectionField
+from django.core.urlresolvers import reverse
 from common.schema import BaseNode
 
 from historias.schema import Historia
@@ -55,7 +57,6 @@ class Sesion(DjangoObjectType):
         interfaces = (BaseNode,)
 
     def resolve_url_historia(self, args, context, info):
-        from django.core.urlresolvers import reverse
         return reverse('pacientes:historias', args=(self.id, ))
 
     def resolve_can_edit(self, args, context, info):

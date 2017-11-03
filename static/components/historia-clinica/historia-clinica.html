@@ -55,7 +55,7 @@
                 <historia-clinica-content index$="[[index]]" on-close-historia="_close" on-validate-historia="_checkValidity" fields="[[item.fields]]" is-editable=[[historia.is_editable]]></historia-clinica-content>
             </template>
             <historia-clinica-adjuntos index$="[[_adjuntosIndex(historia.contenido)]]" url="[[historia.url_adjunto]]" is-editable=[[historia.is_editable]]></historia-clinica-adjuntos>
-            <historia-clinica-historias index$="[[_historialIndex(historia.contenido)]]" paciente="[[historia.paciente_graph_id]]"></historia-clinica-historias>
+            <historia-clinica-historias index$="[[_historialIndex(historia.contenido)]]" paciente="[[historia.paciente_graph_id]]" sesion="[[historia.sesion_id]]"></historia-clinica-historias>
         </iron-pages>
 
     </template>
