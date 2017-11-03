@@ -58,7 +58,7 @@
                     <template>
                         <div style="display: flex;">
                             <template is="dom-if" if="[[!_isActualSesion(item.sesion.pk)]]">
-                                <a href="[[ item.sesionUrl ]]" tabindex="-1">
+                                <a href="[[ item.sesionUrl ]]" tabindex="-1" target="_blank">
                                     <paper-icon-button icon="my-icons:remove-red-eye"></paper-icon-button>
                                 </a>
                             </template>
