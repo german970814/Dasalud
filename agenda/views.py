@@ -1,4 +1,6 @@
 from django.http import Http404
+from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import get_object_or_404, render
 from rest_framework import filters, generics
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
@@ -11,23 +13,18 @@ from .models import Cita, HorarioAtencion, Persona
 from .serializers import (CitaSerializer, HorarioAtencionSerializer, PersonaSerializer)
 
 
-class AgendaView(APIView):
+class AgendaView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     """Permite listar la agenda de los medicos."""
 
-    renderer_classes = [TemplateHTMLRenderer]
     template_name = 'agenda/agenda.html'
+    permission_required = 'historias.add_historia'
 
-    def get(self, request):
-        return Response()
-
-class TriageView(APIView):
+class TriageView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     """Lista las sesiones que la historia maneja triage."""
 
-    renderer_classes = [TemplateHTMLRenderer]
     template_name = 'agenda/triage.html'
+    permission_required = 'historias.puede_agregar_triage'
 
-    def get(self, request):
-        return Response()
 
 class HorarioAtencionMedicosView(generics.ListCreateAPIView):
     """Permite agendar el horario de atención de los medicos."""
