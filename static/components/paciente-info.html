@@ -1,6 +1,7 @@
-<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
 <link rel="import" href="/static/bower_components/paper-card/paper-card.html">
 <link rel="import" href="/static/bower_components/iron-image/iron-image.html">
+<link rel="import" href="/static/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/static/bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="/static/my-icons.html">
 
@@ -53,8 +54,16 @@
                 </div>
             </div>
             <div class="card-actions">
-                <a href="[[paciente.edit_link]]" title="Editar paciente"><paper-icon-button icon="my-icons:edit"></paper-icon-button></a>
-                <a href="[[paciente.ordenes_link]]" title="Crear orden"><paper-icon-button icon="my-icons:menu"></paper-icon-button></a>
+                <template is="dom-if" if="[[paciente.edit_link]]">
+                    <a href="[[paciente.edit_link]]" title="Editar paciente">
+                        <paper-icon-button icon="my-icons:edit"></paper-icon-button>
+                    </a>
+                </template>
+                <template is="dom-if" if="[[paciente.ordenes_link]]">
+                    <a href="[[paciente.ordenes_link]]" title="Crear orden">
+                        <paper-icon-button icon="my-icons:add"></paper-icon-button>
+                    </a>
+                </template>
             </div>
         </paper-card>
     </template>

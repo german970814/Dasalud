@@ -48,7 +48,7 @@ class ListarPacientesView(generics.ListCreateAPIView):
             return super().get(request, *args, **kwargs)
         else:
             queryset = self.filter_queryset(self.get_queryset())
-            serializer = PacienteSerializer(queryset, many=True, context={'request': None})
+            serializer = PacienteSerializer(queryset, many=True, context={'request': request})
             pacientes = JSONRenderer().render(serializer.data)
             return Response({'pacientes': pacientes})
 
@@ -75,7 +75,7 @@ class CrearPacienteView(APIView):
         cita = request.session.get('cita', None)
         if cita:
             paciente = Paciente(**request.session.pop('paciente-cita', {}))
-        form = PacienteSerializer(paciente, context={'request': None})
+        form = PacienteSerializer(paciente, context={'request': request})
         return Response({'form': form, 'VERBO': self.VERBO, 'URL': self.URL, 'MSJ': self.MSJ, 'METHOD': self.METHOD})
 
 
@@ -91,7 +91,7 @@ class EditarPacienteView(APIView):
     def get(self, request, pk):
         self.URL = reverse_lazy('pacientes:detalle', args=[pk])
         paciente = get_object_or_404(Paciente, pk=pk)
-        form = PacienteSerializer(paciente, context={'request': None})
+        form = PacienteSerializer(paciente, context={'request': request})
         return Response({'form': form, 'VERBO': self.VERBO, 'URL': self.URL, 'MSJ': self.MSJ, 'METHOD': self.METHOD})
 
 
@@ -206,7 +206,7 @@ class HistoriasClinicasView(APIView):
         sesion = get_object_or_404(Sesion, pk=pk)
         paciente = sesion.servicio.orden.paciente
 
-        serializer_paciente = PacienteSerializer(paciente, context={'request': None})
+        serializer_paciente = PacienteSerializer(paciente, context={'request': request})
         paciente_json = JSONRenderer().render(serializer_paciente.data)
 
         historia = sesion.get_historia(force_instance=True)

@@ -12,9 +12,9 @@ from . import models
 class PacienteSerializer(serializers.ModelSerializer):
     """Serializer para el modelo paciente."""
 
-    edit_link = serializers.HyperlinkedIdentityField(view_name='pacientes:editar')
-    ordenes_link = serializers.HyperlinkedIdentityField(view_name='pacientes:ordenes-nueva')
     graph_id = serializers.SerializerMethodField()
+    edit_link = serializers.SerializerMethodField()
+    ordenes_link = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Paciente
@@ -37,6 +37,20 @@ class PacienteSerializer(serializers.ModelSerializer):
 
     def get_graph_id(self, obj):
         return BaseNode.to_global_id('Paciente', obj.id)
+
+    def get_ordenes_link(self, obj):
+        request = self.context.get('request', None)
+        if request and not request.user.has_perm('pacientes.add_orden'):
+            return None
+
+        return reverse('pacientes:ordenes-nueva', kwargs={'pk': obj.pk})
+
+    def get_edit_link(self, obj):
+        request = self.context.get('request', None)
+        if request and not request.user.has_perm('pacientes.change_paciente'):
+            return None
+
+        return reverse('pacientes:editar', kwargs={'pk': obj.pk})
 
 
 class AcompananteSerializer(serializers.ModelSerializer):
@@ -144,7 +158,6 @@ class ServicioRealizarSerializer(PrimaryKeyGlobalIDMixin, FlexFieldsModelSeriali
     class Meta:
         model = models.ServicioRealizar
         fields = ['id', 'orden', 'servicio', 'numero_sesiones', 'valor', 'coopago']
-        # extra_kwargs = {'id': {'required': 'False', 'read_only': 'False'}}
     
     expandable_fields = {
         'sesiones': ('pacientes.SesionSerializer', {'source': 'sesiones', 'many': True, 'fields': [
