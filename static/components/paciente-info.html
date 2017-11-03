@@ -49,7 +49,7 @@
                 <div class="info">
                     <h4><strong>[[nombreCompleto]]</strong></h4>
                     <p><small>[[paciente.tipo_documento]]: [[paciente.numero_documento]]</small></p>
-                    <p><small>Edad: 23 años</small></p>
+                    <p><small>Edad: [[_getEdad(paciente.fecha_nacimiento)]]</small></p>
                 </div>
             </div>
             <div class="card-actions">
@@ -59,6 +59,7 @@
         </paper-card>
     </template>
 
+    <script src="/static/bower_components/moment/min/moment.min.js"></script>
     <script>
         /**
          * `paciente-info` Muestra la información de un paciente.
@@ -143,20 +144,42 @@
              * @return {string}
              */
             _nombreCompleto(primerNombre, segundoNombre, primerApellido, segundoApellido) {
-                return `${primerNombre} ${segundoNombre} ${primerApellido} ${segundoApellido}`;
+                let nombre =  `${primerNombre} ${segundoNombre} ${primerApellido} ${segundoApellido}`;
+                return nombre.toUpperCase();
             }
 
-            // TODO calcular la edad
-            // function getAge(dateString) {
-            //     var today = new Date();
-            //     var birthDate = new Date(dateString);
-            //     var age = today.getFullYear() - birthDate.getFullYear();
-            //     var m = today.getMonth() - birthDate.getMonth();
-            //     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            //         age--;
-            //     }
-            //     return age;
-            // }        
+            /**
+             * Calcula la edad del paciente
+             * 
+             * @param {string} fechaNacimiento
+            */
+            _getEdad(fechaNacimiento) {
+
+                if (fechaNacimiento) {
+                    let today = moment();
+                    let birthDate = moment.utc(fechaNacimiento);
+
+                    let age = today.year() - birthDate.year();
+                    let dMonth = today.month() - birthDate.month();
+
+                    if (age == 0 && dMonth == 0) {
+                        return `${today.date() - birthDate.date()} Dias`;
+                    }
+                    else {
+                        if (age == 0) {
+                            return `${dMonth} Meses`;
+                        }
+
+                        if (dMonth < 0 || (dMonth == 0 && today.date() < birthDate.date())) {
+                            age--;
+                        }
+                        
+                        return `${age} Años`;
+                    }
+                }
+
+                return '';
+            }  
         }
         
         window.customElements.define(PacienteInfo.is, PacienteInfo);
