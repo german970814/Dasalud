@@ -4,6 +4,7 @@
 <link rel="import" href="/static/bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
 <link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/static/bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="/static/my-icons.html">
 
 <dom-module id="historia-clinica-historias">
@@ -22,8 +23,10 @@
                         node {
                             id
                             contenido
+                            sesionUrl
                             sesion {
                                 id
+                                pk
                                 fecha
                                 medico { nombreCompleto }
                                 servicio {
@@ -54,7 +57,11 @@
                     <template class="header"></template>
                     <template>
                         <div style="display: flex;">
-                            <paper-icon-button icon="my-icons:remove-red-eye"></paper-icon-button>
+                            <template is="dom-if" if="[[!_isActualSesion(item.sesion.pk)]]">
+                                <a href="[[ item.sesionUrl ]]" tabindex="-1">
+                                    <paper-icon-button icon="my-icons:remove-red-eye"></paper-icon-button>
+                                </a>
+                            </template>
                         </div>
                     </template>
                 </vaadin-grid-column>
@@ -80,11 +87,15 @@
                     url: String,
                     paciente: {
                         type: String,
-                        value: 'UGFjaWVudGU6MQ=='
+                        value: ''
                     },
                     result: {
                         type: Object,
                         readOnly: true
+                    },
+                    sesion: {
+                        type: Number,
+                        value: NaN
                     },
                     historias: Array
                 };
@@ -116,6 +127,13 @@
             */
             _formatFecha(fecha) {
                 return moment.utc(fecha).format("DD/MM/YYYY hh:mm A");
+            }
+
+            /**
+            * Verifica que el id de la sesion pasada, sea igual a la sesion actual.
+            */
+            _isActualSesion(sesionPk) {
+                return sesionPk === this.sesion;
             }
 
             /**

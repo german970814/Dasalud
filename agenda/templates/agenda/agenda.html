@@ -40,7 +40,7 @@
         <template>
             <graphql-query id="sesionesQuery" hold>
                 query agendaDoctor($fecha: String){
-                    sesiones(fecha: $fecha, estado: "CU") {
+                    sesiones(fecha: $fecha) {
                         edges {
                             node {
                                 id
