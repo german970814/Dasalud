@@ -11,6 +11,7 @@ from dasalud.schema import schema
 from common.schema import BaseNode
 from agenda.models import Cita
 from historias.serializers import HistoriaSerializer
+from historias.models import Historia
 from .models import Paciente, Orden, Sesion
 from .serializers import PacienteSerializer, OrdenSerializer, AcompananteSerializer
 from . import serializers
@@ -210,6 +211,18 @@ class HistoriasClinicasView(APIView):
         paciente_json = JSONRenderer().render(serializer_paciente.data)
 
         historia = sesion.get_historia(force_instance=True)
+        formato = sesion.servicio.servicio.formato
+        historias = Historia.objects.filter(
+            sesion__servicio__orden__paciente=paciente,
+            sesion__servicio__servicio__formato=formato,
+            terminada=True
+        )
+        if historia.pk:
+            historias = historias.exclude(id=historia.id)
+        historia_formato = historias.first()  # se escoge la primera, que viene siendo la última
+        if historia_formato:
+            historia.contenido = historia_formato.contenido
+
         serializer_historia = HistoriaSerializer(historia, context={'request': request})
 
         historia_json = JSONRenderer().render(serializer_historia.data)
