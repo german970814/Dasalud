@@ -26,7 +26,7 @@ from graphene_django.views import GraphQLView
 urlpatterns = [
     url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout_then_login, name='logout'),
-    url(r'^$', TemplateView.as_view(template_name='base.html')),
+    url(r'^', include('common.urls', namespace='common')),
     url(r'^agenda/', include('agenda.urls', namespace='agenda')),
     url(r'^globales/', include('globales.urls', namespace='globales')),
     url(r'^historias/', include('historias.urls', namespace='historias')),

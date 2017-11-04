@@ -47,6 +47,10 @@
                     flex: 1;
                 }
 
+                app-toolbar [main-title] {
+                    pointer-events: none;
+                }
+
                 main {
                     padding: 24px;
                 }
@@ -137,6 +141,9 @@
                         <div main-title>DASALUD</div>
                         <search-box placeholder="Buscar pacientes"></search-box>
                         <span></span>
+                        <a href="{% url 'common:home' %}" tabindex="-1">
+                            <paper-icon-button icon="my-icons:home"></paper-icon-button>
+                        </a>
                         <a href="{% url 'logout' %}" tabindex="-1">
                             <paper-icon-button icon="my-icons:exit-to-app"></paper-icon-button>
                         </a>
