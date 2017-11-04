@@ -44,10 +44,25 @@
                 </div>
             </vaadin-upload>
         </div>
+        <template is="dom-if" if="[[isEditable]]">
+            <div class="actions">
+                <paper-button on-tap="save">Guardar</paper-button>
+                <paper-button on-tap="close">Cerrar</paper-button>
+            </div>
+        </template>
 
         <paper-dialog id="dialog" with-backdrop style="width: 75%; height: 90%;">
             <div style="width: 90%; height: 90%;">  
                 <object width="100%" height="100%" data="/static/a.pdf"></object>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog on-iron-overlay-closed="confirmClose" id="dialogCerrar">
+            <h2>¿Estás seguro que deseas cerrar la historia?</h2>
+            <p>Recuerda que si cierras la historia no podrás seguir editandola.</p>
+            <div class="actions">
+                <paper-button dialog-dismiss>NO</paper-button>
+                <paper-button dialog-confirm autofocus>SI</paper-button>
             </div>
         </paper-dialog>
     </template>
@@ -81,15 +96,17 @@
             handleResponse(e) {
                 let response = e.detail.response;
                 let files = [];
-                response.forEach(function(element) {
-                    files.push(
-                        {
-                            name: element.nombre, url: element.archivo,
-                            complete: true, progress: 100,
-                            url_delete: element.url_delete
-                        }
-                    );
-                }, this);
+                if (response) {
+                    response.forEach(function(element) {
+                        files.push(
+                            {
+                                name: element.nombre, url: element.archivo,
+                                complete: true, progress: 100,
+                                url_delete: element.url_delete
+                            }
+                        );
+                    }, this);
+                }
 
                 this.$.upload.files = files;
             }
@@ -99,6 +116,12 @@
                 let response = JSON.parse(e.detail.xhr.response);
                 file.url = response.archivo;
                 file.url_delete = response.url_delete;
+
+                this.dispatchEvent(new CustomEvent('notify-toast-success', {
+                    bubbles: true, composed: true, detail: {
+                        text: 'El archivo se ha guardado con éxito'
+                    }
+                }));
             }
 
             showFile(e) {
@@ -113,7 +136,11 @@
                 this.$.ajax.method = 'DELETE';
                 this.$.ajax.addEventListener('response', (e) => {
                     if (e.detail.__data.status != 204) {
-                        alert('El archivo no pudo ser elíminado, por favor, recargue la página e intentelo de nuevo')
+                        this.dispatchEvent(new CustomEvent('notify-toast-error', {
+                            bubbles: true, composed: true, detail: {
+                                text: 'El archivo no pudo ser elíminado, por favor, recargue la página e intentelo de nuevo'
+                            }
+                        }));
                     }
                 });
                 this.$.ajax.generateRequest();
@@ -122,6 +149,42 @@
             getMaxFiles(_new, old) {
                 if (!_new) {
                     this.$.upload.maxFiles = this.$.upload.files.length;
+                }
+            }
+
+            validate() {
+                let valid = true;
+                let fields = this.shadowRoot.querySelectorAll('historia-clinica-field, historia-clinica-table-field');
+                for (let i = 0; i < fields.length; i++) {
+                    if (!fields[i].validate()) {
+                        valid = false;
+                    }
+                }
+
+                this.invalid = !valid;
+                this.dispatchEvent(new CustomEvent('validate-historia'));
+                return valid;
+            }
+
+            save() {
+                if (this.validate()) {
+                    this.dispatchEvent(new CustomEvent('save-historia', {
+                        detail: { terminada: false }, bubbles: true, composed: true
+                    }));
+                } else {
+                    this.dispatchEvent(new CustomEvent('notify-toast-form-error', {
+                        bubbles: true, composed: true, detail: {}
+                    }));
+                }
+            }
+
+            close() {
+                this.$.dialogCerrar.open();
+            }
+
+            confirmClose(e) {
+                if (e.detail.confirmed) {
+                    this.dispatchEvent(new CustomEvent('close-historia'));
                 }
             }
 
