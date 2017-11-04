@@ -46,7 +46,6 @@
         </div>
         <template is="dom-if" if="[[isEditable]]">
             <div class="actions">
-                <paper-button on-tap="save">Guardar</paper-button>
                 <paper-button on-tap="close">Cerrar</paper-button>
             </div>
         </template>
@@ -164,18 +163,6 @@
                 this.invalid = !valid;
                 this.dispatchEvent(new CustomEvent('validate-historia'));
                 return valid;
-            }
-
-            save() {
-                if (this.validate()) {
-                    this.dispatchEvent(new CustomEvent('save-historia', {
-                        detail: { terminada: false }, bubbles: true, composed: true
-                    }));
-                } else {
-                    this.dispatchEvent(new CustomEvent('notify-toast-form-error', {
-                        bubbles: true, composed: true, detail: {}
-                    }));
-                }
             }
 
             close() {
