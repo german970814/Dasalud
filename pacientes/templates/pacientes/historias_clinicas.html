@@ -3,7 +3,7 @@
 
 {% block imports %}
     <link rel="import" href="/static/bower_components/vaadin-combo-box/vaadin-combo-box.html">
-    <link rel="import" href="/static/bower_components/iron-ajax/iron-ajax.html">
+    <link rel="import" href="/static/components/ig-iron-ajax.html">
     <link rel="import" href="/static/components/paciente-info.html">
     <link rel="import" href="/static/components/historia-clinica/historia-clinica.html">
 {% endblock imports %}
@@ -12,9 +12,9 @@
     <paciente-info paciente='{{ paciente }}' full-width></paciente-info>
     <br>
 
-    <iron-ajax id="request" url="{% url "pacientes:historias" pk %}" method="POST" handle-as="json"
+    <ig-iron-ajax id="request" url="{% url "pacientes:historias" pk %}" method="POST" handle-as="json"
                 content-type="application/json">
-    </iron-ajax>
+    </ig-iron-ajax>
     <historia-clinica id="historia" historia='{{ historia }}'></historia-clinica>
 {% endblock content %}
 
@@ -22,26 +22,52 @@
     <script src="{% static 'js/utils.js' %}"></script>
     <script>
         let historiaNode = document.getElementById('historia');
+        let request = document.getElementById('request');
         historiaNode.addEventListener('save-historia', function(e) {
             e.stopPropagation();
 
-            let request = document.getElementById('request');
-            request.headers = {'X-CSRFToken': getCsrfToken()}
             // TODO modificar el terminada dentro de la historia en el componente y solo enviar la historia.
             // TODO Evitar que se modifique si ya ha sido terminada
             historiaNode.historia.terminada = e.detail.terminada;
             request.body = historiaNode.historia;
             request.generateRequest();
+        });
 
-            request.addEventListener('error', function(e) {
-                console.log('error');
-                console.log(e);
-            });
+        request.addEventListener('error', function (e) {
+            let error_message = '';
 
-            request.addEventListener('response', function(e) {
-                console.log('response');
-                historiaNode.historia = e.detail.response;
-            });
+            if (e.detail.request.status === 500) {
+                error_message = 'Ha ocurrido un error inesperado, por favor contacte un administrador';
+            } else if (e.detail.request.status === 400) {
+                error_message = 'Aún hay campos con errores, imposible guardar';
+            } else {
+                error_message = 'Unhandled Error Code';
+            }
+            
+            this.dispatchEvent(new CustomEvent('notify-toast-error', {
+                bubbles: true, composed: true, detail: {
+                    text: error_message
+                }
+            }));
+        });
+
+        request.addEventListener('response', function (e) {
+            let success_message = '';
+            historiaNode.historia = e.detail.response;
+
+            if (e.detail.status.status === 201) {
+                success_message = 'Se ha creado la historia para la sesión con éxito';
+            } else if (e.detail.status === 202) {
+                success_message = 'Se han actualizado los datos de la historia con éxito';
+            } else {
+                success_message = 'Se ha guardado la sesión con éxito';
+            }
+
+            this.dispatchEvent(new CustomEvent('notify-toast-success', {
+                bubbles: true, composed: true, detail: {
+                    text: success_message
+                }
+            }));
         });
     </script>
 {% endblock js %}

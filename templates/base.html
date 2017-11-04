@@ -22,6 +22,7 @@
 
                     --app-primary-color: #4285f4;
                     --app-secondary-color: black;
+                    --success-color: #64c93c;
                 }
 
                 a {
@@ -168,6 +169,12 @@
                     toast.open();
                 });
 
+                document.body.addEventListener('notify-toast-success', function(e) {
+                    toast.text = e.detail.text;
+                    setSuccesStyle(toast);
+                    toast.open();
+                })
+
                 function setToastStyle(toast, backgroundColor, color) {
                     toast.style.setProperty('--paper-toast-background-color', backgroundColor || '#323232');
                     toast.style.setProperty('--paper-toast-color', color || '#f1f1f1');
@@ -175,6 +182,11 @@
 
                 function setErrorStyle(toast) {
                     toast.style.setProperty('--paper-toast-background-color', getComputedStyle(document.body).getPropertyValue('--error-color'));
+                    toast.style.setProperty('--paper-toast-color', 'white');
+                }
+
+                function setSuccesStyle(toast) {
+                    toast.style.setProperty('--paper-toast-background-color', getComputedStyle(document.body).getPropertyValue('--success-color'));
                     toast.style.setProperty('--paper-toast-color', 'white');
                 }
             })();            
