@@ -37,7 +37,7 @@ class HistoriaSerializer(FlexFieldsModelSerializer):
         return reverse('historias:adjuntos', args=(obj.sesion_id, ))
 
     def get_is_editable(self, obj):
-        if 'request' in self.context:
+        if 'request' in self.context and obj.terminada:
             return self.context['request'].user.has_perm('historias.change_historia')
         return not obj.terminada
 
