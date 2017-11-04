@@ -37,6 +37,8 @@ class HistoriaSerializer(FlexFieldsModelSerializer):
         return reverse('historias:adjuntos', args=(obj.sesion_id, ))
 
     def get_is_editable(self, obj):
+        if 'request' in self.context:
+            return self.context['request'].user.has_perm('historias.change_historia')
         return not obj.terminada
 
     def get_paciente_graph_id(self, obj):
