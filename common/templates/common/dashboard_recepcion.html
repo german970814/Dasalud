@@ -15,7 +15,7 @@
                                 servicio { nombre }
                                 orden {
                                     paciente { primerNombre, primerApellido, numeroDocumento }
-                                    plan { nombre }
+                                    plan { cliente { nombre } }
                                 }
                             }
                             medico { nombreCompleto }
@@ -54,7 +54,7 @@
             <vaadin-grid-column>
                 <template class="header">{% trans 'Empresa' %}</template>
                 <template>
-                    <div done$="[[item.node.terminada]]">[[item.node.servicio.orden.plan.nombre]]</div>
+                    <div done$="[[item.node.terminada]]">[[item.node.servicio.orden.plan.cliente.nombre]]</div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column flex-grow="0">
@@ -63,24 +63,18 @@
                     <div done$="[[item.node.terminada]]">[[_formatHora(item.node.fecha)]]</div>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column flex-grow="0">
-                <template class="header">{% trans "Orden" %}</template>
-                <template>
-                    <div done$="[[item.node.terminada]]">[[item.node.servicio.orden.plan.nombre]]</div>
-                </template>
-            </vaadin-grid-column>
-            <vaadin-grid-column flex-grow="0">
+            <vaadin-grid-column>
                 <template class="header">{% trans "Médico" %}</template>
                 <template>
                     <div done$="[[item.node.terminada]]">[[item.node.medico.nombreCompleto]]</div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column flex-grow="0">
-                <template class="header">Historia</template>
+                <template class="header">{% trans "Orden" %}</template>
                 <template>
                     <div style="display: flex;">
-                        <a title="historia" href="[[item.node.urlOrden]]" tabindex="-1">
-                            <paper-icon-button icon="my-icons:menu" title="{% trans 'Historia' %}"></paper-icon-button>
+                        <a href="[[item.node.urlOrden]]" tabindex="-1">
+                            <paper-icon-button icon="my-icons:menu" title="{% trans 'Orden' %}"></paper-icon-button>
                         </a>
                     </div>
                 </template>

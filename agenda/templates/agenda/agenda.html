@@ -55,7 +55,7 @@
                                     servicio { nombre }
                                     orden {
                                         paciente { primerNombre, primerApellido, numeroDocumento }
-                                        plan { nombre }
+                                        plan { cliente { nombre } }
                                     }
                                 }
                             }
@@ -93,7 +93,7 @@
                 <vaadin-grid-column>
                     <template class="header">{% trans 'Empresa' %}</template>
                     <template>
-                        <div done$="[[item.node.terminada]]">[[item.node.servicio.orden.plan.nombre]]</div>
+                        <div done$="[[item.node.terminada]]">[[item.node.servicio.orden.plan.cliente.nombre]]</div>
                     </template>
                 </vaadin-grid-column>
                 <vaadin-grid-column flex-grow="0">
