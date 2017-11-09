@@ -1,10 +1,13 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% load i18n %}
 
 {% block imports %}
 <link rel="import" href="/static/bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="/static/bower_components/apollo-client/graphql-query.html">
 <link rel="import" href="/static/bower_components/polymer/lib/elements/dom-bind.html">
-<link rel="import" href="/static/bower_components/vaadin-material-theme/vaadin-grid.html">  
+<link rel="import" href="/static/bower_components/vaadin-material-theme/vaadin-grid.html">
+<link rel="import" href="/static/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/static/bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="/static/bower_components/vaadin-material-theme/vaadin-date-picker.html">
 {% endblock imports %}
 
 {% block content %}
@@ -12,5 +15,33 @@
         <h1>Dashboard</h1>
     </header>
 
+    {% if perms.pacientes.add_orden %}
+        {% include 'common/dashboard_recepcion.html' %}
+    {% endif %}
+    
     
 {% endblock content %}
+
+{% block css %}
+<style>
+    .card {
+        box-shadow: initial;
+        border-radius: initial;
+        border: 1px solid var(--material-divider-color);
+        border-bottom: initial;
+    }
+
+    .card>vaadin-date-picker {
+        padding-top: 0px;
+    }
+
+    .card>div {
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    vaadin-grid [done] {
+        color: #55d665;
+    }
+</style>
+{% endblock css %}

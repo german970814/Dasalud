@@ -48,6 +48,7 @@ class Sesion(DjangoObjectType):
 
     pk = graphene.Int(source='pk')
     url_historia = graphene.String()
+    url_orden = graphene.String()
     estado_display = graphene.String(source='get_estado_display')
     can_edit = graphene.Boolean()
     terminada = graphene.Boolean(source='terminada')
@@ -58,6 +59,9 @@ class Sesion(DjangoObjectType):
 
     def resolve_url_historia(self, args, context, info):
         return reverse('pacientes:historias', args=(self.id, ))
+
+    def resolve_url_orden(self, args, context, info):
+        return reverse('pacientes:ordenes-detalle', args=(self.servicio.orden.paciente.id, self.servicio.orden.id))
 
     def resolve_can_edit(self, args, context, info):
         return True
