@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+  <title>full-calendar demo</title>
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+  <link rel="import" href="../scheduler-component.html">
+
+  <custom-style>
+    <style is="custom-style" include="demo-pages-shared-styles">
+
+    </style>
+  </custom-style>
+</head>
+
+<body>
+  <div class="vertical-section-container centered">
+    <h3>Basic scheduler-component demo</h3>
+    <demo-snippet>
+      <template>
+       <scheduler-component
+         default-view="month"
+          show-categories
+          selectable
+          editable week-numbers
+          all-day-text="All Day"
+          event-color="#378006"
+          text-color="#ecf0f1"
+          hidden-days='[0]'
+          max-time="18:00:00" min-time="07:00:00"
+          categories='[{ "label": "Holiday", "color": "#1abc9c","hidden":false },
+                       { "label": "Work", "color": "#3498db","hidden":true },
+                       { "label": "Meeting", "color": "#e74c3c","hidden":false }]'
+          events='[{"title" : "event1","start" : "2017-08-06","category":"Holiday"},{"title" : "event2","start" : "2017-08-12","end" : "2017-08-14","category":"Holiday"},{ "title" : "event3","start" : "2017-08-15T12:30:00","allDay" : false,"category":"Work"},{ "title" : "event4","start" : "2017-08-17T10:30:00","durationEditable":false,"category":"Meeting"},{ "title" : "event5","start" : "2017-08-22T10:30:00","durationEditable":false,"category":"Meeting"},{ "title" : "event6","start" : "2017-08-24T10:30:00","durationEditable":false,"category":"Meeting"}]'
+          header='{"center":"title","left":"prev,next,today","right":"month,agendaWeek,agendaDay"}'>
+        </scheduler-component>
+       </template>
+    </demo-snippet>
+  </div>
+</body>
+<script>
+  var scheduler = document.querySelector("scheduler-component");
+  console.log('events '+scheduler.events);
+  scheduler.addEventListener("day-click", function (e) {
+    console.log("day is clicked " + e.detail.date);
+
+  });
+  scheduler.addEventListener("event-click", function (e) {
+    console.log("event is clicked");
+  });
+  scheduler.addEventListener("drop", function (e) {
+    console.log("drop detected");
+  });
+  scheduler.addEventListener("view-render", function (e) {
+    console.log("view is rendered");
+  });
+  scheduler.addEventListener("date-range-changed", function (e) {
+    console.log("date range changed", e.detail.start, e.detail.end);
+  });
+
+  scheduler.addEventListener("select", function (e) {
+    console.log("period is selected [start,end] = ", e.detail.start, e.detail.end);
+  });
+
+  function next() {
+    scheduler.today();
+  }
+
+  function addEvent(){
+    /* console.log("add event clicked");
+    var events = scheduler.events;
+    events.push({"title" : "event11","start" : "2017-07-06","category":"Work"});
+    scheduler.setAttribute("events", JSON.stringify(events));
+ ;  */
+  }
+
+</script>
+
+</html>
